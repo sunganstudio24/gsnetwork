@@ -31,7 +31,8 @@
                 <label class="flex items-center text-sm text-slate-500 cursor-pointer">
                     <input type="checkbox" id="no-more-today" class="mr-2"> 오늘 하루 보지 않기
                 </label>
-                <button id="popup-close-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">닫기</button>
+                <!-- 전역 함수를 호출하도록 수정 -->
+                <button onclick="window.closeMainPopup()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">닫기</button>
             </div>
         </div>
     </div>
@@ -39,7 +40,7 @@
     <!-- 네비게이션 바 -->
     <nav class="fixed w-full z-50 glass-morphism border-b border-slate-200">
         <div class="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="showPage('home')">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="window.showPage('home')">
                 <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white">
                     <i data-lucide="globe"></i>
                 </div>
@@ -47,12 +48,12 @@
             </div>
             
             <div class="hidden md:flex space-x-6 font-medium">
-                <button onclick="showPage('about')" class="hover:text-blue-600 transition">소개/비전</button>
-                <button onclick="showPage('startup')" class="hover:text-blue-600 transition">창업자모집</button>
-                <button onclick="showPage('expert')" class="hover:text-blue-600 transition">전문가모집</button>
-                <button onclick="showPage('matching')" class="hover:text-blue-600 transition">매칭보드</button>
-                <button onclick="showPage('board')" class="hover:text-blue-600 transition">공지사항</button>
-                <button onclick="showPage('admin')" class="bg-slate-100 px-3 py-1 rounded text-slate-500 hover:bg-slate-200 transition text-sm">관리자</button>
+                <button onclick="window.showPage('about')" class="hover:text-blue-600 transition">소개/비전</button>
+                <button onclick="window.showPage('startup')" class="hover:text-blue-600 transition">창업자모집</button>
+                <button onclick="window.showPage('expert')" class="hover:text-blue-600 transition">전문가모집</button>
+                <button onclick="window.showPage('matching')" class="hover:text-blue-600 transition">매칭보드</button>
+                <button onclick="window.showPage('board')" class="hover:text-blue-600 transition">공지사항</button>
+                <button onclick="window.showPage('admin')" class="bg-slate-100 px-3 py-1 rounded text-slate-500 hover:bg-slate-200 transition text-sm">관리자</button>
             </div>
 
             <button class="md:hidden">
@@ -74,8 +75,8 @@
                     <h1 class="text-5xl md:text-7xl font-bold mb-6">글로벌 창업의<br><span class="text-blue-400">새로운 지평을 엽니다.</span></h1>
                     <p class="text-xl text-slate-300 max-w-2xl mb-10">글로벌 연결의 중심에서 창업자와 전문가를 잇는 든든한 다리가 되겠습니다.</p>
                     <div class="flex gap-4">
-                        <button onclick="showPage('startup')" class="bg-blue-600 px-8 py-4 rounded-full font-bold hover:bg-blue-700 transition">창업 신청하기</button>
-                        <button onclick="showPage('about')" class="bg-white/10 backdrop-blur-md px-8 py-4 rounded-full font-bold hover:bg-white/20 transition border border-white/30">네트워크 소개</button>
+                        <button onclick="window.showPage('startup')" class="bg-blue-600 px-8 py-4 rounded-full font-bold hover:bg-blue-700 transition">창업 신청하기</button>
+                        <button onclick="window.showPage('about')" class="bg-white/10 backdrop-blur-md px-8 py-4 rounded-full font-bold hover:bg-white/20 transition border border-white/30">네트워크 소개</button>
                     </div>
                 </div>
             </div>
@@ -91,6 +92,7 @@
                             <i data-lucide="eye" class="text-blue-600 mb-4 w-12 h-12"></i>
                             <h3 class="text-2xl font-bold mb-4 text-blue-900">Vision</h3>
                             <p class="text-slate-700 leading-relaxed italic">"K-스타트업이 글로벌 표준이 되는 세상을 만듭니다."</p>
+                            <p class="mt-4 text-slate-600 text-sm">국내 유망 스타트업이 전 세계 전문가들과 실시간으로 협업할 수 있는 생태계를 구축합니다.</p>
                         </div>
                         <div class="p-8 rounded-2xl bg-slate-50 border border-slate-200">
                             <i data-lucide="target" class="text-blue-600 mb-4 w-12 h-12"></i>
@@ -98,6 +100,7 @@
                             <ul class="space-y-3 text-slate-600">
                                 <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-5 h-5 text-blue-500 mt-1"></i> 글로벌 진출 전략 수립 지원</li>
                                 <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-5 h-5 text-blue-500 mt-1"></i> 최정상급 전문가 네트워크 연계</li>
+                                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-5 h-5 text-blue-500 mt-1"></i> 실질적인 투자 매칭 서비스</li>
                             </ul>
                         </div>
                     </div>
@@ -116,16 +119,16 @@
                     <div class="grid md:grid-cols-2 gap-8 mb-8">
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">성함 / 대표자명</label>
-                            <input type="text" name="name" id="startup_name" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="text" name="name" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">연락처</label>
-                            <input type="tel" name="phone" id="startup_phone" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <input type="tel" name="phone" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
                         </div>
                     </div>
                     <div class="mb-8">
                         <label class="block text-sm font-bold text-slate-700 mb-2">사업 분야</label>
-                        <select name="field" id="startup_field" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <select name="field" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
                             <option>AI / 테크</option>
                             <option>바이오 / 헬스케어</option>
                             <option>에듀테크</option>
@@ -146,11 +149,9 @@
                     </div>
                     <div class="mb-10">
                         <label class="block text-sm font-bold text-slate-700 mb-2">해결하고 싶은 고민</label>
-                        <textarea name="message" id="startup_message" rows="4" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                        <textarea name="message" rows="4" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
                     </div>
-                    <button type="submit" id="btn-startup" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition flex justify-center items-center gap-2">
-                        <span>지원하기</span>
-                    </button>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition">지원하기</button>
                 </form>
             </div>
         </section>
@@ -167,19 +168,17 @@
                     <div class="space-y-6">
                         <div>
                             <label class="block text-sm opacity-70 mb-2">이름 / 소속</label>
-                            <input type="text" name="name" id="expert_name" required class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 focus:bg-white/20 outline-none transition">
+                            <input type="text" name="name" required class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 focus:bg-white/20 outline-none transition">
                         </div>
                         <div>
                             <label class="block text-sm opacity-70 mb-2">전문분야</label>
-                            <input type="text" name="field" id="expert_field" required class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 focus:bg-white/20 outline-none transition">
+                            <input type="text" name="field" required class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 focus:bg-white/20 outline-none transition">
                         </div>
                         <div>
                             <label class="block text-sm opacity-70 mb-2">이메일 주소</label>
-                            <input type="email" name="email" id="expert_email" required class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 focus:bg-white/20 outline-none transition">
+                            <input type="email" name="email" required placeholder="example@gmail.com" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 focus:bg-white/20 outline-none transition">
                         </div>
-                        <button type="submit" id="btn-expert" class="bg-white text-blue-900 px-8 py-3 rounded-lg font-bold hover:bg-slate-100 transition">
-                            등록 신청하기
-                        </button>
+                        <button type="submit" class="bg-white text-blue-900 px-8 py-3 rounded-lg font-bold hover:bg-slate-100 transition">등록 신청하기</button>
                     </div>
                 </form>
             </div>
@@ -188,22 +187,35 @@
         <!-- 4페이지: 매칭/네트워크 -->
         <section id="page-matching" class="tab-content py-24">
             <div class="max-w-7xl mx-auto px-4">
-                <h2 class="text-3xl font-bold mb-8">매칭 보드 및 네트워킹</h2>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                        <h4 class="font-bold text-xl mb-4">창업자와 전문가 연결 대기중</h4>
-                        <p class="text-slate-500">실시간으로 신청한 전문가와 창업자를 관리자 페이지에서 매칭해 드립니다.</p>
+                <h2 class="text-4xl font-bold text-slate-900 mb-8">매칭 보드 및 네트워킹</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden p-6">
+                        <span class="bg-blue-100 text-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase">진행예정</span>
+                        <h4 class="text-xl font-bold mt-4 mb-2">테크 스타트업 네트워킹</h4>
+                        <p class="text-slate-500 text-sm mb-4">창업자와 전문가가 직접 만나 인사이트를 나눕니다.</p>
+                        <button class="text-blue-600 font-bold hover:underline">상세보기 →</button>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- 5페이지: 공지사항 -->
-        <section id="page-board" class="tab-content py-24">
+        <section id="page-board" class="tab-content py-24 bg-white">
             <div class="max-w-5xl mx-auto px-4">
                 <h2 class="text-3xl font-bold mb-8">공지사항</h2>
-                <div class="bg-white rounded-2xl border border-slate-200 p-6">
-                    <p class="text-center text-slate-400">등록된 공지사항이 없습니다.</p>
+                <div class="overflow-hidden rounded-2xl border border-slate-200">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b">
+                            <tr>
+                                <th class="px-6 py-4">번호</th>
+                                <th class="px-6 py-4">제목</th>
+                                <th class="px-6 py-4">날짜</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr><td class="px-6 py-4">01</td><td class="px-6 py-4 font-bold">홈페이지 정식 오픈 안내</td><td class="px-6 py-4 text-slate-400">2024.03.20</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -250,12 +262,9 @@
     <!-- 메시지 모달 -->
     <div id="message-modal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 hidden">
         <div class="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl">
-            <div id="modal-icon" class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="check" class="w-8 h-8"></i>
-            </div>
             <h3 id="modal-title" class="text-xl font-bold text-slate-900 mb-2">접수 완료</h3>
             <p id="modal-text" class="text-slate-600 mb-6">정상적으로 접수되었습니다.</p>
-            <button id="modal-confirm-btn" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition">확인</button>
+            <button onclick="window.toggleModal(false)" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition">확인</button>
         </div>
     </div>
 
@@ -265,7 +274,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase 설정
+        // Firebase 설정 (환경 변수 제공됨)
         const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -274,44 +283,43 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // [주의] EmailJS Public Key 입력 필요
+        // [주의] sunganstudio24@gmail.com 계정에서 발급받은 Public Key를 입력하세요.
         emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); 
 
         let currentUser = null;
 
-        // 팝업 관리 로직
-        const POPUP_STORAGE_KEY = 'gsn_popup_closed_date';
+        // ---------------------------------------------------------
+        // 전역 함수 등록 (HTML onclick 호환용)
+        // ---------------------------------------------------------
+        window.showPage = (id) => {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'page-' + id || (id === 'home' && c.id === 'page-home')));
+            window.scrollTo(0,0);
+        };
 
-        function checkPopup() {
-            const closedDate = localStorage.getItem(POPUP_STORAGE_KEY);
-            const today = new Date().toDateString();
-            if (closedDate === today) {
-                document.getElementById('welcome-popup').style.display = 'none';
-            }
-        }
+        window.toggleModal = (show) => {
+            document.getElementById('message-modal').classList.toggle('hidden', !show);
+        };
 
-        function handlePopupClose() {
+        window.closeMainPopup = () => {
             const noMoreToday = document.getElementById('no-more-today').checked;
             if (noMoreToday) {
-                localStorage.setItem(POPUP_STORAGE_KEY, new Date().toDateString());
+                localStorage.setItem('gsn_popup_hide_date', new Date().toDateString());
             }
             document.getElementById('welcome-popup').style.display = 'none';
-        }
+        };
 
-        // 초기화 및 리스너 등록
+        // ---------------------------------------------------------
+        // 초기화 로직
+        // ---------------------------------------------------------
         document.addEventListener('DOMContentLoaded', () => {
-            checkPopup();
-            const popupCloseBtn = document.getElementById('popup-close-btn');
-            if (popupCloseBtn) {
-                popupCloseBtn.addEventListener('click', handlePopupClose);
+            // 팝업 표시 여부 확인
+            if (localStorage.getItem('gsn_popup_hide_date') === new Date().toDateString()) {
+                document.getElementById('welcome-popup').style.display = 'none';
             }
-
-            const modalConfirmBtn = document.getElementById('modal-confirm-btn');
-            if (modalConfirmBtn) {
-                modalConfirmBtn.addEventListener('click', () => toggleModal(false));
-            }
+            lucide.createIcons();
         });
 
+        // 인증 처리
         const initAuth = async () => {
             if (initialToken) await signInWithCustomToken(auth, initialToken);
             else await signInAnonymously(auth);
@@ -323,9 +331,10 @@
             else initAuth();
         });
 
+        // 이메일 알림 함수
         async function sendEmailNotification(type, details) {
             const serviceId = "service_yk6n7mo";
-            const templateId = "YOUR_TEMPLATE_ID"; 
+            const templateId = "YOUR_TEMPLATE_ID"; // [주의] EmailJS에서 생성한 템플릿 ID를 넣으세요.
             
             const templateParams = {
                 to_email: "sunganstudio24@gmail.com",
@@ -341,6 +350,7 @@
             }
         }
 
+        // 폼 제출 핸들러
         document.getElementById('startup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) return;
@@ -357,11 +367,9 @@
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'applications'), data);
                 await sendEmailNotification('startup', data);
-                showModal("접수 완료", "정상적으로 접수되었습니다.", "check");
+                window.toggleModal(true);
                 e.target.reset();
-            } catch (err) {
-                showModal("오류", "전송 중 문제가 발생했습니다.", "x-circle");
-            }
+            } catch (err) { console.error(err); }
         });
 
         document.getElementById('expert-form').addEventListener('submit', async (e) => {
@@ -378,50 +386,29 @@
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'applications'), data);
                 await sendEmailNotification('expert', data);
-                showModal("접수 완료", "정상적으로 접수되었습니다.", "check");
+                window.toggleModal(true);
                 e.target.reset();
-            } catch (err) {
-                showModal("오류", "전송 중 문제가 발생했습니다.", "x-circle");
-            }
+            } catch (err) { console.error(err); }
         });
 
+        // 관리자 리스너
         function setupAdminListeners() {
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'applications'));
             onSnapshot(q, (snapshot) => {
-                const startupList = document.getElementById('admin-startup-list');
-                const expertList = document.getElementById('admin-expert-list');
-                let startupHtml = "", expertHtml = "";
+                const sL = document.getElementById('admin-startup-list'), eL = document.getElementById('admin-expert-list');
+                let sH = "", eH = "";
                 snapshot.docs.forEach(doc => {
                     const data = doc.data();
                     if (data.type === 'startup') {
-                        startupHtml += `<tr><td class="px-4 py-3"><b>${data.name}</b> (${data.stage})<br><span class="text-xs">${data.phone}</span></td></tr>`;
+                        sH += `<tr><td class="px-4 py-3"><b>${data.name}</b> (${data.phone})<br><span class="text-xs text-slate-500">${data.field} / ${data.stage}</span></td></tr>`;
                     } else {
-                        expertHtml += `<tr><td class="px-4 py-3"><b>${data.name}</b> (${data.field})<br><span class="text-xs">${data.email}</span></td></tr>`;
+                        eH += `<tr><td class="px-4 py-3"><b>${data.name}</b><br><span class="text-xs text-blue-600">${data.email} / ${data.field}</span></td></tr>`;
                     }
                 });
-                startupList.innerHTML = startupHtml || '<tr><td class="p-8 text-center">없음</td></tr>';
-                expertList.innerHTML = expertHtml || '<tr><td class="p-8 text-center">없음</td></tr>';
+                sL.innerHTML = sH || '<tr><td class="p-8 text-center">데이터 없음</td></tr>';
+                eL.innerHTML = eH || '<tr><td class="p-8 text-center">데이터 없음</td></tr>';
             });
         }
-
-        // 전역 함수 노출
-        window.showPage = (id) => {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'page-' + id || (id === 'home' && c.id === 'page-home')));
-            window.scrollTo(0,0);
-        };
-
-        window.toggleModal = (s) => document.getElementById('message-modal').classList.toggle('hidden', !s);
-        
-        function showModal(t, txt, i) {
-            document.getElementById('modal-title').innerText = t;
-            document.getElementById('modal-text').innerText = txt;
-            const iconContainer = document.getElementById('modal-icon');
-            iconContainer.innerHTML = `<i data-lucide="${i}" class="w-8 h-8"></i>`;
-            lucide.createIcons();
-            toggleModal(true);
-        }
-
-        lucide.createIcons();
     </script>
 </body>
 </html>
