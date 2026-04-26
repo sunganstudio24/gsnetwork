@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 전용 공지사항 등록</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+    <div class="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-blue-900">운영진 전용 페이지</h1>
+            <p class="text-slate-500 text-sm mt-2">공지사항을 작성하는 곳입니다.</p>
+        </div>
+
+        <!-- 로그인 화면 -->
+        <div id="login-section" class="space-y-4">
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">관리자 이메일</label>
+                <input type="email" id="email" class="w-full px-4 py-3 rounded-lg border border-slate-200 outline-none focus:border-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">비밀번호</label>
+                <input type="password" id="password" class="w-full px-4 py-3 rounded-lg border border-slate-200 outline-none focus:border-blue-500">
+            </div>
+            <button id="login-btn" class="w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 transition mt-4">로그인하기</button>
+            <button onclick="location.href='index.html'" class="w-full text-sm text-slate-400 mt-4 hover:underline">홈페이지로 돌아가기</button>
+        </div>
+
+        <!-- 공지사항 등록 화면 (초기엔 숨김) -->
+        <div id="write-section" class="hidden space-y-4">
+            <div class="bg-blue-50 p-4 rounded-lg mb-4 text-sm text-blue-800 text-center">
+                로그인 성공! 새로운 공지사항을 작성해주세요.
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">공지 제목</label>
+                <input type="text" id="notice-title" placeholder="예: 홈페이지 정식 오픈 안내" class="w-full px-4 py-3 rounded-lg border border-slate-200 outline-none focus:border-blue-500">
+            </div>
+            <button id="post-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition mt-4">게시판에 등록하기</button>
+            <button onclick="location.href='index.html'" class="w-full text-sm text-slate-400 mt-4 hover:underline">완료 후 홈페이지로 가기</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        // 지호님의 Firebase 키가 모두 들어있습니다.
+        const firebaseConfig = {
+            apiKey: "AIzaSyBz60TBGXkTwHhJ1LmBN0ZXdyM34_ndS_A",
+            authDomain: "gsn-network.firebaseapp.com",
+            projectId: "gsn-network",
+            storageBucket: "gsn-network.firebasestorage.app",
+            messagingSenderId: "1065753363903",
+            appId: "1:1065753363903:web:bd8445b241e658a3becd0a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const loginSection = document.getElementById('login-section');
+        const writeSection = document.getElementById('write-section');
+        const loginBtn = document.getElementById('login-btn');
+        const postBtn = document.getElementById('post-btn');
+
+        // 1. 로그인 기능
+        loginBtn.onclick = async () => {
+            const email = document.getElementById('email').value;
+            const pwd = document.getElementById('password').value;
+            if (!email || !pwd) return alert('이메일과 비밀번호를 입력해주세요.');
+            
+            loginBtn.innerText = "로그인 중...";
+            try {
+                await signInWithEmailAndPassword(auth, email, pwd);
+                // 로그인 성공 시 화면 자동 전환 (아래 onAuthStateChanged에서 처리)
+            } catch (error) {
+                alert("로그인 실패! 이메일과 비밀번호를 다시 확인하세요.");
+                loginBtn.innerText = "로그인하기";
+            }
+        };
+
+        // 2. 로그인 상태 확인 (자동 화면 전환)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginSection.classList.add('hidden');
+                writeSection.classList.remove('hidden');
+            }
+        });
+
+        // 3. 공지사항 DB에 등록하기
+        postBtn.onclick = async () => {
+            const title = document.getElementById('notice-title').value;
+            if (!title) return alert("제목을 입력해주세요!");
+
+            postBtn.innerText = "등록 중...";
+            try {
+                // 현재 날짜 만들기 (예: 2024. 05. 24)
+                const today = new Date();
+                const dateString = `${today.getFullYear()}. ${String(today.getMonth() + 1).padStart(2, '0')}. ${String(today.getDate()).padStart(2, '0')}`;
+
+                // 파이어베이스 DB에 저장
+                await addDoc(collection(db, "notices"), {
+                    title: title,
+                    date: dateString,
+                    createdAt: serverTimestamp() // 나중에 최신순으로 정렬하기 위한 숨겨진 시간표시
+                });
+
+                alert("성공적으로 공지사항이 등록되었습니다!");
+                document.getElementById('notice-title').value = ""; // 입력창 비우기
+                postBtn.innerText = "게시판에 등록하기";
+            } catch (error) {
+                alert("등록에 실패했습니다.");
+                postBtn.innerText = "게시판에 등록하기";
+            }
+        };
+    </script>
+</body>
+</html>
