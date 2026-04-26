@@ -24,75 +24,76 @@
         </div>
 
         <!-- 로그인 섹션 -->
-        <div id="login-section" class="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-200">
-            <h2 class="text-xl font-bold mb-6 text-center text-slate-800">관리자 로그인</h2>
-            <div class="space-y-4">
+        <div id="login-section" class="max-w-md mx-auto bg-white p-10 rounded-[2.5rem] shadow-2xl border border-slate-200">
+            <h2 class="text-xl font-bold mb-8 text-center text-slate-800">관리자 로그인</h2>
+            <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">이메일</label>
-                    <!-- placeholder를 완전히 없애고 value를 비워 자동완성을 차단합니다 -->
-                    <input type="email" id="email" value="" placeholder="" autocomplete="new-password" class="w-full px-4 py-3 rounded-lg border border-slate-200 outline-none focus:border-blue-500 transition bg-white">
+                    <!-- 자동완성 방지를 위해 type="text" 사용 및 autocomplete 속성 강화 -->
+                    <input type="text" id="email" value="" placeholder=" " autocomplete="one-time-code" class="w-full p-4 rounded-xl border border-slate-200 outline-none focus:border-blue-500 transition bg-white shadow-inner">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">비밀번호</label>
-                    <input type="password" id="password" value="" placeholder="" autocomplete="new-password" class="w-full px-4 py-3 rounded-lg border border-slate-200 outline-none focus:border-blue-500 transition bg-white">
+                    <input type="password" id="password" value="" placeholder=" " autocomplete="new-password" class="w-full p-4 rounded-xl border border-slate-200 outline-none focus:border-blue-500 transition bg-white shadow-inner">
                 </div>
-                <button id="login-btn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition shadow-lg">로그인</button>
-                <button onclick="location.href='index.html'" class="w-full text-sm text-slate-400 mt-4 hover:underline text-center">홈페이지로 돌아가기</button>
+                <button id="login-btn" class="w-full bg-slate-900 text-white p-5 rounded-2xl font-bold hover:bg-slate-800 transition shadow-lg mt-4 text-lg">로그인</button>
+                <button onclick="location.href='index.html'" class="w-full text-sm text-slate-400 mt-6 hover:underline text-center">홈페이지로 돌아가기</button>
             </div>
         </div>
 
-        <!-- 관리자 기능 섹션 -->
+        <!-- 관리자 기능 섹션 (로그인 시 보임) -->
         <div id="admin-content" class="hidden space-y-8">
-            <div class="bg-white p-8 rounded-3xl shadow-lg border border-blue-100">
-                <h2 id="form-title" class="text-xl font-bold mb-6 text-blue-900 flex items-center gap-2">
+            <!-- 글쓰기/수정 폼 -->
+            <div class="bg-white p-10 rounded-[2.5rem] shadow-xl border border-blue-100">
+                <h2 id="form-title" class="text-xl font-bold mb-8 text-blue-900 flex items-center gap-2">
                     <i data-lucide="pen-tool"></i> 공지사항 작성 및 수정
                 </h2>
-                <div class="space-y-5">
+                <div class="space-y-6">
                     <input type="hidden" id="edit-id">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">공지 제목</label>
-                        <input type="text" id="notice-title" placeholder="제목을 입력하세요" class="w-full px-4 py-3 rounded-lg border border-slate-200 outline-none focus:border-blue-500 bg-slate-50 transition">
+                        <input type="text" id="notice-title" placeholder="제목을 입력하세요" class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 bg-slate-50 transition">
                     </div>
                     
                     <!-- 사진 삽입 도구 -->
-                    <div class="p-5 bg-blue-50 rounded-2xl border border-blue-100 shadow-inner">
-                        <label class="block text-sm font-bold text-blue-800 mb-2 flex items-center gap-2">
+                    <div class="p-6 bg-blue-50 rounded-3xl border border-blue-100 shadow-inner">
+                        <label class="block text-sm font-bold text-blue-800 mb-3 flex items-center gap-2">
                             <i data-lucide="image-plus" class="w-4 h-4"></i> 본문 내 사진 삽입 도구
                         </label>
                         <div class="flex gap-2">
-                            <input type="text" id="image-helper-url" placeholder="이미지 주소를 여기에 붙여넣으세요" class="flex-1 px-4 py-3 rounded-lg border border-blue-200 outline-none focus:border-blue-500 bg-white">
-                            <button id="insert-image-btn" class="bg-blue-600 text-white px-5 py-2 rounded-lg font-bold text-sm hover:bg-blue-700 whitespace-nowrap shadow-md transition">본문에 삽입</button>
+                            <input type="text" id="image-helper-url" placeholder="여기에 사진 주소를 붙여넣으세요" class="flex-1 p-4 rounded-xl border border-blue-200 outline-none focus:border-blue-500 bg-white">
+                            <button id="insert-image-btn" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition">본문에 삽입</button>
                         </div>
-                        <p class="text-[11px] text-blue-500 mt-3 leading-relaxed font-medium">
+                        <p class="text-[11px] text-blue-500 mt-4 leading-relaxed font-medium">
                             * 사용법: 아래 글을 쓰다가 사진이 들어갈 자리에 커서를 두고 버튼을 누르세요. <br>
-                            * <code class="bg-blue-100 px-1 rounded text-blue-700">[이미지:주소]</code> 태그가 있는 자리에 실제 사진이 나타납니다.
+                            * 팁: 주소가 아무리 길어도 괄호 `]`가 나올 때까지 자동으로 사진으로 변환됩니다.
                         </p>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">공지 내용</label>
-                        <textarea id="notice-content" rows="15" placeholder="공지 내용을 작성하세요. 사진 삽입 도구를 이용해 글 중간에 사진을 배치할 수 있습니다." class="w-full px-4 py-3 rounded-lg border border-slate-200 outline-none focus:border-blue-500 bg-slate-50 leading-relaxed transition"></textarea>
+                        <textarea id="notice-content" rows="18" placeholder="내용을 작성하세요." class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 bg-slate-50 leading-relaxed transition"></textarea>
                     </div>
                     
-                    <div class="flex gap-2 pt-2">
-                        <button id="save-btn" class="flex-1 bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg text-lg">게시물 저장하기</button>
-                        <button id="cancel-edit-btn" class="hidden px-8 bg-slate-100 text-slate-500 py-4 rounded-xl font-bold hover:bg-slate-200 transition">취소</button>
+                    <div class="flex gap-2 pt-4">
+                        <button id="save-btn" class="flex-1 bg-blue-600 text-white p-5 rounded-2xl font-bold hover:bg-blue-700 transition shadow-lg text-lg">게시물 저장하기</button>
+                        <button id="cancel-edit-btn" class="hidden px-8 bg-slate-100 text-slate-500 p-5 rounded-2xl font-bold hover:bg-slate-200 transition text-lg">취소</button>
                     </div>
                 </div>
             </div>
 
             <!-- 관리 리스트 -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="px-6 py-4 border-b bg-slate-50 flex justify-between items-center text-slate-700">
-                    <h2 class="font-bold">게시물 관리 리스트</h2>
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-8 py-6 border-b bg-slate-50 flex justify-between items-center">
+                    <h2 class="font-bold text-slate-700">관리 리스트</h2>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead class="bg-slate-50 text-xs text-slate-400 font-bold uppercase tracking-wider">
-                            <tr><th class="px-6 py-4">제목</th><th class="px-6 py-4 text-center">관리</th></tr>
+                            <tr><th class="px-8 py-5">제목</th><th class="px-8 py-5 text-center">관리</th></tr>
                         </thead>
-                        <tbody id="manage-list" class="divide-y divide-slate-100">
-                            <tr><td colspan="2" class="p-10 text-center text-slate-400 italic">데이터를 불러오는 중...</td></tr>
+                        <tbody id="manage-list" class="divide-y divide-slate-100 bg-white text-sm">
+                            <tr><td colspan="2" class="p-10 text-center text-slate-400 italic font-medium">데이터를 불러오는 중...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -122,12 +123,11 @@
 
         const contentArea = document.getElementById('notice-content');
 
-        // [이미지 삽입 도구]
+        // [사진 삽입 로직]
         document.getElementById('insert-image-btn').onclick = () => {
             const url = document.getElementById('image-helper-url').value.trim();
-            if(!url) return alert("이미지 주소(URL)를 입력하세요.");
+            if(!url) return alert("이미지 주소를 먼저 입력하세요.");
             
-            // 공백 제거 및 정확한 포맷 생성
             const tag = `[이미지:${url}]`;
             const start = contentArea.selectionStart;
             const end = contentArea.selectionEnd;
@@ -140,33 +140,40 @@
             contentArea.setSelectionRange(newCursorPos, newCursorPos);
         };
 
+        // 인증 상태 감시
         onAuthStateChanged(auth, (user) => {
             lucide.createIcons();
             if (user) {
                 document.getElementById('login-section').classList.add('hidden');
                 document.getElementById('admin-content').classList.remove('hidden');
                 document.getElementById('auth-status').classList.remove('hidden');
-                document.getElementById('user-info').innerText = user.email + " (관리자 로그인됨)";
+                document.getElementById('user-info').innerText = user.email + " (접속 중)";
                 loadManageList();
             } else {
                 document.getElementById('login-section').classList.remove('hidden');
                 document.getElementById('admin-content').classList.add('hidden');
                 document.getElementById('auth-status').classList.add('hidden');
-                // 로그아웃 시 확실하게 비우기
                 document.getElementById('email').value = "";
                 document.getElementById('password').value = "";
             }
         });
 
+        // 로그인
         document.getElementById('login-btn').onclick = async () => {
             const email = document.getElementById('email').value.trim();
             const pwd = document.getElementById('password').value.trim();
-            if(!email || !pwd) return alert("계정 정보를 입력해 주세요.");
-            try { await signInWithEmailAndPassword(auth, email, pwd); } catch (e) { alert("로그인 실패: 정보를 다시 확인해 주세요."); }
+            if(!email || !pwd) return alert("아이디와 비밀번호를 입력해 주세요.");
+            try { 
+                await signInWithEmailAndPassword(auth, email, pwd); 
+            } catch (e) { 
+                alert("로그인 정보가 틀립니다. 다시 확인하세요."); 
+            }
         };
 
+        // 로그아웃
         document.getElementById('logout-btn').onclick = () => { if(confirm("로그아웃 하시겠습니까?")) signOut(auth); };
 
+        // 공지사항 리스트 로드
         function loadManageList() {
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), orderBy("createdAt", "desc"));
             onSnapshot(q, (snapshot) => {
@@ -174,37 +181,45 @@
                 snapshot.forEach((doc) => {
                     const data = doc.data();
                     html += `<tr class="border-b last:border-0 hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 font-medium text-slate-800">${data.title}</td>
-                        <td class="px-6 py-4 text-center space-x-2 whitespace-nowrap">
-                            <button onclick="window.editNotice('${doc.id}')" class="text-xs bg-slate-900 text-white px-3 py-1.5 rounded-lg shadow hover:bg-slate-700 transition">수정</button>
-                            <button onclick="window.deleteNotice('${doc.id}')" class="text-xs bg-red-50 text-red-500 px-3 py-1.5 rounded-lg font-bold hover:bg-red-100 transition">삭제</button>
+                        <td class="px-8 py-5 font-bold text-slate-800">${data.title}</td>
+                        <td class="px-8 py-5 text-center space-x-2 whitespace-nowrap">
+                            <button onclick="window.editNotice('${doc.id}')" class="text-xs bg-slate-900 text-white px-4 py-2 rounded-xl font-bold shadow-sm hover:bg-slate-700 transition">수정</button>
+                            <button onclick="window.deleteNotice('${doc.id}')" class="text-xs bg-red-50 text-red-500 px-4 py-2 rounded-xl font-bold hover:bg-red-100 transition">삭제</button>
                         </td>
                     </tr>`;
                 });
-                document.getElementById('manage-list').innerHTML = html || '<tr><td colspan="2" class="p-10 text-center">공지가 없습니다.</td></tr>';
-            }, (e) => console.error(e));
+                document.getElementById('manage-list').innerHTML = html || '<tr><td colspan="2" class="p-10 text-center">등록된 공지가 없습니다.</td></tr>';
+            });
         }
 
+        // 저장 및 업데이트
         document.getElementById('save-btn').onclick = async () => {
             const title = document.getElementById('notice-title').value.trim();
             const content = contentArea.value;
             const editId = document.getElementById('edit-id').value;
+
             if (!title) return alert("제목을 입력해 주세요.");
 
             try {
                 const today = new Date();
-                const dateString = `${today.getFullYear()}. ${String(today.getMonth() + 1).padStart(2, '0')}. ${String(today.getDate()).padStart(2, '0')}`;
+                const dateStr = `${today.getFullYear()}. ${String(today.getMonth() + 1).padStart(2, '0')}. ${String(today.getDate()).padStart(2, '0')}`;
+                
                 if (editId) {
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', editId), { title, content, updatedAt: serverTimestamp() });
-                    alert("수정되었습니다.");
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', editId), {
+                        title, content, updatedAt: serverTimestamp()
+                    });
+                    alert("게시물이 수정되었습니다.");
                 } else {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), { title, content, date: dateString, createdAt: serverTimestamp() });
-                    alert("등록되었습니다.");
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), {
+                        title, content, date: dateStr, createdAt: serverTimestamp()
+                    });
+                    alert("새 공지사항이 등록되었습니다.");
                 }
                 window.resetForm();
-            } catch (e) { alert("저장 실패: " + e.message); }
+            } catch (e) { alert("오류 발생: " + e.message); }
         };
 
+        // 수정 모드 진입
         window.editNotice = async (id) => {
             const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id));
             if (docSnap.exists()) {
@@ -218,11 +233,22 @@
             }
         };
 
-        window.deleteNotice = async (id) => { if (confirm("삭제하시겠습니까?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); };
-        window.resetForm = () => {
-            document.getElementById('notice-title').value = ""; contentArea.value = ""; document.getElementById('edit-id').value = "";
-            document.getElementById('form-title').innerText = "공지사항 작성 및 수정"; document.getElementById('cancel-edit-btn').classList.add('hidden');
+        // 삭제
+        window.deleteNotice = async (id) => { 
+            if (confirm("정말 이 게시물을 삭제하시겠습니까? 복구할 수 없습니다.")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); 
+            }
         };
+
+        // 폼 초기화
+        window.resetForm = () => {
+            document.getElementById('notice-title').value = ""; 
+            contentArea.value = ""; 
+            document.getElementById('edit-id').value = "";
+            document.getElementById('form-title').innerText = "공지사항 작성 및 수정"; 
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+        };
+
         document.getElementById('cancel-edit-btn').onclick = window.resetForm;
         lucide.createIcons();
     </script>
