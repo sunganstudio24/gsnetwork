@@ -15,7 +15,7 @@
                 <h1 class="text-2xl font-bold text-blue-900 flex items-center gap-2">
                     <i data-lucide="settings"></i> 운영진 대시보드
                 </h1>
-                <p class="text-slate-500 text-sm mt-1">글과 사진이 조화로운 공지사항을 작성하세요.</p>
+                <p class="text-slate-500 text-sm mt-1">글과 사진이 자연스럽게 어우러지는 공지를 작성하세요.</p>
             </div>
             <div id="auth-status" class="hidden flex items-center gap-4">
                 <span id="user-info" class="text-xs text-slate-400 font-medium"></span>
@@ -29,7 +29,6 @@
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">이메일</label>
-                    <!-- 자동완성 방지를 위해 type="text" 사용 및 autocomplete 속성 강화 -->
                     <input type="text" id="email" value="" placeholder=" " autocomplete="one-time-code" class="w-full p-4 rounded-xl border border-slate-200 outline-none focus:border-blue-500 transition bg-white shadow-inner">
                 </div>
                 <div>
@@ -41,7 +40,7 @@
             </div>
         </div>
 
-        <!-- 관리자 기능 섹션 (로그인 시 보임) -->
+        <!-- 관리자 기능 섹션 -->
         <div id="admin-content" class="hidden space-y-8">
             <!-- 글쓰기/수정 폼 -->
             <div class="bg-white p-10 rounded-[2.5rem] shadow-xl border border-blue-100">
@@ -52,7 +51,7 @@
                     <input type="hidden" id="edit-id">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">공지 제목</label>
-                        <input type="text" id="notice-title" placeholder="제목을 입력하세요" class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 bg-slate-50 transition">
+                        <input type="text" id="notice-title" placeholder="공고 제목을 입력하세요" class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 bg-slate-50 transition">
                     </div>
                     
                     <!-- 사진 삽입 도구 -->
@@ -65,14 +64,14 @@
                             <button id="insert-image-btn" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition">본문에 삽입</button>
                         </div>
                         <p class="text-[11px] text-blue-500 mt-4 leading-relaxed font-medium">
-                            * 사용법: 아래 글을 쓰다가 사진이 들어갈 자리에 커서를 두고 버튼을 누르세요. <br>
-                            * 팁: 주소가 아무리 길어도 괄호 `]`가 나올 때까지 자동으로 사진으로 변환됩니다.
+                            * 본문 작성 중 사진이 들어갈 자리에 커서를 두고 버튼을 누르세요. <br>
+                            * 사진 주소가 괄호 `]`로 끝나도록 정확히 삽입됩니다.
                         </p>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">공지 내용</label>
-                        <textarea id="notice-content" rows="18" placeholder="내용을 작성하세요." class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 bg-slate-50 leading-relaxed transition"></textarea>
+                        <textarea id="notice-content" rows="18" placeholder="공고 소개 내용을 자유롭게 작성하세요." class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 bg-slate-50 leading-relaxed transition"></textarea>
                     </div>
                     
                     <div class="flex gap-2 pt-4">
@@ -106,7 +105,6 @@
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-        // 파이어베이스 설정
         const firebaseConfig = {
             apiKey: "AIzaSyBz60TBGXkTwHhJ1LmBN0ZXdyM34_ndS_A",
             authDomain: "gsn-network.firebaseapp.com",
@@ -123,24 +121,18 @@
 
         const contentArea = document.getElementById('notice-content');
 
-        // [사진 삽입 로직]
         document.getElementById('insert-image-btn').onclick = () => {
             const url = document.getElementById('image-helper-url').value.trim();
             if(!url) return alert("이미지 주소를 먼저 입력하세요.");
-            
             const tag = `[이미지:${url}]`;
             const start = contentArea.selectionStart;
-            const end = contentArea.selectionEnd;
             const text = contentArea.value;
-            
-            contentArea.value = text.substring(0, start) + tag + text.substring(end);
+            contentArea.value = text.substring(0, start) + tag + text.substring(contentArea.selectionEnd);
             document.getElementById('image-helper-url').value = "";
             contentArea.focus();
-            const newCursorPos = start + tag.length;
-            contentArea.setSelectionRange(newCursorPos, newCursorPos);
+            contentArea.setSelectionRange(start + tag.length, start + tag.length);
         };
 
-        // 인증 상태 감시
         onAuthStateChanged(auth, (user) => {
             lucide.createIcons();
             if (user) {
@@ -158,22 +150,15 @@
             }
         });
 
-        // 로그인
         document.getElementById('login-btn').onclick = async () => {
             const email = document.getElementById('email').value.trim();
             const pwd = document.getElementById('password').value.trim();
-            if(!email || !pwd) return alert("아이디와 비밀번호를 입력해 주세요.");
-            try { 
-                await signInWithEmailAndPassword(auth, email, pwd); 
-            } catch (e) { 
-                alert("로그인 정보가 틀립니다. 다시 확인하세요."); 
-            }
+            if(!email || !pwd) return alert("정보를 모두 입력해 주세요.");
+            try { await signInWithEmailAndPassword(auth, email, pwd); } catch (e) { alert("로그인 정보가 틀렸습니다."); }
         };
 
-        // 로그아웃
         document.getElementById('logout-btn').onclick = () => { if(confirm("로그아웃 하시겠습니까?")) signOut(auth); };
 
-        // 공지사항 리스트 로드
         function loadManageList() {
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), orderBy("createdAt", "desc"));
             onSnapshot(q, (snapshot) => {
@@ -188,38 +173,27 @@
                         </td>
                     </tr>`;
                 });
-                document.getElementById('manage-list').innerHTML = html || '<tr><td colspan="2" class="p-10 text-center">등록된 공지가 없습니다.</td></tr>';
+                document.getElementById('manage-list').innerHTML = html || '<tr><td colspan="2" class="p-10 text-center font-medium">등록된 공지가 없습니다.</td></tr>';
             });
         }
 
-        // 저장 및 업데이트
         document.getElementById('save-btn').onclick = async () => {
             const title = document.getElementById('notice-title').value.trim();
             const content = contentArea.value;
             const editId = document.getElementById('edit-id').value;
-
             if (!title) return alert("제목을 입력해 주세요.");
-
             try {
                 const today = new Date();
                 const dateStr = `${today.getFullYear()}. ${String(today.getMonth() + 1).padStart(2, '0')}. ${String(today.getDate()).padStart(2, '0')}`;
-                
                 if (editId) {
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', editId), {
-                        title, content, updatedAt: serverTimestamp()
-                    });
-                    alert("게시물이 수정되었습니다.");
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', editId), { title, content, updatedAt: serverTimestamp() });
                 } else {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), {
-                        title, content, date: dateStr, createdAt: serverTimestamp()
-                    });
-                    alert("새 공지사항이 등록되었습니다.");
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), { title, content, date: dateStr, createdAt: serverTimestamp() });
                 }
-                window.resetForm();
-            } catch (e) { alert("오류 발생: " + e.message); }
+                alert("성공적으로 저장되었습니다."); window.resetForm();
+            } catch (e) { alert("저장 실패: " + e.message); }
         };
 
-        // 수정 모드 진입
         window.editNotice = async (id) => {
             const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id));
             if (docSnap.exists()) {
@@ -233,22 +207,11 @@
             }
         };
 
-        // 삭제
-        window.deleteNotice = async (id) => { 
-            if (confirm("정말 이 게시물을 삭제하시겠습니까? 복구할 수 없습니다.")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); 
-            }
-        };
-
-        // 폼 초기화
+        window.deleteNotice = async (id) => { if (confirm("정말 삭제하시겠습니까?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); };
         window.resetForm = () => {
-            document.getElementById('notice-title').value = ""; 
-            contentArea.value = ""; 
-            document.getElementById('edit-id').value = "";
-            document.getElementById('form-title').innerText = "공지사항 작성 및 수정"; 
-            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            document.getElementById('notice-title').value = ""; contentArea.value = ""; document.getElementById('edit-id').value = "";
+            document.getElementById('form-title').innerText = "공지사항 작성 및 수정"; document.getElementById('cancel-edit-btn').classList.add('hidden');
         };
-
         document.getElementById('cancel-edit-btn').onclick = window.resetForm;
         lucide.createIcons();
     </script>
