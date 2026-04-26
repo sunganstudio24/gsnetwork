@@ -3,34 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>운영진 마스터 대시보드 - GSN</title>
+    <title>GSN MASTER DASHBOARD - 운영진 전용</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@100;400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@100;400;600;700;800;900&display=swap');
         body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; color: #0f172a; }
         
-        /* 에디터 기본 스타일 */
+        /* 에디터 스타일 */
         #editor {
             min-height: 550px;
             padding: 2.5rem;
             outline: none;
             background: #ffffff;
-            line-height: 1.8;
-            font-size: 1.1rem;
+            line-height: 2;
+            font-size: 1.125rem;
             color: #334155;
             border-radius: 1.5rem;
             border: 2px solid #f1f5f9;
             transition: all 0.2s ease;
         }
         #editor:focus { border-color: #0f172a; box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.1); }
-        #editor img { max-width: 100%; border-radius: 0.75rem; margin: 1rem 0; display: block; }
-        #editor ul { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
         
-        /* 굵게 관련 보완: 색상 강제 지정을 제거하여 기존 색상을 유지하도록 수정 */
+        /* 이미지 선택 시 시각 효과 */
+        #editor img { 
+            max-width: 100%; 
+            border-radius: 8px; 
+            margin: 1.5rem 0; 
+            display: block; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            cursor: pointer;
+            border: 4px solid transparent;
+            transition: all 0.1s ease;
+        }
+        /* 이미지 클릭 시 파란색 테두리 */
+        #editor img.selected {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        #editor ul { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
         #editor b, #editor strong { font-weight: 800; color: inherit; }
         
-        /* 툴바 버튼 스타일 */
         .toolbar-btn {
             padding: 0.65rem;
             border-radius: 0.75rem;
@@ -43,8 +57,6 @@
             color: #64748b;
         }
         .toolbar-btn:hover { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; transform: translateY(-1px); }
-        
-        /* 활성화된 버튼 상태 */
         .toolbar-btn.active { 
             background: #0f172a; 
             color: white; 
@@ -52,7 +64,6 @@
             box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
         }
 
-        /* 색상 칩 디자인 */
         .color-chip {
             width: 26px;
             height: 26px;
@@ -76,38 +87,38 @@
 </head>
 <body class="p-4 md:p-10">
     <div class="max-w-5xl mx-auto">
-        <!-- 메인 헤더 -->
+        <!-- 헤더 -->
         <div class="flex justify-between items-center mb-8 bg-[#0f172a] p-8 rounded-[2.5rem] shadow-2xl text-white">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
                     <i data-lucide="shield-check" class="text-white w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-black tracking-tight text-white">GSN MASTER DASHBOARD</h1>
-                    <p class="text-blue-300/60 text-xs font-bold uppercase tracking-widest mt-0.5">Global Startup Support Network</p>
+                    <h1 class="text-2xl font-black tracking-tight text-white uppercase italic">GSN MASTER.</h1>
+                    <p class="text-blue-300/60 text-[10px] font-bold uppercase tracking-widest mt-0.5">Administrator Dashboard Control</p>
                 </div>
             </div>
-            <div id="auth-status" class="hidden">
-                <button id="logout-btn" class="px-5 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition border border-white/10 text-white">로그아웃</button>
+            <div id="auth-status" class="hidden flex items-center gap-4">
+                <button id="logout-btn" class="px-5 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition border border-white/10 text-white">LOGOUT</button>
             </div>
         </div>
 
-        <!-- 로그인 섹션 -->
+        <!-- 로그인 -->
         <div id="login-section" class="max-w-md mx-auto bg-white p-12 rounded-[3rem] shadow-2xl border border-slate-100">
-            <h2 class="text-2xl font-black mb-8 text-center text-[#0f172a]">관리자 인증</h2>
+            <h2 class="text-2xl font-black mb-8 text-center text-[#0f172a] uppercase italic">System Access</h2>
             <div class="space-y-5">
-                <input type="text" id="email" placeholder="이메일" class="w-full p-4 rounded-2xl border border-slate-200 outline-none focus:border-[#0f172a] transition bg-slate-50">
-                <input type="password" id="password" placeholder="비밀번호" class="w-full p-4 rounded-2xl border border-slate-200 outline-none focus:border-[#0f172a] transition bg-slate-50">
-                <button id="login-btn" class="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black text-lg hover:bg-black transition shadow-xl">시스템 접속</button>
+                <input type="text" id="email" placeholder="ADMIN ID" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold text-sm tracking-wide">
+                <input type="password" id="password" placeholder="PASSWORD" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold">
+                <button id="login-btn" class="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black text-lg hover:bg-black transition shadow-xl uppercase tracking-tighter">Login to System</button>
             </div>
         </div>
 
-        <!-- 에디터 섹션 -->
+        <!-- 에디터 -->
         <div id="admin-content" class="hidden space-y-10 fade-in">
             <div class="bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-100">
                 <div class="grid md:grid-cols-3 gap-8 mb-10">
                     <div class="md:col-span-1">
-                        <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest pl-1">Category</label>
+                        <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest pl-1">Category Select</label>
                         <select id="notice-category" class="w-full p-4 border-2 border-slate-100 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 font-black text-[#0f172a] transition">
                             <option value="지원공고">📢 지원공고</option>
                             <option value="네트워킹">🤝 네트워킹</option>
@@ -115,22 +126,18 @@
                         </select>
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest pl-1">Notice Title</label>
-                        <input type="text" id="notice-title" placeholder="제목을 입력하세요" class="w-full p-4 border-2 border-slate-100 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold text-[#0f172a]">
+                        <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest pl-1">Public Notice Title</label>
+                        <input type="text" id="notice-title" placeholder="제목을 입력하세요" class="w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold text-[#0f172a]">
                     </div>
                 </div>
 
-                <!-- 프로페셔널 툴바 -->
                 <div class="sticky top-6 z-50 bg-white/95 backdrop-blur-md p-6 mb-6 rounded-2xl border border-slate-200 shadow-xl space-y-5">
                     <div class="flex flex-wrap gap-4 items-center">
                         <div class="flex gap-2">
-                            <button type="button" id="btn-bold" onmousedown="event.preventDefault(); formatDoc('bold')" class="toolbar-btn w-11 h-11" title="굵게"><i data-lucide="bold" class="w-5 h-5"></i></button>
-                            <button type="button" id="btn-list" onmousedown="event.preventDefault(); formatDoc('insertUnorderedList')" class="toolbar-btn w-11 h-11" title="불렛 리스트"><i data-lucide="list" class="w-5 h-5"></i></button>
+                            <button type="button" id="btn-bold" onmousedown="event.preventDefault(); formatDoc('bold')" class="toolbar-btn w-11 h-11" title="Bold"><i data-lucide="bold" class="w-5 h-5"></i></button>
+                            <button type="button" id="btn-list" onmousedown="event.preventDefault(); formatDoc('insertUnorderedList')" class="toolbar-btn w-11 h-11" title="List"><i data-lucide="list" class="w-5 h-5"></i></button>
                         </div>
-                        
                         <div class="h-8 w-px bg-slate-200 mx-1"></div>
-                        
-                        <!-- 표준 색상 팔레트 -->
                         <div class="flex items-center gap-2.5 bg-slate-50 p-2.5 px-4 rounded-2xl border border-slate-200">
                             <span class="text-[10px] font-black text-slate-400 mr-2 uppercase tracking-tighter">Quick Colors</span>
                             <div class="color-chip bg-black" onmousedown="event.preventDefault(); formatDoc('foreColor', '#000000')"></div>
@@ -142,7 +149,7 @@
                             <div class="color-chip bg-blue-600" onmousedown="event.preventDefault(); formatDoc('foreColor', '#2563eb')"></div>
                             <div class="color-chip bg-[#0f172a]" onmousedown="event.preventDefault(); formatDoc('foreColor', '#0f172a')"></div>
                             <div class="h-6 w-px bg-slate-200 mx-1"></div>
-                            <input type="color" onchange="formatDoc('foreColor', this.value)" class="w-8 h-8 rounded-full cursor-pointer bg-transparent border-none p-0" title="커스텀 색상">
+                            <input type="color" onchange="formatDoc('foreColor', this.value)" class="w-8 h-8 rounded-full cursor-pointer bg-transparent border-none p-0">
                         </div>
                     </div>
                     
@@ -151,29 +158,20 @@
                             <i data-lucide="image" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
                             <input type="text" id="img-url" placeholder="이미지 주소(URL)를 복사해 붙여넣으세요" class="w-full pl-11 p-3 bg-white rounded-xl border border-slate-200 outline-none focus:border-[#0f172a] text-sm">
                         </div>
-                        <button type="button" onmousedown="event.preventDefault(); insertImage()" class="bg-[#0f172a] text-white px-8 py-3 rounded-xl font-black text-sm hover:bg-black transition-all">이미지 삽입</button>
+                        <button type="button" onmousedown="event.preventDefault(); insertCustomImage()" class="bg-[#0f172a] text-white px-8 py-3 rounded-xl font-black text-sm hover:bg-black transition-all">이미지 삽입</button>
                     </div>
                 </div>
 
-                <!-- 에디터 영역 -->
                 <div id="editor" contenteditable="true"></div>
                 
                 <input type="hidden" id="edit-id">
                 <div class="flex gap-4 mt-12">
-                    <button id="save-btn" class="flex-1 bg-[#0f172a] text-white p-6 rounded-[2rem] font-black text-xl hover:bg-black transition-all shadow-2xl shadow-slate-900/20">게시물 업로드</button>
-                    <button id="cancel-edit-btn" class="hidden px-12 bg-slate-100 text-slate-500 rounded-[2rem] font-black hover:bg-slate-200 transition-all">취소</button>
+                    <button id="save-btn" class="flex-1 bg-[#0f172a] text-white p-6 rounded-[2rem] font-black text-xl hover:bg-black transition-all shadow-2xl">Upload Notice</button>
+                    <button id="cancel-edit-btn" class="hidden px-12 bg-slate-100 text-slate-500 rounded-[2rem] font-black hover:bg-slate-200 transition-all">Cancel</button>
                 </div>
             </div>
 
-            <!-- 게시물 관리 리스트 -->
             <div class="space-y-6">
-                <div class="flex items-center justify-between px-4">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="layout-list" class="w-5 h-5 text-[#0f172a]"></i>
-                        <h3 class="font-black text-[#0f172a] uppercase tracking-widest">Manage Notices</h3>
-                    </div>
-                    <span class="text-[10px] font-bold text-slate-400">최신순 정렬됨</span>
-                </div>
                 <div id="manage-list" class="grid gap-4"></div>
             </div>
         </div>
@@ -199,34 +197,87 @@
         const appId = "gsn-network";
         const editor = document.getElementById('editor');
 
+        // [핵심] 마지막 커서 위치 및 선택 영역 저장 변수
+        let lastSelection = null;
+
         function updateToolbar() {
             const isBold = document.queryCommandState('bold');
             const isList = document.queryCommandState('insertUnorderedList');
-            
             const btnBold = document.getElementById('btn-bold');
             const btnList = document.getElementById('btn-list');
-            
             if (isBold) btnBold.classList.add('active'); else btnBold.classList.remove('active');
             if (isList) btnList.classList.add('active'); else btnList.classList.remove('active');
+            
+            // [보완] 현재 커서 위치를 항상 저장
+            saveSelection();
         }
+
+        // 선택 영역 저장 함수
+        function saveSelection() {
+            const sel = window.getSelection();
+            if (sel.getRangeAt && sel.rangeCount) {
+                lastSelection = sel.getRangeAt(0);
+            }
+        }
+
+        // 선택 영역 복구 함수
+        function restoreSelection() {
+            if (lastSelection) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(lastSelection);
+            }
+        }
+
+        // 이미지 클릭 및 삭제 핸들러 보완
+        editor.addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+                editor.querySelectorAll('img').forEach(img => img.classList.remove('selected'));
+                e.target.classList.add('selected');
+                e.target.focus();
+                saveSelection(); // 이미지 선택 상태도 저장
+            } else {
+                editor.querySelectorAll('img').forEach(img => img.classList.remove('selected'));
+            }
+        });
+
+        // [보완] 키보드 이벤트로 이미지 삭제 구현
+        editor.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                const selectedImg = editor.querySelector('img.selected');
+                if (selectedImg) {
+                    e.preventDefault(); // 기본 백스페이스 동작 방지
+                    selectedImg.remove();
+                    updateToolbar();
+                }
+            }
+        });
 
         editor.addEventListener('mouseup', updateToolbar);
         editor.addEventListener('keyup', updateToolbar);
-        document.addEventListener('selectionchange', () => {
-            if (document.activeElement === editor) updateToolbar();
-        });
+        editor.addEventListener('blur', saveSelection); // 에디터를 벗어날 때 위치 기억
 
         window.formatDoc = (cmd, value = null) => {
+            restoreSelection(); // 명령 실행 전 위치 복구
             document.execCommand(cmd, false, value);
             editor.focus();
             updateToolbar();
         };
 
-        window.insertImage = () => {
+        // [보완] 이미지 삽입 시 마지막 위치 자동 복구
+        window.insertCustomImage = () => {
             const url = document.getElementById('img-url').value.trim();
-            if(!url) return alert("URL을 입력하세요.");
-            formatDoc('insertImage', url);
+            if(!url) return alert("이미지 주소를 입력해 주세요.");
+            
+            restoreSelection(); // [핵심] 주소창 입력 후 버튼 눌러도 마지막 커서 위치로 복원
+            if (!lastSelection && !editor.firstChild) editor.focus(); // 첫 작성 시 처리
+
+            const imgHtml = `<img src="${url}" referrerpolicy="no-referrer" class="article-img" alt="본문 이미지">`;
+            document.execCommand('insertHTML', false, imgHtml);
+            
             document.getElementById('img-url').value = "";
+            editor.focus();
+            updateToolbar();
         };
 
         onAuthStateChanged(auth, (user) => {
@@ -246,7 +297,7 @@
         document.getElementById('login-btn').onclick = async () => {
             const email = document.getElementById('email').value.trim();
             const pwd = document.getElementById('password').value.trim();
-            try { await signInWithEmailAndPassword(auth, email, pwd); } catch (e) { alert("계정 정보가 틀립니다."); }
+            try { await signInWithEmailAndPassword(auth, email, pwd); } catch (e) { alert("계정 정보가 일치하지 않습니다."); }
         };
         document.getElementById('logout-btn').onclick = () => signOut(auth);
 
@@ -257,15 +308,15 @@
                 snapshot.forEach((doc) => {
                     const data = doc.data();
                     html += `
-                        <div class="bg-white p-7 rounded-[2rem] border border-slate-100 flex justify-between items-center shadow-lg shadow-slate-100 hover:border-[#0f172a] transition-all group">
+                        <div class="bg-white p-7 rounded-[2rem] border border-slate-100 flex justify-between items-center shadow-lg hover:border-[#0f172a] transition-all group">
                             <div class="flex items-center gap-5">
-                                <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:bg-[#0f172a] group-hover:text-white transition-all">
+                                <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:bg-[#0f172a] group-hover:text-white transition-all shadow-inner">
                                     <i data-lucide="file-text"></i>
                                 </div>
                                 <div>
                                     <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-md mb-1.5 inline-block uppercase tracking-tighter">${data.category || '기타'}</span>
                                     <h3 class="font-bold text-slate-800 text-lg">${data.title}</h3>
-                                    <p class="text-[11px] text-slate-400 font-bold mt-1 uppercase">${data.date}</p>
+                                    <p class="text-[11px] text-slate-400 font-bold mt-1 uppercase tracking-tighter">${data.date}</p>
                                 </div>
                             </div>
                             <div class="flex gap-2">
@@ -274,7 +325,7 @@
                             </div>
                         </div>`;
                 });
-                document.getElementById('manage-list').innerHTML = html || '<div class="p-20 text-center text-slate-300 font-bold italic">등록된 소식이 없습니다.</div>';
+                document.getElementById('manage-list').innerHTML = html || '<div class="p-20 text-center text-slate-300 font-bold italic">No data found.</div>';
                 lucide.createIcons();
             });
         }
@@ -284,9 +335,7 @@
             const category = document.getElementById('notice-category').value;
             const content = editor.innerHTML; 
             const editId = document.getElementById('edit-id').value;
-
-            if (!title || !content || content === "<br>" || content === "") return alert("내용을 입력해주세요.");
-
+            if (!title || !content || content === "<br>" || content === "") return alert("내용을 입력해 주세요.");
             try {
                 const today = new Date();
                 const dateStr = `${today.getFullYear()}. ${String(today.getMonth() + 1).padStart(2, '0')}. ${String(today.getDate()).padStart(2, '0')}`;
@@ -296,9 +345,8 @@
                 } else {
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), { ...postData, createdAt: serverTimestamp() });
                 }
-                alert("게시물이 안전하게 저장되었습니다."); 
-                window.resetForm();
-            } catch (e) { alert("저장 실패: " + e.message); }
+                alert("게시물이 저장되었습니다."); window.resetForm();
+            } catch (e) { alert("Error: " + e.message); }
         };
 
         window.editNotice = async (id) => {
@@ -312,18 +360,17 @@
                 document.getElementById('cancel-edit-btn').classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 editor.focus();
-                updateToolbar();
             }
         };
 
-        window.deleteNotice = async (id) => { if (confirm("정말 삭제하시겠습니까?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); };
+        window.deleteNotice = async (id) => { if (confirm("삭제하시겠습니까?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); };
         
         window.resetForm = () => {
             document.getElementById('notice-title').value = ""; 
             editor.innerHTML = ""; 
             document.getElementById('edit-id').value = "";
             document.getElementById('cancel-edit-btn').classList.add('hidden');
-            updateToolbar();
+            lastSelection = null;
         };
 
         document.getElementById('cancel-edit-btn').onclick = window.resetForm;
