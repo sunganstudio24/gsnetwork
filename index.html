@@ -43,6 +43,33 @@
         .cat-네트워킹 { background-color: #f0fdf4; color: #15803d; }
         .cat-일반소식 { background-color: #f8fafc; color: #475569; }
 
+        /* 검색창 스타일 */
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 0 1rem;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 300px;
+        }
+        .search-container:focus-within {
+            border-color: #0f172a;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .search-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 0.8rem 0.5rem;
+            width: 100%;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -70,12 +97,12 @@
     </nav>
 
     <main class="pt-20">
-        <!-- [홈 섹션] - 첫 화면으로 설정(active 클래스 추가) -->
+        <!-- [홈 섹션] -->
         <section id="page-home" class="tab-content active">
             <div class="relative h-[750px] flex items-center bg-[#0f172a] overflow-hidden">
                 <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
                 <div class="relative max-w-7xl mx-auto px-6 w-full fade-in text-center md:text-left">
-                    <h1 class="text-7xl md:text-9xl font-black text-white leading-none mb-8 tracking-tighter italic">GLOBAL<br>GSN.</h1>
+                    <h1 class="text-7xl md:text-9xl font-black text-white leading-none mb-8 tracking-tighter italic text-shadow-xl">GLOBAL<br>GSN.</h1>
                     <p class="text-xl text-slate-400 max-w-2xl mb-12 font-light leading-relaxed">대한민국 스타트업의 글로벌 성공을 위한 압도적 네트워크.</p>
                     <div class="flex gap-4 justify-center md:justify-start">
                         <button onclick="window.showPage('startup')" class="bg-white text-[#0f172a] px-12 py-5 rounded-full font-black hover:bg-slate-200 transition-all">지금 시작하기</button>
@@ -128,20 +155,21 @@
                     <h2 class="text-4xl font-black text-[#0f172a] mb-4">창업자 지원 신청</h2>
                     <p class="text-slate-400 font-medium tracking-tight">글로벌 무대를 꿈꾸는 혁신 창업가들을 기다립니다.</p>
                 </div>
-                <form id="startup-form" class="bg-white p-12 rounded-[3rem] shadow-2xl shadow-slate-200 space-y-8">
+                <form id="startup-form" class="bg-white p-12 rounded-[3rem] shadow-2xl space-y-8 border border-slate-100">
                     <div>
-                        <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest">Name / Company</label>
+                        <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest pl-1">Name / Company</label>
                         <input type="text" name="name" required placeholder="신청자명 혹은 기업명을 입력하세요" class="w-full p-5 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest">Contact</label>
+                        <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest pl-1">Contact</label>
                         <input type="tel" name="phone" required placeholder="연락처를 입력하세요" class="w-full p-5 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 transition">
                     </div>
                     <div>
-                        <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest">Description</label>
+                        <label class="block text-xs font-black text-slate-400 mb-2 uppercase tracking-widest pl-1">Description</label>
                         <textarea name="field" required placeholder="현재 사업 분야 및 지원이 필요한 내용을 자유롭게 작성해 주세요." class="w-full p-5 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 transition h-48"></textarea>
                     </div>
                     <button type="submit" id="startup-btn" class="w-full bg-[#0f172a] text-white p-6 rounded-2xl font-black text-xl hover:bg-black transition shadow-xl">지원서 제출하기</button>
+                    <p class="text-[10px] text-slate-300 text-center uppercase tracking-widest">제출 시 개인정보 수집 및 이용에 동의하는 것으로 간주됩니다.</p>
                 </form>
             </div>
         </section>
@@ -149,47 +177,62 @@
         <!-- [전문가 모집 섹션] -->
         <section id="page-expert" class="tab-content py-32 bg-white">
             <div class="max-w-4xl mx-auto px-6">
-                <div class="bg-[#0f172a] rounded-[3rem] p-12 md:p-20 text-white shadow-2xl relative overflow-hidden">
-                    <h2 class="text-4xl font-black mb-8 leading-tight">글로벌 전문가 등록</h2>
-                    <form id="expert-form" class="space-y-4">
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <input type="text" name="name" required placeholder="성함" class="w-full p-4 rounded-2xl bg-white/10 border border-white/10 outline-none text-white">
-                            <input type="text" name="field" required placeholder="전문 분야" class="w-full p-4 rounded-2xl bg-white/10 border border-white/10 outline-none text-white">
-                        </div>
-                        <input type="email" name="email" required placeholder="이메일" class="w-full p-4 rounded-2xl bg-white/10 border border-white/10 outline-none text-white">
-                        <button type="submit" id="expert-btn" class="w-full bg-white text-[#0f172a] p-5 rounded-2xl font-black text-lg hover:bg-slate-200 transition mt-4 shadow-xl">등록 신청하기</button>
-                    </form>
+                <div class="bg-[#0f172a] rounded-[3.5rem] p-12 md:p-20 text-white shadow-2xl relative overflow-hidden">
+                    <div class="absolute -right-20 -bottom-20 opacity-5">
+                        <i data-lucide="award" class="w-96 h-96"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h2 class="text-4xl font-black mb-8 leading-tight">글로벌 전문가 등록</h2>
+                        <form id="expert-form" class="space-y-4">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <input type="text" name="name" required placeholder="성함" class="w-full p-4 rounded-2xl bg-white/10 border border-white/10 outline-none text-white focus:bg-white/20 transition">
+                                <input type="text" name="field" required placeholder="전문 분야" class="w-full p-4 rounded-2xl bg-white/10 border border-white/10 outline-none text-white focus:bg-white/20 transition">
+                            </div>
+                            <input type="email" name="email" required placeholder="이메일" class="w-full p-4 rounded-2xl bg-white/10 border border-white/10 outline-none text-white focus:bg-white/20 transition">
+                            <button type="submit" id="expert-btn" class="w-full bg-white text-[#0f172a] p-5 rounded-2xl font-black text-lg hover:bg-slate-200 transition mt-4 shadow-xl">등록 신청하기</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- [공지사항 섹션] - active 클래스 제거 -->
-        <section id="page-board" class="tab-content py-32">
+        <!-- [공지사항 섹션 - 검색 기능 추가] -->
+        <section id="page-board" class="tab-content py-32 bg-white">
             <div class="max-w-4xl mx-auto px-6">
+                <!-- 리스트 뷰 -->
                 <div id="notice-list-view">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
-                        <h2 class="text-5xl font-black text-[#0f172a] tracking-tighter italic">NOTICE.</h2>
-                        <div id="filter-buttons" class="flex flex-wrap gap-2">
-                            <button onclick="window.filterNotices('전체')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-[#0f172a] text-white shadow-lg">전체보기</button>
-                            <button onclick="window.filterNotices('지원공고')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200">지원공고</button>
-                            <button onclick="window.filterNotices('네트워킹')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200">네트워킹</button>
-                            <button onclick="window.filterNotices('일반소식')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200">일반소식</button>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-8">
+                        <div>
+                            <h2 class="text-5xl font-black text-[#0f172a] tracking-tighter italic mb-4">NOTICE.</h2>
+                            <div id="filter-buttons" class="flex flex-wrap gap-2">
+                                <button onclick="window.applyFilter('전체')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-[#0f172a] text-white shadow-lg">전체보기</button>
+                                <button onclick="window.applyFilter('지원공고')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200">지원공고</button>
+                                <button onclick="window.applyFilter('네트워킹')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200">네트워킹</button>
+                                <button onclick="window.applyFilter('일반소식')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200">일반소식</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 5번 보완: 검색창 추가 -->
+                        <div class="search-container shadow-sm">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                            <input type="text" id="board-search" placeholder="키워드로 검색하세요" oninput="window.applySearch(this.value)" class="search-input">
                         </div>
                     </div>
                     <div id="notice-list-container" class="space-y-1"></div>
                 </div>
 
+                <!-- 상세 아티클 뷰 -->
                 <div id="notice-detail-view" class="hidden fade-in">
                     <button onclick="window.backToList()" class="flex items-center gap-2 text-slate-400 hover:text-[#0f172a] mb-12 font-black transition text-sm">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> 목록으로 돌아가기
                     </button>
                     <div class="article-container">
                         <div id="detail-category" class="mb-4"></div>
-                        <h1 id="detail-title" class="article-title"></h1>
+                        <h1 id="detail-title" class="article-title text-shadow-sm"></h1>
                         <div class="article-meta">
                             <span id="detail-date"></span>
                             <span class="text-slate-200">|</span>
-                            <span class="font-bold text-[#0f172a]">GSN NETWORK</span>
+                            <span class="font-black text-[#0f172a] uppercase tracking-tighter text-xs">GSN Official</span>
                         </div>
                         <div id="detail-body" class="article-body"></div>
                     </div>
@@ -198,10 +241,16 @@
         </section>
     </main>
 
+    <!-- 푸터 - 개인정보처리방침 보완 -->
     <footer class="bg-white border-t border-slate-100 py-24 mt-20">
         <div class="max-w-7xl mx-auto px-6 text-center">
-            <p class="font-black text-2xl tracking-tighter mb-4 text-[#0f172a]">GSN NETWORK.</p>
-            <p class="text-slate-400 text-xs font-medium tracking-widest uppercase">© 2026 GLOBAL STARTUP SUPPORT NETWORK. ALL RIGHTS RESERVED.</p>
+            <p class="font-black text-2xl tracking-tighter mb-6 text-[#0f172a]">GSN NETWORK.</p>
+            <div class="flex justify-center gap-6 mb-8 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                <a href="#" class="hover:text-[#0f172a] transition">About Us</a>
+                <a href="#" class="hover:text-[#0f172a] transition text-[#0f172a]">Privacy Policy</a> <!-- 개인정보처리방침 강조 -->
+                <a href="#" class="hover:text-[#0f172a] transition">Terms</a>
+            </div>
+            <p class="text-slate-300 text-[10px] font-medium tracking-widest uppercase italic">© 2026 GLOBAL STARTUP SUPPORT NETWORK. ALL RIGHTS RESERVED.</p>
         </div>
     </footer>
 
@@ -222,21 +271,21 @@
         const db = getFirestore(app);
         const appId = "gsn-network";
 
-        // [사진 표시 보완] 텍스트 형식의 이미지 태그를 실제 이미지로 변환
+        // 전역 상태 관리
+        let allNotices = [];
+        let currentFilter = '전체';
+        let currentSearchTerm = '';
+
         function parseContent(content) { 
             if (!content) return "";
-            
-            // 1. [이미지:주소] 형식을 <img> 태그로 변환 (기존 데이터 호환)
             let html = content;
             const imageRegex = /\[이미지\s*[:：]\s*([^\]]+)\]/g;
             html = html.replace(imageRegex, (match, url) => {
                 return `<img src="${url.trim()}" class="article-img" referrerpolicy="no-referrer" alt="게시물 사진">`;
             });
-            
             return html; 
         }
 
-        let allNotices = [];
         const noticeContainer = document.getElementById('notice-list-container');
         const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), orderBy("createdAt", "desc"));
         
@@ -247,12 +296,29 @@
                 let cleanCat = data.category ? data.category.replace(/[^\wㄱ-ㅎ가-힣]/g, "").trim() : "일반소식";
                 allNotices.push({ id: doc.id, ...data, category: cleanCat });
             });
-            renderNotices(allNotices);
+            renderNoticesWithFilter();
         });
 
-        function renderNotices(data) {
+        // [핵심] 필터와 검색이 동시에 작동하는 렌더링 함수
+        function renderNoticesWithFilter() {
+            let filtered = allNotices;
+
+            // 1. 카테고리 필터링
+            if (currentFilter !== '전체') {
+                filtered = filtered.filter(n => n.category === currentFilter);
+            }
+
+            // 2. 검색어 필터링
+            if (currentSearchTerm) {
+                const term = currentSearchTerm.toLowerCase();
+                filtered = filtered.filter(n => 
+                    n.title.toLowerCase().includes(term) || 
+                    n.content.toLowerCase().includes(term)
+                );
+            }
+
             let html = "";
-            data.forEach((notice) => {
+            filtered.forEach((notice) => {
                 html += `
                     <div class="py-8 border-b border-slate-100 cursor-pointer group" onclick="window.openNotice('${notice.id}')">
                         <span class="cat-chip cat-${notice.category}">${notice.category}</span>
@@ -260,15 +326,20 @@
                         <p class="text-slate-400 text-xs mt-2 font-medium uppercase tracking-tighter">${notice.date}</p>
                     </div>`;
             });
-            noticeContainer.innerHTML = html || '<p class="text-slate-300 py-10 text-center font-bold italic">공지사항 데이터가 없습니다.</p>';
+
+            if (filtered.length === 0) {
+                html = currentSearchTerm 
+                    ? `<div class="p-20 text-center text-slate-300 font-bold italic">'${currentSearchTerm}'에 대한 검색 결과가 없습니다.</div>`
+                    : '<div class="p-20 text-center text-slate-300 font-bold italic">공지사항이 없습니다.</div>';
+            }
+            
+            noticeContainer.innerHTML = html;
+            lucide.createIcons();
         }
 
-        window.filterNotices = (cat) => {
-            if(cat === '전체') renderNotices(allNotices);
-            else {
-                const filtered = allNotices.filter(n => n.category === cat);
-                renderNotices(filtered);
-            }
+        window.applyFilter = (cat) => {
+            currentFilter = cat;
+            renderNoticesWithFilter();
             
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => {
@@ -282,6 +353,11 @@
             });
         };
 
+        window.applySearch = (term) => {
+            currentSearchTerm = term.trim();
+            renderNoticesWithFilter();
+        };
+
         window.openNotice = (id) => {
             const notice = allNotices.find(n => n.id === id);
             if (!notice) return;
@@ -291,7 +367,7 @@
             document.getElementById('detail-title').innerText = notice.title;
             document.getElementById('detail-date').innerText = notice.date;
             document.getElementById('detail-body').innerHTML = parseContent(notice.content);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: document.getElementById('page-board').offsetTop - 80, behavior: 'smooth' });
         };
 
         window.backToList = () => {
@@ -317,7 +393,7 @@
         document.getElementById('startup-form').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('startup-btn');
-            btn.innerText = "전송 중..."; btn.disabled = true;
+            btn.innerText = "SENDING..."; btn.disabled = true;
             const fd = new FormData(e.target);
             try {
                 await emailjs.send("service_yk6n7mo", "template_4ys4qgh", {
@@ -325,7 +401,7 @@
                     content: `연락처: ${fd.get('phone')}\n내용: ${fd.get('field')}`,
                     to_email: "sunganstudio24@gmail.com"
                 });
-                alert("성공적으로 접수되었습니다."); e.target.reset();
+                alert("지원서가 성공적으로 접수되었습니다."); e.target.reset();
             } catch (err) { alert("잠시 후 다시 시도해 주세요."); } finally { 
                 btn.innerText = "지원서 제출하기"; btn.disabled = false;
             }
