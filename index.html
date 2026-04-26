@@ -63,26 +63,29 @@
                 <button id="nav-about" onclick="window.showPage('about')" class="nav-link">소개/비전</button>
                 <button id="nav-startup" onclick="window.showPage('startup')" class="nav-link">창업자모집</button>
                 <button id="nav-expert" onclick="window.showPage('expert')" class="nav-link">전문가모집</button>
-                <button id="nav-board" onclick="window.showPage('board')" class="nav-link active">공지사항</button>
+                <button id="nav-board" onclick="window.showPage('board')" class="nav-link">공지사항</button>
                 <button onclick="location.href='admin.html'" class="text-[10px] font-bold text-slate-300 hover:text-[#0f172a]">ADMIN</button>
             </div>
         </div>
     </nav>
 
     <main class="pt-20">
-        <!-- [홈 섹션] -->
-        <section id="page-home" class="tab-content">
+        <!-- [홈 섹션] - 첫 화면으로 설정(active 클래스 추가) -->
+        <section id="page-home" class="tab-content active">
             <div class="relative h-[750px] flex items-center bg-[#0f172a] overflow-hidden">
                 <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-                <div class="relative max-w-7xl mx-auto px-6 w-full fade-in">
+                <div class="relative max-w-7xl mx-auto px-6 w-full fade-in text-center md:text-left">
                     <h1 class="text-7xl md:text-9xl font-black text-white leading-none mb-8 tracking-tighter italic">GLOBAL<br>GSN.</h1>
                     <p class="text-xl text-slate-400 max-w-2xl mb-12 font-light leading-relaxed">대한민국 스타트업의 글로벌 성공을 위한 압도적 네트워크.</p>
-                    <button onclick="window.showPage('startup')" class="bg-white text-[#0f172a] px-12 py-5 rounded-full font-black hover:bg-slate-200 transition-all">지금 시작하기</button>
+                    <div class="flex gap-4 justify-center md:justify-start">
+                        <button onclick="window.showPage('startup')" class="bg-white text-[#0f172a] px-12 py-5 rounded-full font-black hover:bg-slate-200 transition-all">지금 시작하기</button>
+                        <button onclick="window.showPage('board')" class="bg-white/10 text-white border border-white/20 px-12 py-5 rounded-full font-black hover:bg-white/20 transition-all">공지사항 확인</button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- [소개/비전 섹션] - 복구 완료 -->
+        <!-- [소개/비전 섹션] -->
         <section id="page-about" class="tab-content py-32 bg-white">
             <div class="max-w-5xl mx-auto px-6">
                 <div class="text-center mb-24">
@@ -118,7 +121,7 @@
             </div>
         </section>
 
-        <!-- [창업자 모집 섹션] - 복구 완료 -->
+        <!-- [창업자 모집 섹션] -->
         <section id="page-startup" class="tab-content py-32 bg-slate-50">
             <div class="max-w-2xl mx-auto px-6">
                 <div class="text-center mb-16">
@@ -160,14 +163,12 @@
             </div>
         </section>
 
-        <!-- [공지사항 섹션] -->
-        <section id="page-board" class="tab-content active py-32">
+        <!-- [공지사항 섹션] - active 클래스 제거 -->
+        <section id="page-board" class="tab-content py-32">
             <div class="max-w-4xl mx-auto px-6">
-                <!-- 리스트 뷰 -->
                 <div id="notice-list-view">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 gap-6">
                         <h2 class="text-5xl font-black text-[#0f172a] tracking-tighter italic">NOTICE.</h2>
-                        <!-- 필터 버튼 -->
                         <div id="filter-buttons" class="flex flex-wrap gap-2">
                             <button onclick="window.filterNotices('전체')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-[#0f172a] text-white shadow-lg">전체보기</button>
                             <button onclick="window.filterNotices('지원공고')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200">지원공고</button>
@@ -178,7 +179,6 @@
                     <div id="notice-list-container" class="space-y-1"></div>
                 </div>
 
-                <!-- 상세 아티클 뷰 (기사형 레이아웃) -->
                 <div id="notice-detail-view" class="hidden fade-in">
                     <button onclick="window.backToList()" class="flex items-center gap-2 text-slate-400 hover:text-[#0f172a] mb-12 font-black transition text-sm">
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> 목록으로 돌아가기
@@ -222,7 +222,19 @@
         const db = getFirestore(app);
         const appId = "gsn-network";
 
-        function parseContent(content) { return content || ""; }
+        // [사진 표시 보완] 텍스트 형식의 이미지 태그를 실제 이미지로 변환
+        function parseContent(content) { 
+            if (!content) return "";
+            
+            // 1. [이미지:주소] 형식을 <img> 태그로 변환 (기존 데이터 호환)
+            let html = content;
+            const imageRegex = /\[이미지\s*[:：]\s*([^\]]+)\]/g;
+            html = html.replace(imageRegex, (match, url) => {
+                return `<img src="${url.trim()}" class="article-img" referrerpolicy="no-referrer" alt="게시물 사진">`;
+            });
+            
+            return html; 
+        }
 
         let allNotices = [];
         const noticeContainer = document.getElementById('notice-list-container');
@@ -232,7 +244,6 @@
             allNotices = [];
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                // 데이터 보정: 카테고리가 없거나 이모지가 포함된 경우 텍스트만 추출
                 let cleanCat = data.category ? data.category.replace(/[^\wㄱ-ㅎ가-힣]/g, "").trim() : "일반소식";
                 allNotices.push({ id: doc.id, ...data, category: cleanCat });
             });
@@ -252,7 +263,6 @@
             noticeContainer.innerHTML = html || '<p class="text-slate-300 py-10 text-center font-bold italic">공지사항 데이터가 없습니다.</p>';
         }
 
-        // [개선된 필터링 로직]
         window.filterNotices = (cat) => {
             if(cat === '전체') renderNotices(allNotices);
             else {
@@ -260,7 +270,6 @@
                 renderNotices(filtered);
             }
             
-            // 필터 버튼 시각적 효과 업데이트
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => {
                 if(btn.innerText === cat || (cat === '전체' && btn.innerText === '전체보기')) {
