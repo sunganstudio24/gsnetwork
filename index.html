@@ -203,8 +203,8 @@
                     <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
                         <div>
                             <h2 class="text-5xl font-black text-[#0f172a] tracking-tighter italic mb-4">NOTICE.</h2>
-                            <div class="flex flex-wrap gap-2">
-                                <button onclick="window.applyFilter('전체')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-[#0f172a] text-white">전체보기</button>
+                            <div id="filter-buttons" class="flex flex-wrap gap-2">
+                                <button onclick="window.applyFilter('전체')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-[#0f172a] text-white shadow-lg">전체보기</button>
                                 <button onclick="window.applyFilter('지원공고')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100">지원공고</button>
                                 <button onclick="window.applyFilter('네트워킹')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100">네트워킹</button>
                                 <button onclick="window.applyFilter('일반소식')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100">일반소식</button>
@@ -266,7 +266,6 @@
         const db = getFirestore(app);
         const appId = "gsn-network";
 
-        // 알림창 띄우기 함수
         window.showToast = (msg) => {
             const toast = document.getElementById('custom-toast');
             document.getElementById('toast-msg').innerText = msg;
@@ -274,7 +273,6 @@
             setTimeout(() => toast.classList.remove('show'), 3500);
         };
 
-        // 플로팅 메뉴 제어
         window.toggleFloatMenu = () => {
             const menu = document.getElementById('float-menu');
             const icon = document.getElementById('float-icon');
@@ -284,7 +282,6 @@
         };
         window.moveToApply = (id) => { window.showPage(id); window.toggleFloatMenu(); };
 
-        // 게시판 상태
         let allNotices = [];
         let currentFilter = '전체';
         let currentSearchTerm = '';
@@ -314,7 +311,21 @@
             lucide.createIcons();
         }
 
-        window.applyFilter = (c) => { currentFilter = c; renderNotices(); };
+        /* [수정] 필터 버튼 클릭 시 색상 변경 로직 추가 */
+        window.applyFilter = (c) => { 
+            currentFilter = c; 
+            renderNotices(); 
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                const isMatch = (btn.innerText === c) || (c === '전체' && btn.innerText === '전체보기');
+                if (isMatch) {
+                    btn.className = "filter-btn px-5 py-2 rounded-full text-xs font-bold bg-[#0f172a] text-white shadow-lg";
+                } else {
+                    btn.className = "filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100";
+                }
+            });
+        };
+
         window.applySearch = (t) => { currentSearchTerm = t.trim(); renderNotices(); };
 
         window.openNotice = (id) => {
@@ -341,38 +352,25 @@
             if (id === 'board') window.backToList();
         };
 
-        // [핵심 보완] 통합 지원서 제출 및 실시간 인증 처리
         async function submitApplication(formId, type) {
             const form = document.getElementById(formId);
             const btn = form.querySelector('button[type="submit"]');
-            
-            // 1. 제출 버튼 비활성화
             btn.innerText = "제출 중...";
             btn.disabled = true;
 
             try {
-                // 2. 인증 상태 체크 및 실시간 로그인 시도
-                if (!auth.currentUser) {
-                    await signInAnonymously(auth);
-                }
-                
+                if (!auth.currentUser) { await signInAnonymously(auth); }
                 const fd = new FormData(form);
                 const data = {
                     type: type, name: fd.get('name'), phone: fd.get('phone'), email: fd.get('email'),
                     content: fd.get('field'), createdAt: serverTimestamp(), date: new Date().toLocaleDateString('ko-KR')
                 };
-
-                // 3. 데이터베이스 저장
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'applications'), data);
-                
-                // 4. 이메일 발송
                 await emailjs.send("service_yk6n7mo", "template_4ys4qgh", {
                     from_name: data.name,
                     content: `[${type}] 연락처: ${data.phone}\n이메일: ${data.email}\n내용: ${data.content}`,
                     to_email: "sunganstudio24@gmail.com"
                 });
-                
-                // 5. 성공 알림 및 폼 초기화
                 window.showToast("정상적으로 접수되었습니다. 곧 연락드릴게요!");
                 form.reset();
             } catch (err) {
