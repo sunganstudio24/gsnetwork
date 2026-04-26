@@ -3,287 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GSN MASTER DASHBOARD - 운영진 전용</title>
+    <title>(사)글로벌창업지원네트워크 - GSN NETWORK</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@100;400;600;700;800;900&display=swap');
-        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@100;300;400;600;700;800;900&display=swap');
+        body { font-family: 'Pretendard', sans-serif; scroll-behavior: smooth; background-color: #ffffff; color: #0f172a; }
         
-        /* 에디터 스타일 */
-        #editor {
-            min-height: 500px;
-            padding: 3rem;
-            outline: none;
-            background: #ffffff;
-            line-height: 1.8;
-            font-size: 11pt;
-            color: #334155;
-            border-radius: 1.5rem;
-            border: 2px solid #f1f5f9;
-            transition: all 0.2s ease;
-        }
-        #editor:focus { border-color: #0f172a; box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.1); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
         
-        /* 이미지 선택 효과 */
-        #editor img { 
-            max-width: 100%; 
-            border-radius: 8px; 
-            margin: 1.5rem auto; 
-            display: block; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            cursor: pointer;
-            border: 4px solid transparent;
-        }
-        #editor img.selected { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
-        #editor ul { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
-        #editor b, #editor strong { font-weight: 800; color: inherit; }
+        .nav-link { position: relative; transition: all 0.2s; color: #64748b; font-weight: 500; }
+        .nav-link.active { color: #0f172a !important; font-weight: 900; }
+        .nav-link.active::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 100%; height: 3px; background-color: #0f172a; }
+
+        .article-container { max-width: 800px; margin: 0 auto; padding: 0 1.5rem; }
+        .article-title { font-size: 2.5rem; font-weight: 900; color: #0f172a; line-height: 1.2; margin-bottom: 1.5rem; }
+        .article-meta { color: #94a3b8; font-size: 0.875rem; margin-bottom: 3rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 1.5rem; display: flex; gap: 15px; }
         
-        /* 탭 스타일 */
-        .admin-tab { padding: 14px 28px; font-weight: 800; cursor: pointer; color: #94a3b8; transition: 0.2s; border-bottom: 3px solid transparent; }
-        .admin-tab.active { color: #0f172a; border-bottom-color: #0f172a; }
+        .article-body { line-height: 2; color: #334155; font-size: 1.125rem; word-break: keep-all; }
+        .article-body b, .article-body strong { font-weight: 800; color: inherit; }
+        .article-body img { width: 100%; height: auto; display: block; margin: 2rem 0; border-radius: 8px; cursor: zoom-in; }
 
-        /* 툴바 스타일 */
-        .toolbar-group {
-            display: flex;
-            align-items: center;
-            background: #f8fafc;
-            border-radius: 0.75rem;
-            padding: 4px;
-            gap: 2px;
-            border: 1px solid #f1f5f9;
-        }
-        .toolbar-btn {
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-            color: #64748b;
-        }
-        .toolbar-btn:hover { background: #ffffff; color: #0f172a; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .toolbar-btn.active { background: #0f172a; color: #ffffff; }
+        .cat-chip { padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+        .cat-지원공고 { background-color: #eff6ff; color: #1d4ed8; }
+        .cat-네트워킹 { background-color: #f0fdf4; color: #15803d; }
+        .cat-일반소식 { background-color: #f8fafc; color: #475569; }
 
-        /* 글자 크기 박스 */
-        .font-size-box {
-            display: flex;
-            align-items: center;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.75rem;
-            padding: 0 8px;
-            height: 38px;
+        /* 플로팅 메뉴 시스템 */
+        .floating-container { position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+        .floating-menu { display: none; flex-direction: column; gap: 10px; margin-bottom: 5px; }
+        .floating-menu.show { display: flex; animation: slideUp 0.3s ease-out; }
+        
+        .sub-float-btn {
+            background: #ffffff; color: #0f172a; padding: 14px 24px; border-radius: 20px;
+            font-size: 13px; font-weight: 800; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0; transition: all 0.2s;
         }
-        .font-size-input {
-            width: 40px;
-            border: none;
-            outline: none;
-            font-weight: 800;
-            text-align: center;
-            font-size: 0.9rem;
+        .sub-float-btn:hover { background: #f8fafc; transform: translateX(-5px); border-color: #0f172a; }
+
+        .main-float-btn {
+            background: #0f172a; color: white; padding: 18px 28px; border-radius: 50px;
+            display: flex; align-items: center; gap: 10px; font-weight: 800;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3); transition: all 0.3s;
         }
 
-        /* 색상 팔레트 */
-        .color-palette-wrap { position: relative; }
-        .dot-color { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); }
-        .custom-trigger {
-            width: 22px;
-            height: 22px;
-            border-radius: 4px;
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 0 0 1px #e2e8f0;
+        /* 커스텀 토스트 알림창 */
+        #custom-toast {
+            position: fixed; top: 40px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            z-index: 9999; background: #0f172a; color: white; padding: 16px 32px; border-radius: 20px;
+            font-weight: 800; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; align-items: center; gap: 12px; opacity: 0; pointer-events: none;
         }
-        #color-popup {
-            display: none;
-            position: absolute;
-            top: 50px;
-            right: 0;
-            z-index: 100;
-            background: white;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            padding: 12px;
-            width: 280px;
-        }
-        #color-popup.show { display: block; }
-        .color-grid-theme { display: grid; grid-template-columns: repeat(10, 1fr); gap: 1px; margin-bottom: 15px; background: #eee; border: 1px solid #ddd; }
-        .color-cell { width: 100%; aspect-ratio: 1.2; cursor: pointer; }
+        #custom-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        /* 지원자 현황 카드 */
-        .applicant-card {
-            background: white;
-            border-radius: 2rem;
-            padding: 24px;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.02);
-            transition: all 0.3s;
+        /* 이미지 확대 모달 */
+        #image-modal {
+            display: none; position: fixed; inset: 0; z-index: 2000;
+            background: rgba(0,0,0,0.9); align-items: center; justify-content: center; cursor: zoom-out;
         }
-        .applicant-card:hover { border-color: #0f172a; transform: translateY(-3px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05); }
+        #image-modal img { max-width: 90%; max-height: 90%; border-radius: 4px; }
 
-        /* 검색창 스타일 */
-        .search-box {
-            display: flex;
-            align-items: center;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 0 12px;
-            height: 44px;
-            transition: all 0.2s;
-        }
-        .search-box:focus-within { border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.05); }
-        .search-input { border: none; outline: none; padding-left: 8px; font-size: 0.9rem; font-weight: 600; width: 100%; }
-
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="p-4 md:p-10">
-    <div class="max-w-6xl mx-auto">
-        <!-- 상단 헤더 -->
-        <div class="flex justify-between items-center mb-8 bg-[#0f172a] p-8 rounded-[2.5rem] shadow-2xl text-white">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center">
-                    <i data-lucide="shield-check" class="text-white w-6 h-6"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-black tracking-tight text-white uppercase italic">GSN MASTER.</h1>
-                    <p class="text-blue-300/60 text-[10px] font-bold uppercase tracking-widest mt-0.5">Control Tower</p>
-                </div>
-            </div>
-            <!-- [보완] 로그아웃 버튼은 이메일 로그인(Admin)시에만 노출됨 -->
-            <div id="auth-status" class="hidden">
-                <button id="logout-btn" class="px-5 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition border border-white/10">LOGOUT</button>
-            </div>
-        </div>
+<body>
 
-        <!-- 로그인 섹션 -->
-        <div id="login-section" class="max-w-md mx-auto bg-white p-12 rounded-[3rem] shadow-2xl border border-slate-100">
-            <h2 class="text-2xl font-black mb-8 text-center text-[#0f172a] uppercase italic">System Access</h2>
-            <div class="space-y-5">
-                <input type="text" id="email" placeholder="ADMIN ID" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold text-sm">
-                <input type="password" id="password" placeholder="PASSWORD" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold">
-                <button id="login-btn" class="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black text-lg hover:bg-black transition shadow-xl uppercase">Login</button>
-            </div>
-        </div>
-
-        <!-- 관리 메인 섹션 -->
-        <div id="admin-content" class="hidden space-y-8 fade-in">
-            <!-- 탭 네비게이션 -->
-            <div class="flex gap-4 border-b border-slate-200 mb-8">
-                <div onclick="window.switchTab('notice')" id="tab-notice" class="admin-tab active">📢 공지사항 관리</div>
-                <div onclick="window.switchTab('applicant')" id="tab-applicant" class="admin-tab">👥 지원자 통합 관리</div>
-            </div>
-
-            <!-- [1] 공지사항 관리 탭 -->
-            <div id="section-notice" class="space-y-8">
-                <div class="bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-100">
-                    <div class="grid md:grid-cols-3 gap-6 mb-8">
-                        <select id="notice-category" class="w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 font-black">
-                            <option value="지원공고">📢 지원공고</option>
-                            <option value="네트워킹">🤝 네트워킹</option>
-                            <option value="일반소식">📰 일반소식</option>
-                        </select>
-                        <input type="text" id="notice-title" placeholder="공지 제목을 입력하세요" class="md:col-span-2 w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 font-bold">
-                    </div>
-
-                    <!-- 통합 툴바 -->
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6 space-y-4">
-                        <div class="flex flex-wrap items-center gap-4">
-                            <div class="toolbar-group">
-                                <button type="button" id="btn-bold" onmousedown="event.preventDefault(); formatDoc('bold')" class="toolbar-btn" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                <button type="button" id="btn-list" onmousedown="event.preventDefault(); formatDoc('insertUnorderedList')" class="toolbar-btn" title="List"><i data-lucide="list" class="w-4 h-4"></i></button>
-                            </div>
-                            <div class="font-size-box shadow-sm">
-                                <input type="number" id="font-size-val" value="11" min="1" max="100" onchange="window.applyFontSize(this.value)" class="font-size-input">
-                                <span class="text-[10px] font-black text-slate-300 mr-1 uppercase">pt</span>
-                                <div class="h-4 w-px bg-slate-100 mx-1"></div>
-                                <select onchange="document.getElementById('font-size-val').value = this.value; window.applyFontSize(this.value);" class="bg-transparent text-[10px] font-black outline-none cursor-pointer">
-                                    <option value="">크기</option>
-                                    <option value="9">9</option><option value="10">10</option><option value="11">11</option>
-                                    <option value="12">12</option><option value="14">14</option><option value="16">16</option>
-                                    <option value="20">20</option><option value="24">24</option>
-                                </select>
-                            </div>
-                            <div class="toolbar-group">
-                                <button type="button" onmousedown="event.preventDefault(); formatDoc('justifyLeft')" class="toolbar-btn" title="Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                <button type="button" onmousedown="event.preventDefault(); formatDoc('justifyCenter')" class="toolbar-btn" title="Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                                <button type="button" onmousedown="event.preventDefault(); formatDoc('justifyRight')" class="toolbar-btn" title="Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
-                            </div>
-                            <div class="color-palette-wrap flex items-center gap-2">
-                                <div class="flex items-center gap-1.5 bg-white border border-slate-200 p-1 rounded-lg px-2">
-                                    <div class="dot-color bg-black" onmousedown="event.preventDefault(); formatDoc('foreColor', '#000000')"></div>
-                                    <div class="dot-color bg-red-600" onmousedown="event.preventDefault(); formatDoc('foreColor', '#dc2626')"></div>
-                                    <div class="dot-color bg-blue-600" onmousedown="event.preventDefault(); formatDoc('foreColor', '#2563eb')"></div>
-                                </div>
-                                <div id="selected-preview" class="custom-trigger bg-black" onclick="window.togglePalette()"></div>
-                                <div id="color-popup" class="fade-in">
-                                    <div class="color-grid-theme" id="theme-colors"></div>
-                                    <input type="color" onchange="window.selectAnyColor(this.value)" class="w-full h-8 cursor-pointer rounded-lg border-none p-0 overflow-hidden shadow-inner">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                            <input type="text" id="img-url" placeholder="이미지 주소(URL)를 입력하세요" class="flex-1 pl-4 p-2.5 bg-white rounded-lg border border-slate-200 outline-none text-sm">
-                            <button type="button" onmousedown="event.preventDefault(); insertCustomImage()" class="bg-[#0f172a] text-white px-8 py-2.5 rounded-lg font-black text-sm hover:bg-black transition-all">이미지 삽입</button>
-                        </div>
-                    </div>
-
-                    <div id="editor" contenteditable="true"></div>
-                    <input type="hidden" id="edit-id">
-                    <div class="flex gap-4 mt-10">
-                        <button id="save-btn" class="flex-1 bg-[#0f172a] text-white p-6 rounded-2xl font-black text-xl hover:bg-black transition shadow-xl">PUBLISH NOTICE</button>
-                        <button id="cancel-edit-btn" class="hidden px-12 bg-slate-100 text-slate-500 rounded-2xl font-black hover:bg-slate-200">CANCEL</button>
-                    </div>
-                </div>
-
-                <!-- 공지사항 검색창 -->
-                <div class="flex justify-between items-center mb-4 px-2">
-                    <h3 class="font-black text-slate-400 uppercase text-xs tracking-widest">Notice List</h3>
-                    <div class="search-box w-64 bg-white border-slate-100">
-                        <i data-lucide="search" class="w-4 h-4 text-slate-300"></i>
-                        <input type="text" id="notice-search" oninput="window.filterNotices(this.value)" placeholder="공지 제목 검색" class="search-input">
-                    </div>
-                </div>
-                <div id="manage-list" class="grid md:grid-cols-2 gap-4 pb-20"></div>
-            </div>
-
-            <!-- [2] 지원자 현황 탭 -->
-            <div id="section-applicant" class="hidden space-y-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-                    <h2 class="text-3xl font-black text-[#0f172a]">지원자 통합 현황</h2>
-                    
-                    <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
-                        <!-- 지원자 유형 필터 -->
-                        <div class="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
-                            <button onclick="window.setApplicantType('전체')" class="app-filter-btn active px-4 py-2 rounded-lg text-xs font-black transition" id="filter-all">전체</button>
-                            <button onclick="window.setApplicantType('창업자')" class="app-filter-btn px-4 py-2 rounded-lg text-xs font-black transition text-slate-400" id="filter-founder">창업자</button>
-                            <button onclick="window.setApplicantType('전문가')" class="app-filter-btn px-4 py-2 rounded-lg text-xs font-black transition text-slate-400" id="filter-expert">전문가</button>
-                        </div>
-
-                        <!-- 지원자 검색창 -->
-                        <div class="search-box flex-1 md:w-64 border-slate-200 shadow-sm">
-                            <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
-                            <input type="text" id="applicant-search" oninput="window.filterApplicants(this.value)" placeholder="이름/번호/메일 검색" class="search-input">
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="applicant-list" class="grid gap-6 pb-20">
-                    <!-- 지원자 리스트 렌더링 영역 -->
-                </div>
-            </div>
-        </div>
+    <!-- 토스트 알림바 -->
+    <div id="custom-toast">
+        <i data-lucide="check-circle" class="w-5 h-5 text-blue-400"></i>
+        <span id="toast-msg">정상적으로 접수되었습니다.</span>
     </div>
+
+    <!-- 플로팅 메뉴 -->
+    <div class="floating-container">
+        <div id="float-menu" class="floating-menu">
+            <button onclick="window.moveToApply('startup')" class="sub-float-btn shadow-xl text-right">🚀 창업자 지원하기</button>
+            <button onclick="window.moveToApply('expert')" class="sub-float-btn shadow-xl text-right">🎓 전문가 등록하기</button>
+        </div>
+        <button onclick="window.toggleFloatMenu()" class="main-float-btn">
+            <i data-lucide="plus-circle" id="float-icon" class="w-6 h-6"></i>
+            <span>지금 지원하기</span>
+        </button>
+    </div>
+
+    <!-- 이미지 확대 -->
+    <div id="image-modal" onclick="this.style.display='none'">
+        <img id="modal-img" src="" alt="확대 이미지">
+    </div>
+
+    <!-- 네비게이션 -->
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="window.showPage('home')">
+                <div class="w-10 h-10 bg-[#0f172a] rounded-xl flex items-center justify-center text-white shadow-2xl">
+                    <i data-lucide="globe"></i>
+                </div>
+                <span class="text-xl font-black tracking-tighter text-[#0f172a]">GSN NETWORK</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-10">
+                <button id="nav-about" onclick="window.showPage('about')" class="nav-link">소개/비전</button>
+                <button id="nav-startup" onclick="window.showPage('startup')" class="nav-link">창업자모집</button>
+                <button id="nav-expert" onclick="window.showPage('expert')" class="nav-link">전문가모집</button>
+                <button id="nav-board" onclick="window.showPage('board')" class="nav-link">공지사항</button>
+                <button onclick="location.href='admin.html'" class="text-[10px] font-bold text-slate-300 hover:text-[#0f172a]">ADMIN</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-20">
+        <!-- 홈 섹션 -->
+        <section id="page-home" class="tab-content active">
+            <div class="relative h-[750px] flex items-center bg-[#0f172a] overflow-hidden">
+                <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+                <div class="relative max-w-7xl mx-auto px-6 w-full fade-in">
+                    <h1 class="text-7xl md:text-9xl font-black text-white leading-none mb-8 tracking-tighter italic">GLOBAL<br>GSN.</h1>
+                    <p class="text-xl text-slate-400 max-w-2xl mb-12 font-light leading-relaxed">대한민국 스타트업의 글로벌 성공을 위한 압도적 네트워크.</p>
+                    <button onclick="window.showPage('startup')" class="bg-white text-[#0f172a] px-10 py-4 rounded-full font-black hover:bg-slate-200 transition-all">START NOW</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 소개 섹션 -->
+        <section id="page-about" class="tab-content py-32 bg-white">
+            <div class="max-w-5xl mx-auto px-6">
+                <div class="text-center mb-24">
+                    <h2 class="text-5xl font-black text-[#0f172a] tracking-tight uppercase italic mb-4">Vision & Mission</h2>
+                    <div class="w-24 h-2 bg-[#0f172a] mx-auto rounded-full"></div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div class="p-12 bg-slate-50 rounded-[3rem] border border-slate-100">
+                        <h3 class="text-2xl font-black text-[#0f172a] mb-6">Our Vision</h3>
+                        <p class="text-lg text-slate-600 leading-relaxed italic">"국경 없는 창업 생태계를 주도하여 대한민국 기업이 글로벌 스탠다드가 되는 세상을 만듭니다."</p>
+                    </div>
+                    <div class="p-12 bg-[#0f172a] text-white rounded-[3rem] shadow-2xl">
+                        <h3 class="text-2xl font-black mb-6">Our Mission</h3>
+                        <ul class="space-y-4 font-bold text-slate-400">
+                            <li class="flex items-center gap-3"><i data-lucide="check-circle" class="text-blue-500 w-5 h-5"></i> 실질적인 글로벌 진출 가이드라인 구축</li>
+                            <li class="flex items-center gap-3"><i data-lucide="check-circle" class="text-blue-500 w-5 h-5"></i> 산·학·연 글로벌 전문가 네트워크 연계</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 창업자 모집 -->
+        <section id="page-startup" class="tab-content py-32 bg-slate-50">
+            <div class="max-w-2xl mx-auto px-6">
+                <h2 class="text-4xl font-black text-[#0f172a] mb-12 text-center">창업 지원 신청</h2>
+                <form id="startup-form" class="bg-white p-12 rounded-[3rem] shadow-2xl space-y-6">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <input type="text" name="name" required placeholder="성함 / 기업명" class="w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold">
+                        <input type="tel" name="phone" required placeholder="연락처 (010-0000-0000)" class="w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold">
+                    </div>
+                    <input type="email" name="email" required placeholder="이메일 주소" class="w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold">
+                    <textarea name="field" required placeholder="상세 지원 내용 및 사업 분야를 입력해 주세요." class="w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 transition h-40 font-bold"></textarea>
+                    
+                    <label class="flex items-center gap-3 cursor-pointer p-2">
+                        <input type="checkbox" required class="w-5 h-5 accent-[#0f172a]">
+                        <span class="text-xs font-bold text-slate-500">정보 수집 및 이용에 동의합니다.</span>
+                    </label>
+
+                    <button type="submit" id="startup-btn" class="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black text-lg hover:bg-black transition shadow-xl">지원서 제출하기</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 전문가 모집 -->
+        <section id="page-expert" class="tab-content py-32 bg-white">
+            <div class="max-w-3xl mx-auto px-6">
+                <div class="bg-[#0f172a] rounded-[3rem] p-12 md:p-16 text-white shadow-2xl relative overflow-hidden">
+                    <h2 class="text-4xl font-black mb-10 text-center">글로벌 전문가 등록</h2>
+                    <form id="expert-form" class="space-y-6">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <input type="text" name="name" required placeholder="성함" class="w-full p-4 rounded-2xl bg-white/10 border border-white/10 outline-none text-white focus:bg-white/20 transition font-bold">
+                            <input type="tel" name="phone" required placeholder="연락처 (010-0000-0000)" class="w-full p-4 rounded-2xl bg-white/10 border border-white/10 outline-none text-white focus:bg-white/20 transition font-bold">
+                        </div>
+                        <input type="email" name="email" required placeholder="이메일 주소" class="w-full p-4 rounded-2xl bg-white/10 border border-white/10 outline-none text-white focus:bg-white/20 transition font-bold">
+                        <textarea name="field" required placeholder="주요 경력 및 지원 가능한 전문 분야를 입력해 주세요." class="w-full p-4 rounded-2xl bg-white/10 border border-white/10 outline-none text-white focus:bg-white/20 transition h-32 font-bold"></textarea>
+                        
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" required class="w-5 h-5 accent-blue-500">
+                            <span class="text-xs font-bold text-slate-400">전문가 등록을 위한 정보 수집 및 이용에 동의합니다.</span>
+                        </label>
+
+                        <button type="submit" id="expert-btn" class="w-full bg-white text-[#0f172a] p-5 rounded-2xl font-black text-lg hover:bg-slate-200 transition shadow-xl">등록 신청하기</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- 공지사항 -->
+        <section id="page-board" class="tab-content py-32 bg-white">
+            <div class="max-w-4xl mx-auto px-6">
+                <div id="notice-list-view">
+                    <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
+                        <div>
+                            <h2 class="text-5xl font-black text-[#0f172a] tracking-tighter italic mb-4">NOTICE.</h2>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="window.applyFilter('전체')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-[#0f172a] text-white">전체보기</button>
+                                <button onclick="window.applyFilter('지원공고')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100">지원공고</button>
+                                <button onclick="window.applyFilter('네트워킹')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100">네트워킹</button>
+                                <button onclick="window.applyFilter('일반소식')" class="filter-btn px-5 py-2 rounded-full text-xs font-bold bg-slate-100">일반소식</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center bg-slate-50 border border-slate-200 px-4 rounded-2xl w-full max-w-xs">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                            <input type="text" placeholder="검색어 입력" oninput="window.applySearch(this.value)" class="bg-transparent border-none outline-none p-3 text-sm w-full">
+                        </div>
+                    </div>
+                    <div id="notice-list-container" class="space-y-1"></div>
+                </div>
+
+                <div id="notice-detail-view" class="hidden fade-in">
+                    <div class="flex justify-between items-center mb-12">
+                        <button onclick="window.backToList()" class="flex items-center gap-2 text-slate-400 hover:text-[#0f172a] font-black transition text-sm">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i> BACK TO LIST
+                        </button>
+                        <button onclick="window.copyNoticeURL()" class="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-full text-xs font-bold text-slate-500">
+                            <i data-lucide="share-2" class="w-3.5 h-3.5"></i> 주소 복사
+                        </button>
+                    </div>
+                    <div class="article-container">
+                        <div id="detail-category" class="mb-4"></div>
+                        <h1 id="detail-title" class="article-title"></h1>
+                        <div class="article-meta">
+                            <span id="detail-date"></span>
+                            <span class="text-slate-200">|</span>
+                            <span class="font-bold text-[#0f172a] uppercase text-xs">GSN Official</span>
+                        </div>
+                        <div id="detail-body" class="article-body"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-slate-100 py-24 mt-20 text-center">
+        <p class="font-black text-2xl mb-6 text-[#0f172a]">GSN NETWORK.</p>
+        <p class="text-slate-300 text-[10px] font-bold uppercase tracking-widest italic">© 2026 GLOBAL STARTUP SUPPORT NETWORK. ALL RIGHTS RESERVED.</p>
+    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBz60TBGXkTwHhJ1LmBN0ZXdyM34_ndS_A",
@@ -298,179 +265,129 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = "gsn-network";
-        const editor = document.getElementById('editor');
 
-        let lastSelection = null;
-        let allApplicants = [];
+        // 알림창 띄우기 함수
+        window.showToast = (msg) => {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        };
+
+        // 플로팅 메뉴 제어
+        window.toggleFloatMenu = () => {
+            const menu = document.getElementById('float-menu');
+            const icon = document.getElementById('float-icon');
+            menu.classList.toggle('show');
+            icon.setAttribute('data-lucide', menu.classList.contains('show') ? 'x-circle' : 'plus-circle');
+            lucide.createIcons();
+        };
+        window.moveToApply = (id) => { window.showPage(id); window.toggleFloatMenu(); };
+
+        // 게시판 상태
         let allNotices = [];
-        let currentApplicantType = '전체';
-        let applicantSearchTerm = '';
-        let noticeSearchTerm = '';
+        let currentFilter = '전체';
+        let currentSearchTerm = '';
 
-        // --- 탭 전환 ---
-        window.switchTab = (target) => {
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-' + target).classList.add('active');
-            if(target === 'notice') {
-                document.getElementById('section-notice').classList.remove('hidden');
-                document.getElementById('section-applicant').classList.add('hidden');
-                renderNotices();
-            } else {
-                document.getElementById('section-notice').classList.add('hidden');
-                document.getElementById('section-applicant').classList.remove('hidden');
-                renderApplicants();
-            }
+        window.copyNoticeURL = () => {
+            navigator.clipboard.writeText(window.location.href).then(() => window.showToast("주소가 복사되었습니다."));
         };
 
-        // --- 지원자 렌더링 (유형 및 검색 필터링) ---
-        function renderApplicants() {
-            let filtered = allApplicants;
-            if(currentApplicantType !== '전체') filtered = filtered.filter(a => a.type === currentApplicantType);
-            if(applicantSearchTerm) {
-                const t = applicantSearchTerm.toLowerCase();
-                filtered = filtered.filter(a => a.name?.toLowerCase().includes(t) || a.phone?.toLowerCase().includes(t) || a.email?.toLowerCase().includes(t) || a.content?.toLowerCase().includes(t));
-            }
-
-            let html = filtered.map(d => `
-                <div class="applicant-card flex flex-col md:flex-row justify-between items-start gap-8 fade-in">
-                    <div class="flex-1 space-y-3">
-                        <div class="flex items-center gap-3">
-                            <span class="text-[10px] font-black px-2 py-1 rounded ${d.type === '창업자' ? 'bg-blue-600' : 'bg-purple-600'} text-white uppercase">${d.type}</span>
-                            <h3 class="text-xl font-bold text-slate-800">${d.name}</h3>
-                        </div>
-                        <div class="flex flex-wrap gap-4 text-sm font-bold">
-                            <span class="text-blue-600"><i data-lucide="phone" class="w-3.5 h-3.5 inline mr-1"></i> ${d.phone || '-'}</span>
-                            <span class="text-slate-500"><i data-lucide="mail" class="w-3.5 h-3.5 inline mr-1"></i> ${d.email || '-'}</span>
-                        </div>
-                        <div class="bg-slate-50 p-5 rounded-2xl text-slate-600 text-sm border border-slate-100 whitespace-pre-wrap mt-4 leading-relaxed">${d.content}</div>
-                    </div>
-                    <div class="flex flex-col items-end gap-4 flex-shrink-0">
-                        <span class="text-[10px] font-bold text-slate-300 uppercase">${d.date}</span>
-                        <button onclick="window.deleteApplicant('${d.id}')" class="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
-                </div>`).join('');
-            document.getElementById('applicant-list').innerHTML = html || '<div class="p-20 text-center text-slate-300 font-bold italic">조회된 지원자가 없습니다.</div>';
-            lucide.createIcons();
-        }
-
-        window.setApplicantType = (t) => {
-            currentApplicantType = t;
-            document.querySelectorAll('.app-filter-btn').forEach(btn => btn.classList.remove('active', 'bg-[#0f172a]', 'text-white'));
-            const activeBtn = document.getElementById(t === '전체' ? 'filter-all' : (t === '창업자' ? 'filter-founder' : 'filter-expert'));
-            activeBtn.classList.add('active', 'bg-[#0f172a]', 'text-white');
-            renderApplicants();
-        };
-
-        window.filterApplicants = (term) => { applicantSearchTerm = term; renderApplicants(); };
-        window.deleteApplicant = async (id) => { if(confirm("영구 삭제하시겠습니까?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'applications', id)); };
-
-        // --- 공지사항 렌더링 ---
-        function renderNotices() {
-            let filtered = allNotices;
-            if(noticeSearchTerm) filtered = filtered.filter(n => n.title.toLowerCase().includes(noticeSearchTerm.toLowerCase()));
-            let html = filtered.map(n => `
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-100 flex justify-between items-center shadow-lg group hover:border-[#0f172a] transition-all">
-                    <div class="flex items-center gap-4 overflow-hidden">
-                        <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 group-hover:bg-[#0f172a] group-hover:text-white transition-all flex-shrink-0"><i data-lucide="file-text" class="w-5 h-5"></i></div>
-                        <div class="truncate">
-                            <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded mb-1 inline-block uppercase">${n.category || '기타'}</span>
-                            <h3 class="font-bold text-slate-800 text-sm truncate">${n.title}</h3>
-                            <p class="text-[9px] text-slate-400 font-bold uppercase">${n.date}</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-2 flex-shrink-0 ml-4">
-                        <button onclick="window.editNotice('${n.id}')" class="w-9 h-9 bg-slate-50 text-slate-400 rounded-lg hover:bg-[#0f172a] hover:text-white transition-all flex items-center justify-center"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                        <button onclick="window.deleteNotice('${n.id}')" class="w-9 h-9 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all flex items-center justify-center"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
-                </div>`).join('');
-            document.getElementById('manage-list').innerHTML = html;
-            lucide.createIcons();
-        }
-        window.filterNotices = (t) => { noticeSearchTerm = t; renderNotices(); };
-
-        // --- 에디터 색상 팔레트 ---
-        const themeKalam = [['#ffffff', '#000000', '#eeece1', '#1f497d', '#4f81bd', '#c0504d', '#9bbb59', '#8064a2', '#4bacc6', '#f79646'], ['#f2f2f2', '#7f7f7f', '#ddd9c3', '#c6d9f0', '#dbe5f1', '#f2dbdb', '#ebf1de', '#e5e0ec', '#dbeef3', '#fdeada'], ['#d8d8d8', '#595959', '#c4bd97', '#8db3e2', '#b8cce4', '#e5b9b7', '#d7e3bc', '#ccc1d9', '#b7dde8', '#fbd5b5']];
-        function initPalette() {
-            const box = document.getElementById('theme-colors'); box.innerHTML = '';
-            themeKalam.forEach(row => row.forEach(c => {
-                const d = document.createElement('div'); d.className='color-cell'; d.style.background=c;
-                d.onclick=() => window.selectAnyColor(c); box.appendChild(d);
-            }));
-        }
-        window.togglePalette = () => document.getElementById('color-popup').classList.toggle('show');
-        window.selectAnyColor = (c) => { window.formatDoc('foreColor', c); document.getElementById('selected-preview').style.background = c; document.getElementById('color-popup').classList.remove('show'); };
-
-        // --- 에디터 기본 기능 ---
-        function saveSelection() { const sel = window.getSelection(); if (sel.getRangeAt && sel.rangeCount) lastSelection = sel.getRangeAt(0); }
-        function restoreSelection() { if (lastSelection) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(lastSelection); } }
-        window.applyFontSize = (s) => {
-            if(!s) return; restoreSelection(); document.execCommand('styleWithCSS', null, true);
-            const sel = window.getSelection(); if (sel.rangeCount) { const range = sel.getRangeAt(0); const span = document.createElement('span'); span.style.fontSize = s + 'pt'; if (range.collapsed) { span.innerHTML = '&#8203;'; range.insertNode(span); range.setStartAfter(span); } else { span.appendChild(range.extractContents()); range.insertNode(span); } sel.removeAllRanges(); sel.addRange(range); } editor.focus();
-        };
-        window.formatDoc = (cmd, val = null) => { restoreSelection(); document.execCommand(cmd, false, val); editor.focus(); updateToolbar(); };
-        function updateToolbar() { const b = document.queryCommandState('bold'); const l = document.queryCommandState('insertUnorderedList'); document.getElementById('btn-bold')?.classList.toggle('active', b); document.getElementById('btn-list')?.classList.toggle('active', l); saveSelection(); }
-        window.insertCustomImage = () => {
-            const url = document.getElementById('img-url').value.trim(); if(!url) return; restoreSelection(); if (!lastSelection && !editor.firstChild) editor.focus();
-            const h = `<img src="${url}" referrerpolicy="no-referrer" class="article-img" alt="본문 이미지">`;
-            document.execCommand('insertHTML', false, h); document.getElementById('img-url').value = ""; editor.focus(); updateToolbar();
-        };
-
-        // --- 인증 리스너 및 데이터 동기화 ---
-        onAuthStateChanged(auth, (user) => {
-            lucide.createIcons();
-            // [보완] 익명 사용자(Anonymous)가 아닌 실사용자(Admin Email)인 경우에만 관리 기능 노출
-            if (user && !user.isAnonymous) {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('admin-content').classList.remove('hidden');
-                document.getElementById('auth-status').classList.remove('hidden');
-                initPalette(); 
-                onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), orderBy("createdAt", "desc")), (snap) => { allNotices = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderNotices(); });
-                onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'applications'), orderBy("createdAt", "desc")), (snap) => { allApplicants = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderApplicants(); });
-            } else {
-                document.getElementById('login-section').classList.remove('hidden');
-                document.getElementById('admin-content').classList.add('hidden');
-                document.getElementById('auth-status').classList.add('hidden');
-            }
+        onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), orderBy("createdAt", "desc")), (snapshot) => {
+            allNotices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderNotices();
         });
 
-        document.getElementById('login-btn').onclick = async () => {
-            const e = document.getElementById('email').value.trim();
-            const p = document.getElementById('password').value.trim();
-            try { await signInWithEmailAndPassword(auth, e, p); } catch (err) { alert("로그인 실패: 아이디 또는 비밀번호를 확인하세요."); }
-        };
-        document.getElementById('logout-btn').onclick = () => signOut(auth);
-
-        document.getElementById('save-btn').onclick = async () => {
-            const t = document.getElementById('notice-title').value.trim();
-            const c = document.getElementById('notice-category').value;
-            const co = editor.innerHTML; 
-            const eid = document.getElementById('edit-id').value;
-            if (!t || !co || co === "<br>") return alert("내용을 입력하세요.");
-            try {
-                const today = new Date();
-                const dStr = `${today.getFullYear()}. ${String(today.getMonth() + 1).padStart(2, '0')}. ${String(today.getDate()).padStart(2, '0')}`;
-                const data = { title: t, category: c, content: co, date: dStr };
-                if (eid) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', eid), { ...data, updatedAt: serverTimestamp() });
-                else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), { ...data, createdAt: serverTimestamp() });
-                alert("성공적으로 저장되었습니다."); window.resetForm();
-            } catch (err) { alert("저장 실패"); }
-        };
-
-        window.editNotice = async (id) => {
-            const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id));
-            if (snap.exists()) {
-                const d = snap.data(); document.getElementById('notice-title').value = d.title; document.getElementById('notice-category').value = d.category || "지원공고";
-                editor.innerHTML = d.content || ""; document.getElementById('edit-id').value = id; document.getElementById('cancel-edit-btn').classList.remove('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' }); window.switchTab('notice');
+        function renderNotices() {
+            let filtered = allNotices;
+            if (currentFilter !== '전체') filtered = filtered.filter(n => n.category === currentFilter);
+            if (currentSearchTerm) {
+                const t = currentSearchTerm.toLowerCase();
+                filtered = filtered.filter(n => n.title.toLowerCase().includes(t) || n.content.toLowerCase().includes(t));
             }
+            document.getElementById('notice-list-container').innerHTML = filtered.map(n => `
+                <div class="py-8 border-b border-slate-100 cursor-pointer group" onclick="window.openNotice('${n.id}')">
+                    <span class="cat-chip cat-${n.category || '일반소식'}">${n.category || '일반소식'}</span>
+                    <h3 class="text-xl font-bold text-slate-800 mt-3 group-hover:text-blue-600 transition line-clamp-1">${n.title}</h3>
+                    <p class="text-slate-400 text-xs mt-2 font-medium uppercase">${n.date}</p>
+                </div>`).join('') || '<p class="text-slate-300 py-10 text-center font-bold">목록이 없습니다.</p>';
+            lucide.createIcons();
+        }
+
+        window.applyFilter = (c) => { currentFilter = c; renderNotices(); };
+        window.applySearch = (t) => { currentSearchTerm = t.trim(); renderNotices(); };
+
+        window.openNotice = (id) => {
+            const n = allNotices.find(i => i.id === id); if(!n) return;
+            document.getElementById('notice-list-view').classList.add('hidden');
+            document.getElementById('notice-detail-view').classList.remove('hidden');
+            document.getElementById('detail-category').innerHTML = `<span class="cat-chip cat-${n.category}">${n.category}</span>`;
+            document.getElementById('detail-title').innerText = n.title;
+            document.getElementById('detail-date').innerText = n.date;
+            document.getElementById('detail-body').innerHTML = n.content;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.querySelectorAll('#detail-body img').forEach(img => {
+                img.onclick = () => { document.getElementById('modal-img').src = img.src; document.getElementById('image-modal').style.display = 'flex'; };
+            });
+        };
+        window.backToList = () => { document.getElementById('notice-list-view').classList.remove('hidden'); document.getElementById('notice-detail-view').classList.add('hidden'); };
+
+        window.showPage = (id) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById('page-' + id)?.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById('nav-' + id)?.classList.add('active');
+            if (id === 'board') window.backToList();
         };
 
-        window.deleteNotice = async (id) => { if(confirm("삭제하시겠습니까?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); };
-        window.resetForm = () => { document.getElementById('notice-title').value = ""; editor.innerHTML = ""; document.getElementById('edit-id').value = ""; document.getElementById('cancel-edit-btn').classList.add('hidden'); };
-        
-        editor.addEventListener('mouseup', updateToolbar); editor.addEventListener('keyup', updateToolbar);
-        editor.addEventListener('click', (e) => { if (e.target.tagName === 'IMG') { editor.querySelectorAll('img').forEach(img => img.classList.remove('selected')); e.target.classList.add('selected'); e.target.focus(); saveSelection(); } else { editor.querySelectorAll('img').forEach(img => img.classList.remove('selected')); } });
-        editor.addEventListener('keydown', (e) => { if ((e.key === 'Backspace' || e.key === 'Delete') && editor.querySelector('img.selected')) { e.preventDefault(); editor.querySelector('img.selected').remove(); updateToolbar(); } });
-        
+        // [핵심 보완] 통합 지원서 제출 및 실시간 인증 처리
+        async function submitApplication(formId, type) {
+            const form = document.getElementById(formId);
+            const btn = form.querySelector('button[type="submit"]');
+            
+            // 1. 제출 버튼 비활성화
+            btn.innerText = "제출 중...";
+            btn.disabled = true;
+
+            try {
+                // 2. 인증 상태 체크 및 실시간 로그인 시도
+                if (!auth.currentUser) {
+                    await signInAnonymously(auth);
+                }
+                
+                const fd = new FormData(form);
+                const data = {
+                    type: type, name: fd.get('name'), phone: fd.get('phone'), email: fd.get('email'),
+                    content: fd.get('field'), createdAt: serverTimestamp(), date: new Date().toLocaleDateString('ko-KR')
+                };
+
+                // 3. 데이터베이스 저장
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'applications'), data);
+                
+                // 4. 이메일 발송
+                await emailjs.send("service_yk6n7mo", "template_4ys4qgh", {
+                    from_name: data.name,
+                    content: `[${type}] 연락처: ${data.phone}\n이메일: ${data.email}\n내용: ${data.content}`,
+                    to_email: "sunganstudio24@gmail.com"
+                });
+                
+                // 5. 성공 알림 및 폼 초기화
+                window.showToast("정상적으로 접수되었습니다. 곧 연락드릴게요!");
+                form.reset();
+            } catch (err) {
+                console.error(err);
+                window.showToast("오류가 발생했습니다. 다시 시도해 주세요.");
+            } finally {
+                btn.innerText = (type === '창업자' ? "지원서 제출하기" : "등록 신청하기");
+                btn.disabled = false;
+            }
+        }
+
+        emailjs.init("vGFkDB_DP_DlBxsHM");
+        document.getElementById('startup-form').onsubmit = (e) => { e.preventDefault(); submitApplication('startup-form', '창업자'); };
+        document.getElementById('expert-form').onsubmit = (e) => { e.preventDefault(); submitApplication('expert-form', '전문가'); };
+
         lucide.createIcons();
     </script>
 </body>
