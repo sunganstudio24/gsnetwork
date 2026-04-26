@@ -120,7 +120,7 @@
                             <option>기타</option>
                         </select>
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">지원하기</button>
+                    <button type="submit" id="startup-submit-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">지원하기</button>
                 </form>
             </div>
         </section>
@@ -134,13 +134,13 @@
                         <input type="text" name="name" required placeholder="이름 / 소속" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 outline-none focus:bg-white/20">
                         <input type="text" name="field" required placeholder="전문분야" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 outline-none focus:bg-white/20">
                         <input type="email" name="email" required placeholder="이메일 주소" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 outline-none focus:bg-white/20">
-                        <button type="submit" class="bg-white text-blue-900 w-full py-3 rounded-lg font-bold hover:bg-slate-100 transition">신청하기</button>
+                        <button type="submit" id="expert-submit-btn" class="bg-white text-blue-900 w-full py-3 rounded-lg font-bold hover:bg-slate-100 transition">신청하기</button>
                     </div>
                 </form>
             </div>
         </section>
 
-        <!-- 매칭보드 섹션 -->
+        <!-- 매칭보드 및 공지사항, 관리자 섹션 생략 (기존 동일) -->
         <section id="page-matching" class="tab-content py-20">
             <div class="max-w-5xl mx-auto px-4">
                 <h2 class="text-3xl font-bold mb-8">매칭 및 네트워킹</h2>
@@ -150,7 +150,6 @@
             </div>
         </section>
 
-        <!-- 공지사항 섹션 -->
         <section id="page-board" class="tab-content py-20 bg-white">
             <div class="max-w-5xl mx-auto px-4">
                 <h2 class="text-3xl font-bold mb-8">공지사항</h2>
@@ -165,18 +164,17 @@
             </div>
         </section>
 
-        <!-- 관리자 섹션 -->
         <section id="page-admin" class="tab-content py-20 bg-slate-50">
             <div class="max-w-6xl mx-auto px-4">
                 <h2 class="text-2xl font-bold mb-6">신청자 현황 (관리자)</h2>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
                         <div class="p-4 bg-slate-800 text-white font-bold">창업자</div>
-                        <div id="admin-startup-list" class="p-4 text-sm space-y-2">GitHub Pages 모드: 데이터베이스 연동 꺼짐</div>
+                        <div id="admin-startup-list" class="p-4 text-sm space-y-2">데이터베이스 연동 꺼짐</div>
                     </div>
                     <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
                         <div class="p-4 bg-blue-800 text-white font-bold">전문가</div>
-                        <div id="admin-expert-list" class="p-4 text-sm space-y-2">GitHub Pages 모드: 데이터베이스 연동 꺼짐</div>
+                        <div id="admin-expert-list" class="p-4 text-sm space-y-2">데이터베이스 연동 꺼짐</div>
                     </div>
                 </div>
             </div>
@@ -191,7 +189,7 @@
         </div>
     </footer>
 
-    <!-- 알림 모달 (접수 완료 창) -->
+    <!-- 알림 모달 -->
     <div id="message-modal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 hidden">
         <div class="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl">
             <h3 class="text-xl font-bold mb-2">접수 완료</h3>
@@ -200,9 +198,8 @@
         </div>
     </div>
 
-    <!-- 기능 작동 자바스크립트 -->
     <script type="module">
-        // 1. 화면 이동 및 팝업 닫기 기능 (가장 중요)
+        // 화면 전환 및 모달 함수
         window.showPage = (id) => {
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(t => t.classList.remove('active'));
@@ -224,73 +221,91 @@
             document.getElementById('welcome-popup').style.display = 'none';
         };
 
-        // 2. 화면 켜질 때 팝업 설정
         document.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('gsn_popup_hide') !== new Date().toDateString()) {
                 document.getElementById('welcome-popup').style.display = 'flex';
             }
             lucide.createIcons();
-            setupFormHandlers(); // 폼 기능 켜기
+            setupFormHandlers(); 
         });
 
-        // 3. 이메일 보내기 기능
         // =====================================================================
-        // [중요 수정 부분 1] 여기에 가입하신 EmailJS의 Public Key를 붙여넣으세요!
+        // [중요] 지호님의 Public Key를 아래 " " 안에 넣어주세요! (이것만 하시면 됩니다)
         // =====================================================================
         emailjs.init("template_7c98orf"); 
 
+        // 이메일 전송 함수 (에러를 밖으로 던지도록 수정)
         async function sendEmailNotification(type, details) {
-            const serviceId = "service_yk6n7mo";
+            const serviceId = "service_yk6n7mo"; // 지호님 서비스 아이디
+            const templateId = "template_7c98orf"; // 방금 알려주신 템플릿 아이디
             
-            // =====================================================================
-            // [중요 수정 부분 2] 여기에 EmailJS에서 만든 템플릿 ID를 붙여넣으세요!
-            // =====================================================================
-            const templateId = "template_7c98orf"; 
-            
+            // EmailJS 기본 템플릿이 {{message}}를 사용하므로 텍스트를 미리 조립합니다.
+            let messageText = "";
+            if (type === 'startup') {
+                messageText = `[신규 창업자 지원]\n이름: ${details.name}\n연락처: ${details.phone}\n분야: ${details.field}`;
+            } else {
+                messageText = `[신규 전문가 지원]\n이름: ${details.name}\n이메일: ${details.email}\n전문분야: ${details.field}`;
+            }
+
             const templateParams = {
-                to_email: "sunganstudio24@gmail.com",
                 from_name: details.name,
-                subject: `[(사)글로벌창업지원네트워크] 신규 ${type === 'startup' ? '창업자' : '전문가'} 지원 안내`,
-                content: JSON.stringify(details, null, 2)
+                message: messageText
             };
 
-            try {
-                await emailjs.send(serviceId, templateId, templateParams);
-                console.log("이메일 전송 성공!");
-            } catch (error) {
-                console.warn("이메일 전송 실패 (키를 넣었는지 확인하세요):", error);
-            }
+            // 전송 실패 시 바로 알 수 있도록 return을 걸어두었습니다.
+            return emailjs.send(serviceId, templateId, templateParams);
         }
 
-        // 4. 지원하기 버튼 눌렀을 때 작동하는 로직
         function setupFormHandlers() {
-            // 창업자 폼
+            // 1. 창업자 폼
             const startupForm = document.getElementById('startup-form');
             if (startupForm) {
                 startupForm.addEventListener('submit', async (e) => {
-                    e.preventDefault(); // 화면 새로고침(튕김) 방지!
-                    
+                    e.preventDefault(); 
+                    const btn = document.getElementById('startup-submit-btn');
+                    btn.innerText = "전송 중..."; // 버튼 상태 변경
+                    btn.disabled = true;
+
                     const fd = new FormData(e.target);
-                    const data = { type: 'startup', name: fd.get('name'), phone: fd.get('phone') };
+                    const data = { type: 'startup', name: fd.get('name'), phone: fd.get('phone'), field: fd.get('field') };
                     
-                    await sendEmailNotification('startup', data); // 메일 쏘기
-                    window.toggleModal(true); // 완료 팝업 띄우기
-                    e.target.reset(); // 적은 내용 지우기
+                    try {
+                        // 메일을 쏘고, 성공해야만 아래 팝업이 뜹니다.
+                        await sendEmailNotification('startup', data); 
+                        window.toggleModal(true); 
+                        e.target.reset(); 
+                    } catch (error) {
+                        // 실패하면 화면에 경고창이 뜹니다!
+                        alert("이메일 전송 실패! Public Key를 다시 확인해주세요.\n(에러내용: " + (error.text || "알 수 없음") + ")");
+                    } finally {
+                        btn.innerText = "지원하기";
+                        btn.disabled = false;
+                    }
                 });
             }
 
-            // 전문가 폼
+            // 2. 전문가 폼
             const expertForm = document.getElementById('expert-form');
             if (expertForm) {
                 expertForm.addEventListener('submit', async (e) => {
-                    e.preventDefault(); // 화면 새로고침 방지!
-                    
+                    e.preventDefault(); 
+                    const btn = document.getElementById('expert-submit-btn');
+                    btn.innerText = "전송 중...";
+                    btn.disabled = true;
+
                     const fd = new FormData(e.target);
-                    const data = { type: 'expert', name: fd.get('name'), email: fd.get('email') };
+                    const data = { type: 'expert', name: fd.get('name'), email: fd.get('email'), field: fd.get('field') };
                     
-                    await sendEmailNotification('expert', data); // 메일 쏘기
-                    window.toggleModal(true); // 완료 팝업 띄우기
-                    e.target.reset(); // 적은 내용 지우기
+                    try {
+                        await sendEmailNotification('expert', data); 
+                        window.toggleModal(true); 
+                        e.target.reset(); 
+                    } catch (error) {
+                        alert("이메일 전송 실패! Public Key를 다시 확인해주세요.\n(에러내용: " + (error.text || "알 수 없음") + ")");
+                    } finally {
+                        btn.innerText = "신청하기";
+                        btn.disabled = false;
+                    }
                 });
             }
         }
