@@ -17,27 +17,29 @@
         
         /* 공지사항 목록 스타일 */
         .notice-row { cursor: pointer; transition: all 0.2s; border-left: 4px solid transparent; }
-        .notice-row:hover { border-left-color: #2563eb; background-color: #eff6ff; }
+        .notice-row:hover { border-left-color: #2563eb; background-color: #f8fafc; }
+        
+        /* 게시글 본문 영역 - 파란 선 제거 및 기사형 디자인 */
         .notice-content-area { display: none; background-color: #ffffff; border-bottom: 1px solid #f1f5f9; }
         .notice-content-area.open { display: table-row; }
         
-        /* 기사형 본문 스타일 */
+        /* 기사형 본문 스타일 (간격 최적화) */
         .article-content { 
-            line-height: 1.8; 
+            line-height: 1.7; 
             color: #334155; 
             font-size: 1.05rem; 
             word-break: keep-all; 
             overflow-wrap: break-word;
         }
         
-        /* 본문 내 이미지 스타일 (간격 최적화 및 차단 방지) */
-        .content-image-wrapper { margin: 1.2rem 0; text-align: center; }
+        /* 본문 내 이미지 스타일 (글과 사진 사이 여백 최소화) */
+        .content-image-wrapper { margin: 0.8rem 0; text-align: center; }
         .content-image { 
             max-width: 100%; 
             height: auto; 
-            border-radius: 0.75rem; 
+            border-radius: 0.5rem; 
             display: inline-block; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid #f1f5f9;
         }
 
@@ -89,7 +91,88 @@
             </div>
         </section>
 
-        <!-- [공지사항 섹션 - 기사형 디자인] -->
+        <!-- [소개/비전 섹션] -->
+        <section id="page-about" class="tab-content py-32 bg-white">
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="text-center mb-20">
+                    <h2 class="text-4xl font-bold mb-4 text-slate-900 text-center uppercase tracking-tight">Vision & Mission</h2>
+                    <div class="w-20 h-1.5 bg-blue-600 mx-auto rounded-full"></div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12 text-left">
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="mt-1 w-12 h-12 flex-shrink-0 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center font-bold text-xl">V</div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-blue-900 mb-4">Vision</h3>
+                                <p class="text-lg text-slate-700 leading-relaxed italic">
+                                    "대한민국 스타트업이 글로벌 표준이 되고,<br>세계 시장의 혁신을 주도하는 세상을 꿈꿉니다."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="mt-1 w-12 h-12 flex-shrink-0 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center font-bold text-xl">M</div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-indigo-900 mb-4">Mission</h3>
+                                <ul class="space-y-4 text-slate-600">
+                                    <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="text-emerald-500 w-5 h-5"></i> 실질적인 글로벌 시장 진출 가이드라인 구축</li>
+                                    <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="text-emerald-500 w-5 h-5"></i> 산·학·연 전문가 네트워크 연계</li>
+                                    <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="text-emerald-500 w-5 h-5"></i> 국경 없는 창업 생태계 조성 및 지원</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- [전문가 모집 섹션 - 복구 완료] -->
+        <section id="page-expert" class="tab-content py-24 bg-white">
+            <div class="max-w-4xl mx-auto px-4">
+                <div class="bg-blue-900 text-white rounded-[3rem] p-12 md:p-20 relative overflow-hidden shadow-2xl">
+                    <div class="absolute top-0 right-0 p-10 opacity-10">
+                        <i data-lucide="award" class="w-64 h-64"></i>
+                    </div>
+                    <div class="relative z-10 max-w-2xl text-left">
+                        <h2 class="text-4xl font-bold mb-6 leading-tight text-white">전문가 네트워크로<br>함께 참여하세요</h2>
+                        <p class="text-blue-100 text-lg mb-10 leading-relaxed">당신의 풍부한 경험과 전문 지식은 후배 창업가들에게 위대한 자산이 됩니다.</p>
+                        <form id="expert-form" class="space-y-4">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <input type="text" name="name" required placeholder="성함 / 소속" class="w-full p-4 rounded-xl bg-white/10 border border-white/20 outline-none focus:bg-white/20 transition placeholder-white/40">
+                                <input type="text" name="field" required placeholder="전문 분야" class="w-full p-4 rounded-xl bg-white/10 border border-white/20 outline-none focus:bg-white/20 transition placeholder-white/40">
+                            </div>
+                            <input type="email" name="email" required placeholder="이메일 주소" class="w-full p-4 rounded-xl bg-white/10 border border-white/20 outline-none focus:bg-white/20 transition placeholder-white/40">
+                            <button type="submit" id="expert-btn" class="w-full bg-white text-blue-900 p-5 rounded-2xl font-bold text-lg hover:bg-blue-50 transition shadow-lg mt-4">전문가 등록 신청</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- [창업자 모집 섹션] -->
+        <section id="page-startup" class="tab-content py-24 bg-slate-50">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold text-slate-900 mb-10">창업 지원 신청하기</h2>
+                <form id="startup-form" class="max-w-xl mx-auto bg-white p-10 rounded-[2.5rem] shadow-2xl border border-slate-100 space-y-6 text-left">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">이름 / 대표자명</label>
+                        <input type="text" name="name" required placeholder="성함을 입력하세요" class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">연락처</label>
+                        <input type="tel" name="phone" required placeholder="연락처를 입력하세요" class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">지원 내용</label>
+                        <textarea name="field" required placeholder="상세 내용을 입력해 주세요." class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 h-40 transition shadow-sm"></textarea>
+                    </div>
+                    <button type="submit" id="startup-btn" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-bold text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-200">지원서 제출하기</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- [공지사항 섹션 - 기사형 디자인 적용] -->
         <section id="page-board" class="tab-content py-24 bg-white min-h-screen">
             <div class="max-w-5xl mx-auto px-4">
                 <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4 border-b border-slate-100 pb-8 text-center md:text-left">
@@ -116,42 +199,13 @@
                 </div>
             </div>
         </section>
-
-        <!-- [신청 및 소개 섹션 - 구조 유지] -->
-        <section id="page-startup" class="tab-content py-24 bg-slate-50">
-            <div class="max-w-4xl mx-auto px-4 text-center">
-                <h2 class="text-3xl font-bold text-slate-900 mb-10">창업 지원 신청하기</h2>
-                <form id="startup-form" class="max-w-xl mx-auto bg-white p-10 rounded-[2.5rem] shadow-2xl border border-slate-100 space-y-6 text-left">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">성함 / 대표자명</label>
-                        <input type="text" name="name" required placeholder="성함을 입력하세요" class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">연락처</label>
-                        <input type="tel" name="phone" required placeholder="연락처를 입력하세요" class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 transition">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">지원 내용</label>
-                        <textarea name="field" required placeholder="상세 내용을 작성해 주세요." class="w-full p-4 border border-slate-200 rounded-2xl outline-none focus:border-blue-500 h-40 transition"></textarea>
-                    </div>
-                    <button type="submit" id="startup-btn" class="w-full bg-blue-600 text-white p-5 rounded-2xl font-bold text-lg hover:bg-blue-700 transition shadow-lg">지원서 제출하기</button>
-                </form>
-            </div>
-        </section>
-
-        <section id="page-about" class="tab-content py-24 bg-white">
-            <div class="max-w-4xl mx-auto px-4 text-center">
-                <h2 class="text-3xl font-bold mb-6 text-blue-900 italic">"Global Standard for Startups"</h2>
-                <p class="text-slate-600 leading-relaxed max-w-2xl mx-auto">글로벌 창업 지원 네트워크는 창업가의 꿈이 국경을 넘어 실현될 수 있도록 실질적인 솔루션을 제안합니다.</p>
-            </div>
-        </section>
     </main>
 
     <footer class="bg-slate-900 text-white py-20 mt-32 border-t-8 border-blue-600">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <div class="flex items-center justify-center gap-2 mb-6">
                 <i data-lucide="globe" class="text-blue-500"></i>
-                <span class="font-bold text-xl uppercase tracking-tighter">(사)글로벌창업지원네트워크</span>
+                <span class="font-bold text-xl uppercase tracking-tighter text-white">(사)글로벌창업지원네트워크</span>
             </div>
             <p class="text-slate-500 text-sm mb-10 italic">Inquiry: sunganstudio24@gmail.com</p>
             <p class="text-slate-600 text-[10px] uppercase tracking-widest">© 2026 Global Startup Support Network. All rights reserved.</p>
@@ -162,6 +216,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+        // 파이어베이스 설정
         const firebaseConfig = {
             apiKey: "AIzaSyBz60TBGXkTwHhJ1LmBN0ZXdyM34_ndS_A",
             authDomain: "gsn-network.firebaseapp.com",
@@ -175,14 +230,14 @@
         const db = getFirestore(app);
         const appId = "gsn-network";
 
-        // [본문 내 이미지 파싱 - 간격 최적화 및 차단 방지 적용]
+        // [본문 내 이미지 파싱 - 디자인 고도화 및 간격 최적화]
         function parseContentWithImages(content) {
             if (!content) return "내용이 없습니다.";
             
             // 보안을 위한 HTML 변환
             let html = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             
-            // [이미지:주소] 태그 감지 정규식
+            // [이미지:주소] 태그 감지 및 기사형 이미지로 변환
             const imageRegex = /\[이미지\s*[:：]\s*([^\]]+)\]/g;
             
             return html.replace(imageRegex, (match, url) => {
@@ -193,12 +248,12 @@
                              class="content-image" 
                              alt="본문 이미지" 
                              referrerpolicy="no-referrer" 
-                             onerror="this.parentNode.innerHTML='<p class=\'text-xs text-slate-300 py-2\'>[이미지를 불러올 수 없습니다]</p>'">
+                             onerror="this.parentNode.innerHTML='<p class=\'text-xs text-slate-300 py-1\'>[이미지를 불러올 수 없습니다]</p>'">
                     </div>`;
             });
         }
 
-        // 공지사항 로드
+        // 공지사항 실시간 로드
         const noticeList = document.getElementById('notice-list');
         const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), orderBy("createdAt", "desc"));
         
@@ -212,12 +267,12 @@
                 html += `
                     <tr class="notice-row" onclick="window.toggleNotice('${docId}')">
                         <td class="px-8 py-7 font-bold text-slate-800 text-lg flex items-center gap-2">
-                            ${data.title} ${hasImage ? '<span class="text-blue-500 text-[10px] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100 flex items-center gap-1 font-bold shadow-sm">사진포함</span>' : ''}
+                            ${data.title} ${hasImage ? '<span class="text-blue-500 text-[10px] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100 flex items-center gap-1 font-bold shadow-sm"><i data-lucide="image" class="w-2.5 h-2.5"></i> 사진</span>' : ''}
                         </td>
                         <td class="px-8 py-7 text-right text-slate-400 text-sm font-medium tracking-tight">${data.date}</td>
                     </tr>
                     <tr id="detail-${docId}" class="notice-content-area">
-                        <td colspan="2" class="px-8 md:px-16 py-10">
+                        <td colspan="2" class="px-8 md:px-20 py-10">
                             <div class="max-w-3xl mx-auto">
                                 <div class="article-content whitespace-pre-wrap">
                                     ${parseContentWithImages(data.content)}
@@ -226,7 +281,7 @@
                         </td>
                     </tr>`;
             });
-            noticeList.innerHTML = html || '<tr><td colspan="2" class="p-24 text-center text-slate-400">등록된 공지가 없습니다.</td></tr>';
+            noticeList.innerHTML = html || '<tr><td colspan="2" class="p-24 text-center text-slate-400">등록된 소식이 없습니다.</td></tr>';
             lucide.createIcons();
         });
 
@@ -249,22 +304,30 @@
 
         // EmailJS
         emailjs.init("vGFkDB_DP_DlBxsHM");
-        document.getElementById('startup-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('startup-btn');
-            btn.innerText = "전송 중..."; btn.disabled = true;
-            const fd = new FormData(e.target);
-            try {
-                await emailjs.send("service_yk6n7mo", "template_4ys4qgh", {
-                    from_name: fd.get('name'),
-                    content: `연락처: ${fd.get('phone')}\n내용: ${fd.get('field')}`,
-                    to_email: "sunganstudio24@gmail.com"
-                });
-                alert("성공적으로 접수되었습니다."); e.target.reset();
-            } catch (err) { alert("잠시 후 다시 시도해 주세요."); } finally { 
-                btn.innerText = "지원서 제출하기"; btn.disabled = false;
-            }
+        
+        const setupForm = (formId, btnId, label) => {
+            const form = document.getElementById(formId);
+            if(!form) return;
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById(btnId);
+                btn.innerText = "전송 중..."; btn.disabled = true;
+                const fd = new FormData(e.target);
+                try {
+                    await emailjs.send("service_yk6n7mo", "template_4ys4qgh", {
+                        from_name: fd.get('name'),
+                        content: `[${label}] 연락처/이메일: ${fd.get('phone') || fd.get('email')}\n내용: ${fd.get('field')}`,
+                        to_email: "sunganstudio24@gmail.com"
+                    });
+                    alert("성공적으로 접수되었습니다."); e.target.reset();
+                } catch (err) { alert("잠시 후 다시 시도해 주세요."); } finally { 
+                    btn.innerText = label === "창업자" ? "지원서 제출하기" : "전문가 등록 신청"; btn.disabled = false;
+                }
+            };
         };
+
+        setupForm('startup-form', 'startup-btn', '창업자');
+        setupForm('expert-form', 'expert-btn', '전문가');
 
         lucide.createIcons();
     </script>
