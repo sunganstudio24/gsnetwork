@@ -52,6 +52,8 @@
                 <button onclick="window.showPage('expert')" class="hover:text-blue-600 transition">전문가모집</button>
                 <button onclick="window.showPage('matching')" class="hover:text-blue-600 transition">매칭보드</button>
                 <button onclick="window.showPage('board')" class="hover:text-blue-600 transition">공지사항</button>
+                <!-- 관리자 버튼을 누르면 admin.html 페이지로 넘어가도록 수정됨 -->
+                <button onclick="location.href='admin.html'" class="bg-slate-100 px-3 py-1 rounded text-slate-500 hover:bg-slate-200 transition text-sm">관리자</button>
             </div>
         </div>
     </nav>
@@ -139,7 +141,7 @@
             </div>
         </section>
 
-        <!-- 매칭보드 및 공지사항 -->
+        <!-- 매칭보드 -->
         <section id="page-matching" class="tab-content py-20">
             <div class="max-w-5xl mx-auto px-4">
                 <h2 class="text-3xl font-bold mb-8">매칭 및 네트워킹</h2>
@@ -149,16 +151,25 @@
             </div>
         </section>
 
+        <!-- 공지사항 게시판 (데이터베이스 연동 완료!) -->
         <section id="page-board" class="tab-content py-20 bg-white">
             <div class="max-w-5xl mx-auto px-4">
-                <h2 class="text-3xl font-bold mb-8">공지사항</h2>
-                <div class="border rounded-xl overflow-hidden">
-                    <div class="p-6 bg-slate-50 border-b font-bold grid grid-cols-3">
-                        <span>번호</span><span>제목</span><span>날짜</span>
-                    </div>
-                    <div class="p-6 grid grid-cols-3 border-b text-sm">
-                        <span>1</span><span class="font-bold">공식 웹사이트 오픈</span><span>2024.03.20</span>
-                    </div>
+                <div class="flex justify-between items-end mb-8">
+                    <h2 class="text-3xl font-bold">공지사항</h2>
+                    <a href="admin.html" class="text-sm font-bold text-blue-600 hover:underline">관리자 접속 ⚙️</a>
+                </div>
+                <div class="border rounded-xl overflow-hidden shadow-sm">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b">
+                            <tr>
+                                <th class="px-6 py-4">제목</th>
+                                <th class="px-6 py-4 text-right">등록일</th>
+                            </tr>
+                        </thead>
+                        <tbody id="notice-list" class="divide-y bg-white">
+                            <tr><td colspan="2" class="p-8 text-center text-slate-400">게시판을 불러오는 중입니다...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -181,8 +192,42 @@
         </div>
     </div>
 
-    <!-- 기능 작동 자바스크립트 -->
+    <!-- 스크립트 (기능 작동부) -->
     <script type="module">
+        // 1. 공지사항 데이터베이스(Firebase) 연결
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, query, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        // 지호님께서 찾아주신 데이터베이스 열쇠
+        const firebaseConfig = {
+            apiKey: "AIzaSyBz60TBGXkTwHhJ1LmBN0ZXdyM34_ndS_A",
+            authDomain: "gsn-network.firebaseapp.com",
+            projectId: "gsn-network",
+            storageBucket: "gsn-network.firebasestorage.app",
+            messagingSenderId: "1065753363903",
+            appId: "1:1065753363903:web:bd8445b241e658a3becd0a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 실시간으로 공지사항 가져오기
+        const noticeList = document.getElementById('notice-list');
+        const q = query(collection(db, "notices"), orderBy("createdAt", "desc"));
+        
+        onSnapshot(q, (snapshot) => {
+            let html = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                html += `<tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4 font-medium text-slate-800">${data.title}</td>
+                            <td class="px-6 py-4 text-right text-slate-400 text-sm">${data.date}</td>
+                         </tr>`;
+            });
+            noticeList.innerHTML = html || '<tr><td colspan="2" class="p-8 text-center text-slate-400">등록된 공지사항이 없습니다.</td></tr>';
+        });
+
+        // 2. 화면 이동 및 팝업 닫기 (기존 정상작동 기능)
         window.showPage = (id) => {
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(t => t.classList.remove('active'));
@@ -194,10 +239,7 @@
             }
         };
 
-        window.toggleModal = (show) => {
-            document.getElementById('message-modal').classList.toggle('hidden', !show);
-        };
-
+        window.toggleModal = (show) => { document.getElementById('message-modal').classList.toggle('hidden', !show); };
         window.closeMainPopup = () => {
             const noMore = document.getElementById('no-more-today').checked;
             if (noMore) localStorage.setItem('gsn_popup_hide', new Date().toDateString());
@@ -212,29 +254,21 @@
             setupFormHandlers(); 
         });
 
-        // =====================================================================
-        // 지호님의 완벽한 키 세팅! (모두 넣어두었습니다)
-        // =====================================================================
-        emailjs.init("vGFkDB_DP_DlBxsHM"); // 퍼블릭 키
+        // 3. 이메일 전송 세팅 (기존 성공했던 기능 그대로 유지!)
+        emailjs.init("vGFkDB_DP_DlBxsHM"); 
 
         async function sendEmailNotification(type, details) {
-            const serviceId = "service_yk6n7mo"; // 서비스 아이디
-            const templateId = "template_4ys4qgh"; // 템플릿 아이디
-            
-            let messageText = "";
-            if (type === 'startup') {
-                messageText = `[신규 창업자 지원]\n이름: ${details.name}\n연락처: ${details.phone}\n분야: ${details.field}`;
-            } else {
-                messageText = `[신규 전문가 지원]\n이름: ${details.name}\n이메일: ${details.email}\n전문분야: ${details.field}`;
-            }
+            const serviceId = "service_yk6n7mo"; 
+            const templateId = "template_4ys4qgh"; 
+            let messageText = type === 'startup' 
+                ? `[신규 창업자 지원]\n이름: ${details.name}\n연락처: ${details.phone}\n분야: ${details.field}`
+                : `[신규 전문가 지원]\n이름: ${details.name}\n이메일: ${details.email}\n전문분야: ${details.field}`;
 
-            const templateParams = {
+            return emailjs.send(serviceId, templateId, {
                 from_name: details.name,
                 message: messageText,
                 to_email: "sunganstudio24@gmail.com"
-            };
-
-            return emailjs.send(serviceId, templateId, templateParams);
+            });
         }
 
         function setupFormHandlers() {
@@ -243,22 +277,12 @@
                 startupForm.addEventListener('submit', async (e) => {
                     e.preventDefault(); 
                     const btn = document.getElementById('startup-submit-btn');
-                    btn.innerText = "전송 중..."; 
-                    btn.disabled = true;
-
+                    btn.innerText = "전송 중..."; btn.disabled = true;
                     const fd = new FormData(e.target);
-                    const data = { type: 'startup', name: fd.get('name'), phone: fd.get('phone'), field: fd.get('field') };
-                    
                     try {
-                        await sendEmailNotification('startup', data); 
-                        window.toggleModal(true); 
-                        e.target.reset(); 
-                    } catch (error) {
-                        alert("이메일 전송 실패! EmailJS 설정을 다시 확인해주세요.\n(에러내용: " + (error.text || "알 수 없음") + ")");
-                    } finally {
-                        btn.innerText = "지원하기";
-                        btn.disabled = false;
-                    }
+                        await sendEmailNotification('startup', { name: fd.get('name'), phone: fd.get('phone'), field: fd.get('field') }); 
+                        window.toggleModal(true); e.target.reset(); 
+                    } catch (error) { alert("이메일 전송 실패!"); } finally { btn.innerText = "지원하기"; btn.disabled = false; }
                 });
             }
 
@@ -267,22 +291,12 @@
                 expertForm.addEventListener('submit', async (e) => {
                     e.preventDefault(); 
                     const btn = document.getElementById('expert-submit-btn');
-                    btn.innerText = "전송 중...";
-                    btn.disabled = true;
-
+                    btn.innerText = "전송 중..."; btn.disabled = true;
                     const fd = new FormData(e.target);
-                    const data = { type: 'expert', name: fd.get('name'), email: fd.get('email'), field: fd.get('field') };
-                    
                     try {
-                        await sendEmailNotification('expert', data); 
-                        window.toggleModal(true); 
-                        e.target.reset(); 
-                    } catch (error) {
-                        alert("이메일 전송 실패! EmailJS 설정을 다시 확인해주세요.\n(에러내용: " + (error.text || "알 수 없음") + ")");
-                    } finally {
-                        btn.innerText = "신청하기";
-                        btn.disabled = false;
-                    }
+                        await sendEmailNotification('expert', { name: fd.get('name'), email: fd.get('email'), field: fd.get('field') }); 
+                        window.toggleModal(true); e.target.reset(); 
+                    } catch (error) { alert("이메일 전송 실패!"); } finally { btn.innerText = "신청하기"; btn.disabled = false; }
                 });
             }
         }
