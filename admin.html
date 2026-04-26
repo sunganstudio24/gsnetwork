@@ -142,7 +142,20 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body class="p-4 md:p-10 relative">
+
+    <!-- [추가] 커스텀 모달 (경고/확인창) -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-[9999] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
+            <div id="modal-icon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"></div>
+            <h3 id="modal-title" class="text-xl font-black text-[#0f172a] mb-2">알림</h3>
+            <p id="modal-desc" class="text-slate-500 font-bold mb-8 whitespace-pre-wrap leading-relaxed">내용</p>
+            <div id="modal-buttons" class="flex gap-3 justify-center">
+                <!-- 버튼 동적 생성 -->
+            </div>
+        </div>
+    </div>
+
     <div class="max-w-6xl mx-auto">
         <!-- 상단 헤더 -->
         <div class="flex justify-between items-center mb-8 bg-[#0f172a] p-8 rounded-[2.5rem] shadow-2xl text-white">
@@ -156,7 +169,7 @@
                 </div>
             </div>
             <div id="auth-status" class="hidden">
-                <button id="logout-btn" class="px-5 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition border border-white/10">LOGOUT</button>
+                <button id="logout-btn" type="button" class="px-5 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition border border-white/10">LOGOUT</button>
             </div>
         </div>
 
@@ -166,7 +179,7 @@
             <div class="space-y-5">
                 <input type="text" id="email" placeholder="ADMIN ID" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold text-sm">
                 <input type="password" id="password" placeholder="PASSWORD" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold">
-                <button id="login-btn" class="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black text-lg hover:bg-black transition shadow-xl uppercase">Login</button>
+                <button id="login-btn" type="button" class="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black text-lg hover:bg-black transition shadow-xl uppercase">Login</button>
             </div>
         </div>
 
@@ -228,15 +241,15 @@
                         </div>
                         <div class="flex gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                             <input type="text" id="img-url" placeholder="이미지 주소(URL)를 입력하세요" class="flex-1 pl-4 p-2.5 bg-white rounded-lg border border-slate-200 outline-none text-sm">
-                            <button type="button" onmousedown="event.preventDefault(); insertCustomImage()" class="bg-[#0f172a] text-white px-8 py-2.5 rounded-lg font-black text-sm hover:bg-black transition-all">이미지 삽입</button>
+                            <button type="button" onmousedown="event.preventDefault(); window.insertCustomImage()" class="bg-[#0f172a] text-white px-8 py-2.5 rounded-lg font-black text-sm hover:bg-black transition-all">이미지 삽입</button>
                         </div>
                     </div>
 
                     <div id="editor" contenteditable="true"></div>
                     <input type="hidden" id="edit-id">
                     <div class="flex gap-4 mt-10">
-                        <button id="save-btn" class="flex-1 bg-[#0f172a] text-white p-6 rounded-2xl font-black text-xl hover:bg-black transition shadow-xl">PUBLISH NOTICE</button>
-                        <button id="cancel-edit-btn" class="hidden px-12 bg-slate-100 text-slate-500 rounded-2xl font-black hover:bg-slate-200">CANCEL</button>
+                        <button id="save-btn" type="button" class="flex-1 bg-[#0f172a] text-white p-6 rounded-2xl font-black text-xl hover:bg-black transition shadow-xl">PUBLISH NOTICE</button>
+                        <button id="cancel-edit-btn" onclick="window.cancelEdit()" type="button" class="hidden px-12 bg-slate-100 text-slate-500 rounded-2xl font-black hover:bg-slate-200 transition">CANCEL</button>
                     </div>
                 </div>
 
@@ -308,6 +321,37 @@
         let applicantSearchTerm = '';
         let noticeSearchTerm = '';
 
+        // --- 커스텀 모달 (팝업창) 기능 ---
+        window.showModal = (title, desc, type = 'alert') => {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('custom-modal');
+                document.getElementById('modal-title').innerText = title;
+                document.getElementById('modal-desc').innerText = desc;
+                const btnContainer = document.getElementById('modal-buttons');
+
+                if (type === 'confirm') {
+                    document.getElementById('modal-icon').className = "w-16 h-16 bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-4 rounded-2xl";
+                    document.getElementById('modal-icon').innerHTML = '<i data-lucide="help-circle" class="w-8 h-8"></i>';
+                    btnContainer.innerHTML = `
+                        <button id="modal-btn-no" class="flex-1 bg-slate-100 text-slate-500 py-3.5 rounded-2xl font-black hover:bg-slate-200 transition">아니오</button>
+                        <button id="modal-btn-yes" class="flex-1 bg-red-500 text-white py-3.5 rounded-2xl font-black hover:bg-red-600 transition shadow-lg shadow-red-500/30">예</button>
+                    `;
+                    document.getElementById('modal-btn-no').onclick = () => { modal.classList.add('hidden'); resolve(false); };
+                    document.getElementById('modal-btn-yes').onclick = () => { modal.classList.add('hidden'); resolve(true); };
+                } else {
+                    document.getElementById('modal-icon').className = "w-16 h-16 bg-blue-50 text-blue-500 flex items-center justify-center mx-auto mb-4 rounded-2xl";
+                    document.getElementById('modal-icon').innerHTML = '<i data-lucide="info" class="w-8 h-8"></i>';
+                    btnContainer.innerHTML = `
+                        <button id="modal-btn-ok" class="w-full bg-[#0f172a] text-white py-3.5 rounded-2xl font-black hover:bg-black transition shadow-xl">확인</button>
+                    `;
+                    document.getElementById('modal-btn-ok').onclick = () => { modal.classList.add('hidden'); resolve(true); };
+                }
+                
+                lucide.createIcons();
+                modal.classList.remove('hidden');
+            });
+        };
+
         // --- 탭 전환 로직 ---
         window.switchTab = (target) => {
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
@@ -327,12 +371,10 @@
         function renderApplicants() {
             let filtered = allApplicants;
             
-            // 1. 유형 필터링
             if(currentApplicantType !== '전체') {
                 filtered = filtered.filter(a => a.type === currentApplicantType);
             }
             
-            // 2. 검색 필터링 (이름, 번호, 메일 통합)
             if(applicantSearchTerm) {
                 const term = applicantSearchTerm.toLowerCase();
                 filtered = filtered.filter(a => 
@@ -347,7 +389,7 @@
             filtered.forEach((docData) => {
                 html += `
                     <div class="applicant-card flex flex-col md:flex-row justify-between items-start gap-8 fade-in">
-                        <div class="flex-1 space-y-3">
+                        <div class="flex-1 space-y-3 w-full">
                             <div class="flex items-center gap-3">
                                 <span class="text-[10px] font-black px-2 py-1 rounded ${docData.type === '창업자' ? 'bg-blue-600' : 'bg-purple-600'} text-white uppercase">${docData.type}</span>
                                 <h3 class="text-xl font-bold text-slate-800">${docData.name}</h3>
@@ -382,7 +424,12 @@
 
         window.filterApplicants = (term) => { applicantSearchTerm = term; renderApplicants(); };
 
-        window.deleteApplicant = async (id) => { if(confirm("신청 데이터를 영구 삭제하시겠습니까?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'applications', id)); };
+        window.deleteApplicant = async (id) => { 
+            const isConfirmed = await window.showModal("지원자 데이터 삭제", "해당 신청 데이터를 영구적으로 삭제하시겠습니까?", "confirm");
+            if(isConfirmed) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'applications', id)); 
+            }
+        };
 
         // --- 공지사항 리스트 렌더링 로직 ---
         function renderNotices() {
@@ -444,7 +491,11 @@
         }
 
         window.insertCustomImage = () => {
-            const url = document.getElementById('img-url').value.trim(); if(!url) return alert("이미지 주소를 입력하세요.");
+            const url = document.getElementById('img-url').value.trim(); 
+            if(!url) {
+                window.showModal("알림", "이미지 주소(URL)를 입력하세요.");
+                return;
+            }
             restoreSelection(); if (!lastSelection && !editor.firstChild) editor.focus();
             const h = `<img src="${url}" referrerpolicy="no-referrer" class="article-img" alt="본문 이미지">`;
             document.execCommand('insertHTML', false, h); document.getElementById('img-url').value = ""; editor.focus(); updateToolbar();
@@ -499,7 +550,11 @@
         document.getElementById('login-btn').onclick = async () => {
             const e = document.getElementById('email').value.trim();
             const p = document.getElementById('password').value.trim();
-            try { await signInWithEmailAndPassword(auth, e, p); } catch (err) { alert("계정 정보가 일치하지 않습니다."); }
+            try { 
+                await signInWithEmailAndPassword(auth, e, p); 
+            } catch (err) { 
+                window.showModal("로그인 실패", "계정 정보가 일치하지 않습니다."); 
+            }
         };
         document.getElementById('logout-btn').onclick = () => signOut(auth);
 
@@ -508,15 +563,24 @@
             const c = document.getElementById('notice-category').value;
             const co = editor.innerHTML; 
             const eid = document.getElementById('edit-id').value;
-            if (!t || !co || co === "<br>") return alert("내용을 입력하세요.");
+            
+            if (!t || !co || co === "<br>") {
+                window.showModal("안내", "게시물 제목과 내용을 모두 작성해주세요.");
+                return;
+            }
+
             try {
                 const today = new Date();
                 const dStr = `${today.getFullYear()}. ${String(today.getMonth() + 1).padStart(2, '0')}. ${String(today.getDate()).padStart(2, '0')}`;
                 const data = { title: t, category: c, content: co, date: dStr };
                 if (eid) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', eid), { ...data, updatedAt: serverTimestamp() });
                 else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), { ...data, createdAt: serverTimestamp() });
-                alert("게시물이 저장되었습니다."); window.resetForm();
-            } catch (err) { alert("저장 실패"); }
+                
+                await window.showModal("성공", "게시물이 정상적으로 저장되었습니다."); 
+                window.resetForm();
+            } catch (err) { 
+                window.showModal("오류", "게시물 저장 중 문제가 발생했습니다."); 
+            }
         };
 
         window.editNotice = async (id) => {
@@ -533,9 +597,33 @@
             }
         };
 
-        window.deleteNotice = async (id) => { if(confirm("삭제하시겠습니까?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); };
-        window.resetForm = () => { document.getElementById('notice-title').value = ""; editor.innerHTML = ""; document.getElementById('edit-id').value = ""; document.getElementById('cancel-edit-btn').classList.add('hidden'); };
+        window.deleteNotice = async (id) => { 
+            const isConfirmed = await window.showModal("공지사항 삭제", "해당 공지사항을 정말 삭제하시겠습니까?", "confirm");
+            if(isConfirmed) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); 
+            }
+        };
         
+        window.resetForm = () => { 
+            document.getElementById('notice-title').value = ""; 
+            editor.innerHTML = ""; 
+            document.getElementById('edit-id').value = ""; 
+            document.getElementById('cancel-edit-btn').classList.add('hidden'); 
+        };
+        
+        // CANCEL 버튼 로직 - 커스텀 모달 적용
+        window.cancelEdit = async () => {
+            const isConfirmed = await window.showModal(
+                "수정 취소", 
+                "정말 취소하시겠습니까?\n작성 중인 내용은 저장되지 않습니다.", 
+                "confirm"
+            );
+            
+            if(isConfirmed) {
+                window.resetForm();
+            }
+        };
+
         editor.addEventListener('mouseup', updateToolbar);
         editor.addEventListener('keyup', updateToolbar);
         editor.addEventListener('click', (e) => {
