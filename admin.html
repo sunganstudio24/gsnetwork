@@ -12,7 +12,7 @@
         
         /* 에디터 스타일 */
         #editor {
-            min-height: 600px;
+            min-height: 500px;
             padding: 3rem;
             outline: none;
             background: #ffffff;
@@ -124,6 +124,20 @@
         }
         .applicant-card:hover { border-color: #0f172a; transform: translateY(-3px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05); }
 
+        /* 검색창 스타일 */
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0 12px;
+            height: 44px;
+            transition: all 0.2s;
+        }
+        .search-box:focus-within { border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.05); }
+        .search-input { border: none; outline: none; padding-left: 8px; font-size: 0.9rem; font-weight: 600; width: 100%; }
+
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -225,15 +239,39 @@
                         <button id="cancel-edit-btn" class="hidden px-12 bg-slate-100 text-slate-500 rounded-2xl font-black hover:bg-slate-200">CANCEL</button>
                     </div>
                 </div>
+
+                <!-- [추가] 공지사항 검색창 -->
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h3 class="font-black text-slate-400 uppercase text-xs tracking-widest">Notice List</h3>
+                    <div class="search-box w-64 bg-white border-slate-100">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-300"></i>
+                        <input type="text" id="notice-search" oninput="window.filterNotices(this.value)" placeholder="공지 제목 검색" class="search-input">
+                    </div>
+                </div>
                 <div id="manage-list" class="grid md:grid-cols-2 gap-4 pb-20"></div>
             </div>
 
             <!-- [2] 지원자 현황 탭 -->
             <div id="section-applicant" class="hidden space-y-6">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                     <h2 class="text-3xl font-black text-[#0f172a]">지원자 통합 현황</h2>
-                    <span class="text-xs font-bold text-slate-400">실시간으로 접수된 신청 데이터입니다.</span>
+                    
+                    <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                        <!-- [추가] 지원자 유형 필터 -->
+                        <div class="flex bg-white p-1 rounded-xl border border-slate-200">
+                            <button onclick="window.setApplicantType('전체')" class="app-filter-btn active px-4 py-2 rounded-lg text-xs font-black transition" id="filter-all">전체</button>
+                            <button onclick="window.setApplicantType('창업자')" class="app-filter-btn px-4 py-2 rounded-lg text-xs font-black transition text-slate-400" id="filter-founder">창업자</button>
+                            <button onclick="window.setApplicantType('전문가')" class="app-filter-btn px-4 py-2 rounded-lg text-xs font-black transition text-slate-400" id="filter-expert">전문가</button>
+                        </div>
+
+                        <!-- [추가] 지원자 검색창 -->
+                        <div class="search-box flex-1 md:w-64">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                            <input type="text" id="applicant-search" oninput="window.filterApplicants(this.value)" placeholder="이름/번호/메일 검색" class="search-input">
+                        </div>
+                    </div>
                 </div>
+                
                 <div id="applicant-list" class="grid gap-6 pb-20">
                     <!-- 지원자 리스트 렌더링 영역 -->
                 </div>
@@ -262,6 +300,13 @@
         const editor = document.getElementById('editor');
 
         let lastSelection = null;
+        
+        // 데이터 저장소
+        let allApplicants = [];
+        let allNotices = [];
+        let currentApplicantType = '전체';
+        let applicantSearchTerm = '';
+        let noticeSearchTerm = '';
 
         // --- 탭 전환 로직 ---
         window.switchTab = (target) => {
@@ -270,64 +315,108 @@
             if(target === 'notice') {
                 document.getElementById('section-notice').classList.remove('hidden');
                 document.getElementById('section-applicant').classList.add('hidden');
-                loadManageList();
+                renderNotices();
             } else {
                 document.getElementById('section-notice').classList.add('hidden');
                 document.getElementById('section-applicant').classList.remove('hidden');
-                loadApplicants();
+                renderApplicants();
             }
         };
 
-        // --- 지원자 리스트 로드 (연락처/이메일 필드 포함) ---
-        function loadApplicants() {
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'applications'), orderBy("createdAt", "desc"));
-            onSnapshot(q, (snapshot) => {
-                let html = "";
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    html += `
-                        <div class="applicant-card flex flex-col md:flex-row justify-between items-start gap-8">
-                            <div class="flex-1 space-y-3">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-[10px] font-black px-2 py-1 rounded bg-[#0f172a] text-white uppercase">${data.type}</span>
-                                    <h3 class="text-xl font-bold text-slate-800">${data.name}</h3>
-                                </div>
-                                <div class="flex flex-wrap gap-4 text-sm font-bold">
-                                    <span class="text-blue-600"><i data-lucide="phone" class="w-3.5 h-3.5 inline mr-1"></i> ${data.phone}</span>
-                                    <span class="text-slate-500"><i data-lucide="mail" class="w-3.5 h-3.5 inline mr-1"></i> ${data.email}</span>
-                                </div>
-                                <div class="bg-slate-50 p-5 rounded-2xl text-slate-600 text-sm border border-slate-100 whitespace-pre-wrap mt-4 leading-relaxed">${data.content}</div>
+        // --- 지원자 리스트 렌더링 로직 ---
+        function renderApplicants() {
+            let filtered = allApplicants;
+            
+            // 1. 유형 필터링
+            if(currentApplicantType !== '전체') {
+                filtered = filtered.filter(a => a.type === currentApplicantType);
+            }
+            
+            // 2. 검색 필터링 (이름, 번호, 메일 통합)
+            if(applicantSearchTerm) {
+                const term = applicantSearchTerm.toLowerCase();
+                filtered = filtered.filter(a => 
+                    a.name?.toLowerCase().includes(term) || 
+                    a.phone?.toLowerCase().includes(term) || 
+                    a.email?.toLowerCase().includes(term) ||
+                    a.content?.toLowerCase().includes(term)
+                );
+            }
+
+            let html = "";
+            filtered.forEach((docData) => {
+                html += `
+                    <div class="applicant-card flex flex-col md:flex-row justify-between items-start gap-8 fade-in">
+                        <div class="flex-1 space-y-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-[10px] font-black px-2 py-1 rounded ${docData.type === '창업자' ? 'bg-blue-600' : 'bg-purple-600'} text-white uppercase">${docData.type}</span>
+                                <h3 class="text-xl font-bold text-slate-800">${docData.name}</h3>
                             </div>
-                            <div class="flex flex-col items-end gap-4 flex-shrink-0">
-                                <span class="text-[10px] font-bold text-slate-300 uppercase">${data.date}</span>
-                                <button onclick="window.deleteApplicant('${doc.id}')" class="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <div class="flex flex-wrap gap-4 text-sm font-bold">
+                                <span class="text-blue-600"><i data-lucide="phone" class="w-3.5 h-3.5 inline mr-1"></i> ${docData.phone || 'N/A'}</span>
+                                <span class="text-slate-500"><i data-lucide="mail" class="w-3.5 h-3.5 inline mr-1"></i> ${docData.email || 'N/A'}</span>
                             </div>
-                        </div>`;
-                });
-                document.getElementById('applicant-list').innerHTML = html || '<div class="p-20 text-center text-slate-300 font-bold italic">신청자가 없습니다.</div>';
-                lucide.createIcons();
+                            <div class="bg-slate-50 p-5 rounded-2xl text-slate-600 text-sm border border-slate-100 whitespace-pre-wrap mt-4 leading-relaxed">${docData.content}</div>
+                        </div>
+                        <div class="flex flex-col items-end gap-4 flex-shrink-0">
+                            <span class="text-[10px] font-bold text-slate-300 uppercase">${docData.date}</span>
+                            <button onclick="window.deleteApplicant('${docData.id}')" class="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>`;
             });
+            document.getElementById('applicant-list').innerHTML = html || '<div class="p-20 text-center text-slate-300 font-bold italic">해당하는 지원자가 없습니다.</div>';
+            lucide.createIcons();
         }
+
+        window.setApplicantType = (type) => {
+            currentApplicantType = type;
+            document.querySelectorAll('.app-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-[#0f172a]', 'text-white');
+                btn.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById(`filter-${type === '전체' ? 'all' : (type === '창업자' ? 'founder' : 'expert')}`);
+            activeBtn.classList.add('active', 'bg-[#0f172a]', 'text-white');
+            activeBtn.classList.remove('text-slate-400');
+            renderApplicants();
+        };
+
+        window.filterApplicants = (term) => { applicantSearchTerm = term; renderApplicants(); };
 
         window.deleteApplicant = async (id) => { if(confirm("신청 데이터를 영구 삭제하시겠습니까?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'applications', id)); };
 
-        // --- 에디터 색상 팔레트 로직 ---
-        const themeColors = [
-            ['#ffffff', '#000000', '#eeece1', '#1f497d', '#4f81bd', '#c0504d', '#9bbb59', '#8064a2', '#4bacc6', '#f79646'],
-            ['#f2f2f2', '#7f7f7f', '#ddd9c3', '#c6d9f0', '#dbe5f1', '#f2dbdb', '#ebf1de', '#e5e0ec', '#dbeef3', '#fdeada'],
-            ['#d8d8d8', '#595959', '#c4bd97', '#8db3e2', '#b8cce4', '#e5b9b7', '#d7e3bc', '#ccc1d9', '#b7dde8', '#fbd5b5'],
-            ['#bfbfbf', '#3f3f3f', '#938953', '#548dd4', '#95b3d7', '#d99694', '#c3d69b', '#b2a2c7', '#92cddc', '#fac08f'],
-            ['#a5a5a5', '#262626', '#494429', '#17365d', '#366092', '#953734', '#76923c', '#5f497a', '#31859b', '#e36c09']
-        ];
-        function initPalette() {
-            const box = document.getElementById('theme-colors'); box.innerHTML = '';
-            themeColors.forEach(row => row.forEach(c => {
-                const d = document.createElement('div'); d.className='color-cell'; d.style.background=c;
-                d.onclick=() => window.selectAnyColor(c); box.appendChild(d);
-            }));
+        // --- 공지사항 리스트 렌더링 로직 ---
+        function renderNotices() {
+            let filtered = allNotices;
+            if(noticeSearchTerm) {
+                const term = noticeSearchTerm.toLowerCase();
+                filtered = filtered.filter(n => n.title.toLowerCase().includes(term));
+            }
+
+            let html = "";
+            filtered.forEach((notice) => {
+                html += `
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-100 flex justify-between items-center shadow-lg group hover:border-[#0f172a] transition-all">
+                        <div class="flex items-center gap-4 overflow-hidden">
+                            <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 group-hover:bg-[#0f172a] group-hover:text-white transition-all flex-shrink-0">
+                                <i data-lucide="file-text" class="w-5 h-5"></i>
+                            </div>
+                            <div class="truncate">
+                                <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded mb-1 inline-block uppercase">${notice.category || '기타'}</span>
+                                <h3 class="font-bold text-slate-800 text-sm truncate">${notice.title}</h3>
+                                <p class="text-[9px] text-slate-400 font-bold uppercase">${notice.date}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 flex-shrink-0 ml-4">
+                            <button onclick="window.editNotice('${notice.id}')" class="w-9 h-9 bg-slate-50 text-slate-400 rounded-lg hover:bg-[#0f172a] hover:text-white transition-all flex items-center justify-center shadow-sm"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="window.deleteNotice('${notice.id}')" class="w-9 h-9 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all flex items-center justify-center shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('manage-list').innerHTML = html;
+            lucide.createIcons();
         }
-        window.togglePalette = () => document.getElementById('color-popup').classList.toggle('show');
-        window.selectAnyColor = (c) => { window.formatDoc('foreColor', c); document.getElementById('selected-preview').style.background = c; document.getElementById('color-popup').classList.remove('show'); };
+
+        window.filterNotices = (term) => { noticeSearchTerm = term; renderNotices(); };
 
         // --- 에디터 기본 기능 ---
         function saveSelection() { const sel = window.getSelection(); if (sel.getRangeAt && sel.rangeCount) lastSelection = sel.getRangeAt(0); }
@@ -361,6 +450,24 @@
             document.execCommand('insertHTML', false, h); document.getElementById('img-url').value = ""; editor.focus(); updateToolbar();
         };
 
+        // --- 에디터 색상 팔레트 로직 ---
+        const themeColors = [
+            ['#ffffff', '#000000', '#eeece1', '#1f497d', '#4f81bd', '#c0504d', '#9bbb59', '#8064a2', '#4bacc6', '#f79646'],
+            ['#f2f2f2', '#7f7f7f', '#ddd9c3', '#c6d9f0', '#dbe5f1', '#f2dbdb', '#ebf1de', '#e5e0ec', '#dbeef3', '#fdeada'],
+            ['#d8d8d8', '#595959', '#c4bd97', '#8db3e2', '#b8cce4', '#e5b9b7', '#d7e3bc', '#ccc1d9', '#b7dde8', '#fbd5b5'],
+            ['#bfbfbf', '#3f3f3f', '#938953', '#548dd4', '#95b3d7', '#d99694', '#c3d69b', '#b2a2c7', '#92cddc', '#fac08f'],
+            ['#a5a5a5', '#262626', '#494429', '#17365d', '#366092', '#953734', '#76923c', '#5f497a', '#31859b', '#e36c09']
+        ];
+        function initPalette() {
+            const box = document.getElementById('theme-colors'); box.innerHTML = '';
+            themeColors.forEach(row => row.forEach(c => {
+                const d = document.createElement('div'); d.className='color-cell'; d.style.background=c;
+                d.onclick=() => window.selectAnyColor(c); box.appendChild(d);
+            }));
+        }
+        window.togglePalette = () => document.getElementById('color-popup').classList.toggle('show');
+        window.selectAnyColor = (c) => { window.formatDoc('foreColor', c); document.getElementById('selected-preview').style.background = c; document.getElementById('color-popup').classList.remove('show'); };
+
         // --- Firebase Auth & Notice 로직 ---
         onAuthStateChanged(auth, (user) => {
             lucide.createIcons();
@@ -368,7 +475,20 @@
                 document.getElementById('login-section').classList.add('hidden');
                 document.getElementById('admin-content').classList.remove('hidden');
                 document.getElementById('auth-status').classList.remove('hidden');
-                initPalette(); loadManageList();
+                initPalette(); 
+                
+                // 공지 데이터 리스너
+                onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), orderBy("createdAt", "desc")), (snap) => {
+                    allNotices = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderNotices();
+                });
+                
+                // 지원자 데이터 리스너
+                onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'applications'), orderBy("createdAt", "desc")), (snap) => {
+                    allApplicants = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderApplicants();
+                });
+
             } else {
                 document.getElementById('login-section').classList.remove('hidden');
                 document.getElementById('admin-content').classList.add('hidden');
@@ -382,35 +502,6 @@
             try { await signInWithEmailAndPassword(auth, e, p); } catch (err) { alert("계정 정보가 일치하지 않습니다."); }
         };
         document.getElementById('logout-btn').onclick = () => signOut(auth);
-
-        function loadManageList() {
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), orderBy("createdAt", "desc"));
-            onSnapshot(q, (snapshot) => {
-                let html = "";
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    html += `
-                        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 flex justify-between items-center shadow-lg group hover:border-[#0f172a] transition-all">
-                            <div class="flex items-center gap-4 overflow-hidden">
-                                <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 group-hover:bg-[#0f172a] group-hover:text-white transition-all flex-shrink-0">
-                                    <i data-lucide="file-text" class="w-5 h-5"></i>
-                                </div>
-                                <div class="truncate">
-                                    <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded mb-1 inline-block uppercase">${data.category || '기타'}</span>
-                                    <h3 class="font-bold text-slate-800 text-sm truncate">${data.title}</h3>
-                                    <p class="text-[9px] text-slate-400 font-bold uppercase">${data.date}</p>
-                                </div>
-                            </div>
-                            <div class="flex gap-2 flex-shrink-0 ml-4">
-                                <button onclick="window.editNotice('${doc.id}')" class="w-9 h-9 bg-slate-50 text-slate-400 rounded-lg hover:bg-[#0f172a] hover:text-white transition-all flex items-center justify-center shadow-sm"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                                <button onclick="window.deleteNotice('${doc.id}')" class="w-9 h-9 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all flex items-center justify-center shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                            </div>
-                        </div>`;
-                });
-                document.getElementById('manage-list').innerHTML = html;
-                lucide.createIcons();
-            });
-        }
 
         document.getElementById('save-btn').onclick = async () => {
             const t = document.getElementById('notice-title').value.trim();
