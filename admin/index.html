@@ -293,8 +293,9 @@
     </div>
 
     <script type="module">
+        // [수정] 보안 인증 강화를 위해 setPersistence와 browserSessionPersistence 추가
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -313,13 +314,32 @@
         const editor = document.getElementById('editor');
 
         let lastSelection = null;
-        
-        // 데이터 저장소
         let allApplicants = [];
         let allNotices = [];
         let currentApplicantType = '전체';
         let applicantSearchTerm = '';
         let noticeSearchTerm = '';
+
+        // --- [추가] 보안 기능: 미활동 시 자동 로그아웃 ---
+        let inactivityTimeout;
+
+        const resetInactivityTimer = () => {
+            clearTimeout(inactivityTimeout);
+            // 30분(1000ms * 60초 * 30분) 동안 활동이 없으면 자동 로그아웃
+            inactivityTimeout = setTimeout(async () => {
+                if (auth.currentUser) {
+                    await signOut(auth);
+                    window.showModal("자동 로그아웃", "보안을 위해 30분간 활동이 없어 자동 로그아웃 되었습니다.");
+                }
+            }, 1000 * 60 * 30);
+        };
+
+        const setupInactivityListeners = () => {
+            ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(name => {
+                document.addEventListener(name, resetInactivityTimer);
+            });
+            resetInactivityTimer();
+        };
 
         // --- 커스텀 모달 (팝업창) 기능 ---
         window.showModal = (title, desc, type = 'alert') => {
@@ -527,6 +547,7 @@
                 document.getElementById('admin-content').classList.remove('hidden');
                 document.getElementById('auth-status').classList.remove('hidden');
                 initPalette(); 
+                setupInactivityListeners(); // [추가] 로그인 성공 시 활동 감지 시작
                 
                 // 공지 데이터 리스너
                 onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), orderBy("createdAt", "desc")), (snap) => {
@@ -544,6 +565,7 @@
                 document.getElementById('login-section').classList.remove('hidden');
                 document.getElementById('admin-content').classList.add('hidden');
                 document.getElementById('auth-status').classList.add('hidden');
+                clearTimeout(inactivityTimeout); // [추가] 로그아웃 시 타이머 정지
             }
         });
 
@@ -551,6 +573,8 @@
             const e = document.getElementById('email').value.trim();
             const p = document.getElementById('password').value.trim();
             try { 
+                // [추가] 브라우저 종료 시 로그아웃되는 보안 세션 설정
+                await setPersistence(auth, browserSessionPersistence);
                 await signInWithEmailAndPassword(auth, e, p); 
             } catch (err) { 
                 window.showModal("로그인 실패", "계정 정보가 일치하지 않습니다."); 
