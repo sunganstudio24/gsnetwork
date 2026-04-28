@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSN MASTER DASHBOARD - 운영진 전용</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@100;400;600;700;800;900&display=swap');
+        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        
+        /* 에디터 스타일 */
+        #editor {
+            min-height: 500px;
+            padding: 3rem;
+            outline: none;
+            background: #ffffff;
+            line-height: 1.8;
+            font-size: 11pt;
+            color: #334155;
+            border-radius: 1.5rem;
+            border: 2px solid #f1f5f9;
+            transition: all 0.2s ease;
+        }
+        #editor:focus { border-color: #0f172a; box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.1); }
+        
+        /* 이미지 선택 효과 */
+        #editor img { 
+            max-width: 100%; 
+            border-radius: 8px; 
+            margin: 1.5rem auto; 
+            display: block; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            cursor: pointer;
+            border: 4px solid transparent;
+        }
+        #editor img.selected { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        #editor ul { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
+        #editor b, #editor strong { font-weight: 800; color: inherit; }
+        
+        /* 탭 스타일 */
+        .admin-tab { padding: 14px 28px; font-weight: 800; cursor: pointer; color: #94a3b8; transition: 0.2s; border-bottom: 3px solid transparent; }
+        .admin-tab.active { color: #0f172a; border-bottom-color: #0f172a; }
+
+        /* 툴바 스타일 */
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            padding: 4px;
+            gap: 2px;
+            border: 1px solid #f1f5f9;
+        }
+        .toolbar-btn {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+        .toolbar-btn:hover { background: #ffffff; color: #0f172a; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .toolbar-btn.active { background: #0f172a; color: #ffffff; }
+
+        /* 글자 크기 박스 */
+        .font-size-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 0 8px;
+            height: 38px;
+        }
+        .font-size-input {
+            width: 40px;
+            border: none;
+            outline: none;
+            font-weight: 800;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* 색상 팔레트 */
+        .color-palette-wrap { position: relative; }
+        .dot-color { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); }
+        .custom-trigger {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px #e2e8f0;
+        }
+        #color-popup {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            z-index: 100;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 12px;
+            width: 280px;
+        }
+        #color-popup.show { display: block; }
+        .color-grid-theme { display: grid; grid-template-columns: repeat(10, 1fr); gap: 1px; margin-bottom: 15px; background: #eee; border: 1px solid #ddd; }
+        .color-cell { width: 100%; aspect-ratio: 1.2; cursor: pointer; }
+
+        /* 지원자 현황 카드 */
+        .applicant-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 24px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.02);
+            transition: all 0.3s;
+        }
+        .applicant-card:hover { border-color: #0f172a; transform: translateY(-3px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05); }
+
+        /* 검색창 스타일 */
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0 12px;
+            height: 44px;
+            transition: all 0.2s;
+        }
+        .search-box:focus-within { border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.05); }
+        .search-input { border: none; outline: none; padding-left: 8px; font-size: 0.9rem; font-weight: 600; width: 100%; }
+
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="p-4 md:p-10 relative">
+
+    <!-- [추가] 커스텀 모달 (경고/확인창) -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-[9999] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
+            <div id="modal-icon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"></div>
+            <h3 id="modal-title" class="text-xl font-black text-[#0f172a] mb-2">알림</h3>
+            <p id="modal-desc" class="text-slate-500 font-bold mb-8 whitespace-pre-wrap leading-relaxed">내용</p>
+            <div id="modal-buttons" class="flex gap-3 justify-center">
+                <!-- 버튼 동적 생성 -->
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto">
+        <!-- 상단 헤더 -->
+        <div class="flex justify-between items-center mb-8 bg-[#0f172a] p-8 rounded-[2.5rem] shadow-2xl text-white">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center">
+                    <i data-lucide="shield-check" class="text-white w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight text-white uppercase italic">GSN MASTER.</h1>
+                    <p class="text-blue-300/60 text-[10px] font-bold uppercase tracking-widest mt-0.5">Control Tower</p>
+                </div>
+            </div>
+            <div id="auth-status" class="hidden">
+                <button id="logout-btn" type="button" class="px-5 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition border border-white/10">LOGOUT</button>
+            </div>
+        </div>
+
+        <!-- 로그인 섹션 -->
+        <div id="login-section" class="max-w-md mx-auto bg-white p-12 rounded-[3rem] shadow-2xl border border-slate-100">
+            <h2 class="text-2xl font-black mb-8 text-center text-[#0f172a] uppercase italic">System Access</h2>
+            <div class="space-y-5">
+                <input type="text" id="email" placeholder="ADMIN ID" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold text-sm">
+                <input type="password" id="password" placeholder="PASSWORD" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold">
+                <button id="login-btn" type="button" class="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black text-lg hover:bg-black transition shadow-xl uppercase">Login</button>
+            </div>
+        </div>
+
+        <!-- 관리 메인 섹션 -->
+        <div id="admin-content" class="hidden space-y-8 fade-in">
+            <!-- 탭 네비게이션 -->
+            <div class="flex gap-4 border-b border-slate-200 mb-8">
+                <div onclick="window.switchTab('notice')" id="tab-notice" class="admin-tab active">📢 공지사항 관리</div>
+                <div onclick="window.switchTab('applicant')" id="tab-applicant" class="admin-tab">👥 지원자 통합 관리</div>
+            </div>
+
+            <!-- [1] 공지사항 관리 탭 -->
+            <div id="section-notice" class="space-y-8">
+                <div class="bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-100">
+                    <div class="grid md:grid-cols-3 gap-6 mb-8">
+                        <select id="notice-category" class="w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 font-black">
+                            <option value="지원공고">📢 지원공고</option>
+                            <option value="네트워킹">🤝 네트워킹</option>
+                            <option value="일반소식">📰 일반소식</option>
+                        </select>
+                        <input type="text" id="notice-title" placeholder="공지 제목을 입력하세요" class="md:col-span-2 w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 font-bold">
+                    </div>
+
+                    <!-- 통합 툴바 -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6 space-y-4">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="toolbar-group">
+                                <button type="button" id="btn-bold" onmousedown="event.preventDefault(); formatDoc('bold')" class="toolbar-btn" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                <button type="button" id="btn-list" onmousedown="event.preventDefault(); formatDoc('insertUnorderedList')" class="toolbar-btn" title="List"><i data-lucide="list" class="w-4 h-4"></i></button>
+                            </div>
+                            <div class="font-size-box shadow-sm">
+                                <input type="number" id="font-size-val" value="11" min="1" max="100" onchange="window.applyFontSize(this.value)" class="font-size-input">
+                                <span class="text-[10px] font-black text-slate-300 mr-1 uppercase">pt</span>
+                                <div class="h-4 w-px bg-slate-100 mx-1"></div>
+                                <select onchange="document.getElementById('font-size-val').value = this.value; window.applyFontSize(this.value);" class="bg-transparent text-[10px] font-black outline-none cursor-pointer">
+                                    <option value="">크기</option>
+                                    <option value="9">9</option><option value="10">10</option><option value="11">11</option>
+                                    <option value="12">12</option><option value="14">14</option><option value="16">16</option>
+                                    <option value="20">20</option><option value="24">24</option>
+                                </select>
+                            </div>
+                            <div class="toolbar-group">
+                                <button type="button" onmousedown="event.preventDefault(); formatDoc('justifyLeft')" class="toolbar-btn" title="Left"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                <button type="button" onmousedown="event.preventDefault(); formatDoc('justifyCenter')" class="toolbar-btn" title="Center"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                <button type="button" onmousedown="event.preventDefault(); formatDoc('justifyRight')" class="toolbar-btn" title="Right"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                            </div>
+                            <div class="color-palette-wrap flex items-center gap-2">
+                                <div class="flex items-center gap-1.5 bg-white border border-slate-200 p-1 rounded-lg px-2">
+                                    <div class="dot-color bg-black" onmousedown="event.preventDefault(); formatDoc('foreColor', '#000000')"></div>
+                                    <div class="dot-color bg-red-600" onmousedown="event.preventDefault(); formatDoc('foreColor', '#dc2626')"></div>
+                                    <div class="dot-color bg-blue-600" onmousedown="event.preventDefault(); formatDoc('foreColor', '#2563eb')"></div>
+                                </div>
+                                <div id="selected-preview" class="custom-trigger bg-black" onclick="window.togglePalette()"></div>
+                                <div id="color-popup" class="fade-in">
+                                    <div class="color-grid-theme" id="theme-colors"></div>
+                                    <input type="color" onchange="window.selectAnyColor(this.value)" class="w-full h-8 cursor-pointer rounded-lg border-none p-0 overflow-hidden shadow-inner">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <input type="text" id="img-url" placeholder="이미지 주소(URL)를 입력하세요" class="flex-1 pl-4 p-2.5 bg-white rounded-lg border border-slate-200 outline-none text-sm">
+                            <button type="button" onmousedown="event.preventDefault(); window.insertCustomImage()" class="bg-[#0f172a] text-white px-8 py-2.5 rounded-lg font-black text-sm hover:bg-black transition-all">이미지 삽입</button>
+                        </div>
+                    </div>
+
+                    <div id="editor" contenteditable="true"></div>
+                    <input type="hidden" id="edit-id">
+                    <div class="flex gap-4 mt-10">
+                        <button id="save-btn" type="button" class="flex-1 bg-[#0f172a] text-white p-6 rounded-2xl font-black text-xl hover:bg-black transition shadow-xl">PUBLISH NOTICE</button>
+                        <button id="cancel-edit-btn" onclick="window.cancelEdit()" type="button" class="hidden px-12 bg-slate-100 text-slate-500 rounded-2xl font-black hover:bg-slate-200 transition">CANCEL</button>
+                    </div>
+                </div>
+
+                <!-- [추가] 공지사항 검색창 -->
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h3 class="font-black text-slate-400 uppercase text-xs tracking-widest">Notice List</h3>
+                    <div class="search-box w-64 bg-white border-slate-100">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-300"></i>
+                        <input type="text" id="notice-search" oninput="window.filterNotices(this.value)" placeholder="공지 제목 검색" class="search-input">
+                    </div>
+                </div>
+                <div id="manage-list" class="grid md:grid-cols-2 gap-4 pb-20"></div>
+            </div>
+
+            <!-- [2] 지원자 현황 탭 -->
+            <div id="section-applicant" class="hidden space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+                    <h2 class="text-3xl font-black text-[#0f172a]">지원자 통합 현황</h2>
+                    
+                    <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                        <!-- [추가] 지원자 유형 필터 -->
+                        <div class="flex bg-white p-1 rounded-xl border border-slate-200">
+                            <button onclick="window.setApplicantType('전체')" class="app-filter-btn active px-4 py-2 rounded-lg text-xs font-black transition" id="filter-all">전체</button>
+                            <button onclick="window.setApplicantType('창업자')" class="app-filter-btn px-4 py-2 rounded-lg text-xs font-black transition text-slate-400" id="filter-founder">창업자</button>
+                            <button onclick="window.setApplicantType('전문가')" class="app-filter-btn px-4 py-2 rounded-lg text-xs font-black transition text-slate-400" id="filter-expert">전문가</button>
+                        </div>
+
+                        <!-- [추가] 지원자 검색창 -->
+                        <div class="search-box flex-1 md:w-64">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                            <input type="text" id="applicant-search" oninput="window.filterApplicants(this.value)" placeholder="이름/번호/메일 검색" class="search-input">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="applicant-list" class="grid gap-6 pb-20">
+                    <!-- 지원자 리스트 렌더링 영역 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBz60TBGXkTwHhJ1LmBN0ZXdyM34_ndS_A",
+            authDomain: "gsn-network.firebaseapp.com",
+            projectId: "gsn-network",
+            storageBucket: "gsn-network.firebasestorage.app",
+            messagingSenderId: "1065753363903",
+            appId: "1:1065753363903:web:bd8445b241e658a3becd0a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = "gsn-network";
+        const editor = document.getElementById('editor');
+
+        let lastSelection = null;
+        
+        // 데이터 저장소
+        let allApplicants = [];
+        let allNotices = [];
+        let currentApplicantType = '전체';
+        let applicantSearchTerm = '';
+        let noticeSearchTerm = '';
+
+        // --- 커스텀 모달 (팝업창) 기능 ---
+        window.showModal = (title, desc, type = 'alert') => {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('custom-modal');
+                document.getElementById('modal-title').innerText = title;
+                document.getElementById('modal-desc').innerText = desc;
+                const btnContainer = document.getElementById('modal-buttons');
+
+                if (type === 'confirm') {
+                    document.getElementById('modal-icon').className = "w-16 h-16 bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-4 rounded-2xl";
+                    document.getElementById('modal-icon').innerHTML = '<i data-lucide="help-circle" class="w-8 h-8"></i>';
+                    btnContainer.innerHTML = `
+                        <button id="modal-btn-no" class="flex-1 bg-slate-100 text-slate-500 py-3.5 rounded-2xl font-black hover:bg-slate-200 transition">아니오</button>
+                        <button id="modal-btn-yes" class="flex-1 bg-red-500 text-white py-3.5 rounded-2xl font-black hover:bg-red-600 transition shadow-lg shadow-red-500/30">예</button>
+                    `;
+                    document.getElementById('modal-btn-no').onclick = () => { modal.classList.add('hidden'); resolve(false); };
+                    document.getElementById('modal-btn-yes').onclick = () => { modal.classList.add('hidden'); resolve(true); };
+                } else {
+                    document.getElementById('modal-icon').className = "w-16 h-16 bg-blue-50 text-blue-500 flex items-center justify-center mx-auto mb-4 rounded-2xl";
+                    document.getElementById('modal-icon').innerHTML = '<i data-lucide="info" class="w-8 h-8"></i>';
+                    btnContainer.innerHTML = `
+                        <button id="modal-btn-ok" class="w-full bg-[#0f172a] text-white py-3.5 rounded-2xl font-black hover:bg-black transition shadow-xl">확인</button>
+                    `;
+                    document.getElementById('modal-btn-ok').onclick = () => { modal.classList.add('hidden'); resolve(true); };
+                }
+                
+                lucide.createIcons();
+                modal.classList.remove('hidden');
+            });
+        };
+
+        // --- 탭 전환 로직 ---
+        window.switchTab = (target) => {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + target).classList.add('active');
+            if(target === 'notice') {
+                document.getElementById('section-notice').classList.remove('hidden');
+                document.getElementById('section-applicant').classList.add('hidden');
+                renderNotices();
+            } else {
+                document.getElementById('section-notice').classList.add('hidden');
+                document.getElementById('section-applicant').classList.remove('hidden');
+                renderApplicants();
+            }
+        };
+
+        // --- 지원자 리스트 렌더링 로직 ---
+        function renderApplicants() {
+            let filtered = allApplicants;
+            
+            if(currentApplicantType !== '전체') {
+                filtered = filtered.filter(a => a.type === currentApplicantType);
+            }
+            
+            if(applicantSearchTerm) {
+                const term = applicantSearchTerm.toLowerCase();
+                filtered = filtered.filter(a => 
+                    a.name?.toLowerCase().includes(term) || 
+                    a.phone?.toLowerCase().includes(term) || 
+                    a.email?.toLowerCase().includes(term) ||
+                    a.content?.toLowerCase().includes(term)
+                );
+            }
+
+            let html = "";
+            filtered.forEach((docData) => {
+                html += `
+                    <div class="applicant-card flex flex-col md:flex-row justify-between items-start gap-8 fade-in">
+                        <div class="flex-1 space-y-3 w-full">
+                            <div class="flex items-center gap-3">
+                                <span class="text-[10px] font-black px-2 py-1 rounded ${docData.type === '창업자' ? 'bg-blue-600' : 'bg-purple-600'} text-white uppercase">${docData.type}</span>
+                                <h3 class="text-xl font-bold text-slate-800">${docData.name}</h3>
+                            </div>
+                            <div class="flex flex-wrap gap-4 text-sm font-bold">
+                                <span class="text-blue-600"><i data-lucide="phone" class="w-3.5 h-3.5 inline mr-1"></i> ${docData.phone || 'N/A'}</span>
+                                <span class="text-slate-500"><i data-lucide="mail" class="w-3.5 h-3.5 inline mr-1"></i> ${docData.email || 'N/A'}</span>
+                            </div>
+                            <div class="bg-slate-50 p-5 rounded-2xl text-slate-600 text-sm border border-slate-100 whitespace-pre-wrap mt-4 leading-relaxed">${docData.content}</div>
+                        </div>
+                        <div class="flex flex-col items-end gap-4 flex-shrink-0">
+                            <span class="text-[10px] font-bold text-slate-300 uppercase">${docData.date}</span>
+                            <button onclick="window.deleteApplicant('${docData.id}')" class="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('applicant-list').innerHTML = html || '<div class="p-20 text-center text-slate-300 font-bold italic">해당하는 지원자가 없습니다.</div>';
+            lucide.createIcons();
+        }
+
+        window.setApplicantType = (type) => {
+            currentApplicantType = type;
+            document.querySelectorAll('.app-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-[#0f172a]', 'text-white');
+                btn.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById(`filter-${type === '전체' ? 'all' : (type === '창업자' ? 'founder' : 'expert')}`);
+            activeBtn.classList.add('active', 'bg-[#0f172a]', 'text-white');
+            activeBtn.classList.remove('text-slate-400');
+            renderApplicants();
+        };
+
+        window.filterApplicants = (term) => { applicantSearchTerm = term; renderApplicants(); };
+
+        window.deleteApplicant = async (id) => { 
+            const isConfirmed = await window.showModal("지원자 데이터 삭제", "해당 신청 데이터를 영구적으로 삭제하시겠습니까?", "confirm");
+            if(isConfirmed) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'applications', id)); 
+            }
+        };
+
+        // --- 공지사항 리스트 렌더링 로직 ---
+        function renderNotices() {
+            let filtered = allNotices;
+            if(noticeSearchTerm) {
+                const term = noticeSearchTerm.toLowerCase();
+                filtered = filtered.filter(n => n.title.toLowerCase().includes(term));
+            }
+
+            let html = "";
+            filtered.forEach((notice) => {
+                html += `
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-100 flex justify-between items-center shadow-lg group hover:border-[#0f172a] transition-all">
+                        <div class="flex items-center gap-4 overflow-hidden">
+                            <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 group-hover:bg-[#0f172a] group-hover:text-white transition-all flex-shrink-0">
+                                <i data-lucide="file-text" class="w-5 h-5"></i>
+                            </div>
+                            <div class="truncate">
+                                <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded mb-1 inline-block uppercase">${notice.category || '기타'}</span>
+                                <h3 class="font-bold text-slate-800 text-sm truncate">${notice.title}</h3>
+                                <p class="text-[9px] text-slate-400 font-bold uppercase">${notice.date}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 flex-shrink-0 ml-4">
+                            <button onclick="window.editNotice('${notice.id}')" class="w-9 h-9 bg-slate-50 text-slate-400 rounded-lg hover:bg-[#0f172a] hover:text-white transition-all flex items-center justify-center shadow-sm"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="window.deleteNotice('${notice.id}')" class="w-9 h-9 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-all flex items-center justify-center shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('manage-list').innerHTML = html;
+            lucide.createIcons();
+        }
+
+        window.filterNotices = (term) => { noticeSearchTerm = term; renderNotices(); };
+
+        // --- 에디터 기본 기능 ---
+        function saveSelection() { const sel = window.getSelection(); if (sel.getRangeAt && sel.rangeCount) lastSelection = sel.getRangeAt(0); }
+        function restoreSelection() { if (lastSelection) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(lastSelection); } }
+
+        window.applyFontSize = (s) => {
+            if(!s) return; restoreSelection(); document.execCommand('styleWithCSS', null, true);
+            const sel = window.getSelection();
+            if (sel.rangeCount) {
+                const range = sel.getRangeAt(0); const span = document.createElement('span'); span.style.fontSize = s + 'pt';
+                if (range.collapsed) { span.innerHTML = '&#8203;'; range.insertNode(span); range.setStartAfter(span); }
+                else { span.appendChild(range.extractContents()); range.insertNode(span); }
+                sel.removeAllRanges(); sel.addRange(range);
+            }
+            editor.focus();
+        };
+
+        window.formatDoc = (cmd, val = null) => { restoreSelection(); document.execCommand(cmd, false, val); editor.focus(); updateToolbar(); };
+
+        function updateToolbar() {
+            const b = document.queryCommandState('bold'); const l = document.queryCommandState('insertUnorderedList');
+            document.getElementById('btn-bold')?.classList.toggle('active', b);
+            document.getElementById('btn-list')?.classList.toggle('active', l);
+            saveSelection();
+        }
+
+        window.insertCustomImage = () => {
+            const url = document.getElementById('img-url').value.trim(); 
+            if(!url) {
+                window.showModal("알림", "이미지 주소(URL)를 입력하세요.");
+                return;
+            }
+            restoreSelection(); if (!lastSelection && !editor.firstChild) editor.focus();
+            const h = `<img src="${url}" referrerpolicy="no-referrer" class="article-img" alt="본문 이미지">`;
+            document.execCommand('insertHTML', false, h); document.getElementById('img-url').value = ""; editor.focus(); updateToolbar();
+        };
+
+        // --- 에디터 색상 팔레트 로직 ---
+        const themeColors = [
+            ['#ffffff', '#000000', '#eeece1', '#1f497d', '#4f81bd', '#c0504d', '#9bbb59', '#8064a2', '#4bacc6', '#f79646'],
+            ['#f2f2f2', '#7f7f7f', '#ddd9c3', '#c6d9f0', '#dbe5f1', '#f2dbdb', '#ebf1de', '#e5e0ec', '#dbeef3', '#fdeada'],
+            ['#d8d8d8', '#595959', '#c4bd97', '#8db3e2', '#b8cce4', '#e5b9b7', '#d7e3bc', '#ccc1d9', '#b7dde8', '#fbd5b5'],
+            ['#bfbfbf', '#3f3f3f', '#938953', '#548dd4', '#95b3d7', '#d99694', '#c3d69b', '#b2a2c7', '#92cddc', '#fac08f'],
+            ['#a5a5a5', '#262626', '#494429', '#17365d', '#366092', '#953734', '#76923c', '#5f497a', '#31859b', '#e36c09']
+        ];
+        function initPalette() {
+            const box = document.getElementById('theme-colors'); box.innerHTML = '';
+            themeColors.forEach(row => row.forEach(c => {
+                const d = document.createElement('div'); d.className='color-cell'; d.style.background=c;
+                d.onclick=() => window.selectAnyColor(c); box.appendChild(d);
+            }));
+        }
+        window.togglePalette = () => document.getElementById('color-popup').classList.toggle('show');
+        window.selectAnyColor = (c) => { window.formatDoc('foreColor', c); document.getElementById('selected-preview').style.background = c; document.getElementById('color-popup').classList.remove('show'); };
+
+        // --- Firebase Auth & Notice 로직 ---
+        onAuthStateChanged(auth, (user) => {
+            lucide.createIcons();
+            if (user) {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('admin-content').classList.remove('hidden');
+                document.getElementById('auth-status').classList.remove('hidden');
+                initPalette(); 
+                
+                // 공지 데이터 리스너
+                onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), orderBy("createdAt", "desc")), (snap) => {
+                    allNotices = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderNotices();
+                });
+                
+                // 지원자 데이터 리스너
+                onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'applications'), orderBy("createdAt", "desc")), (snap) => {
+                    allApplicants = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderApplicants();
+                });
+
+            } else {
+                document.getElementById('login-section').classList.remove('hidden');
+                document.getElementById('admin-content').classList.add('hidden');
+                document.getElementById('auth-status').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('login-btn').onclick = async () => {
+            const e = document.getElementById('email').value.trim();
+            const p = document.getElementById('password').value.trim();
+            try { 
+                await signInWithEmailAndPassword(auth, e, p); 
+            } catch (err) { 
+                window.showModal("로그인 실패", "계정 정보가 일치하지 않습니다."); 
+            }
+        };
+        document.getElementById('logout-btn').onclick = () => signOut(auth);
+
+        document.getElementById('save-btn').onclick = async () => {
+            const t = document.getElementById('notice-title').value.trim();
+            const c = document.getElementById('notice-category').value;
+            const co = editor.innerHTML; 
+            const eid = document.getElementById('edit-id').value;
+            
+            if (!t || !co || co === "<br>") {
+                window.showModal("안내", "게시물 제목과 내용을 모두 작성해주세요.");
+                return;
+            }
+
+            try {
+                const today = new Date();
+                const dStr = `${today.getFullYear()}. ${String(today.getMonth() + 1).padStart(2, '0')}. ${String(today.getDate()).padStart(2, '0')}`;
+                const data = { title: t, category: c, content: co, date: dStr };
+                if (eid) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', eid), { ...data, updatedAt: serverTimestamp() });
+                else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), { ...data, createdAt: serverTimestamp() });
+                
+                await window.showModal("성공", "게시물이 정상적으로 저장되었습니다."); 
+                window.resetForm();
+            } catch (err) { 
+                window.showModal("오류", "게시물 저장 중 문제가 발생했습니다."); 
+            }
+        };
+
+        window.editNotice = async (id) => {
+            const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id));
+            if (snap.exists()) {
+                const d = snap.data();
+                document.getElementById('notice-title').value = d.title;
+                document.getElementById('notice-category').value = d.category || "지원공고";
+                editor.innerHTML = d.content || "";
+                document.getElementById('edit-id').value = id;
+                document.getElementById('cancel-edit-btn').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.switchTab('notice');
+            }
+        };
+
+        window.deleteNotice = async (id) => { 
+            const isConfirmed = await window.showModal("공지사항 삭제", "해당 공지사항을 정말 삭제하시겠습니까?", "confirm");
+            if(isConfirmed) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); 
+            }
+        };
+        
+        window.resetForm = () => { 
+            document.getElementById('notice-title').value = ""; 
+            editor.innerHTML = ""; 
+            document.getElementById('edit-id').value = ""; 
+            document.getElementById('cancel-edit-btn').classList.add('hidden'); 
+        };
+        
+        // CANCEL 버튼 로직 - 커스텀 모달 적용
+        window.cancelEdit = async () => {
+            const isConfirmed = await window.showModal(
+                "수정 취소", 
+                "정말 취소하시겠습니까?\n작성 중인 내용은 저장되지 않습니다.", 
+                "confirm"
+            );
+            
+            if(isConfirmed) {
+                window.resetForm();
+            }
+        };
+
+        editor.addEventListener('mouseup', updateToolbar);
+        editor.addEventListener('keyup', updateToolbar);
+        editor.addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+                editor.querySelectorAll('img').forEach(img => img.classList.remove('selected'));
+                e.target.classList.add('selected'); e.target.focus(); saveSelection();
+            } else { editor.querySelectorAll('img').forEach(img => img.classList.remove('selected')); }
+        });
+        editor.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                const img = editor.querySelector('img.selected');
+                if (img) { e.preventDefault(); img.remove(); updateToolbar(); }
+            }
+        });
+        
+        lucide.createIcons();
+    </script>
+</body>
+</html>
