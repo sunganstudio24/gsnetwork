@@ -570,17 +570,29 @@
             }
         });
 
-        document.getElementById('login-btn').onclick = async () => {
+        // --- [추가] 로그인 실행 함수 분리 ---
+        const executeLogin = async () => {
             const e = document.getElementById('email').value.trim();
             const p = document.getElementById('password').value.trim();
             try { 
-                // [추가] 브라우저 종료 시 로그아웃되는 보안 세션 설정
+                // 브라우저 종료 시 로그아웃되는 보안 세션 설정
                 await setPersistence(auth, browserSessionPersistence);
                 await signInWithEmailAndPassword(auth, e, p); 
             } catch (err) { 
                 window.showModal("로그인 실패", "계정 정보가 일치하지 않습니다."); 
             }
         };
+
+        // 클릭으로 로그인
+        document.getElementById('login-btn').onclick = executeLogin;
+
+        // --- [추가] 엔터키로 로그인 지원 ---
+        const handleEnterKey = (e) => {
+            if (e.key === 'Enter') executeLogin();
+        };
+        document.getElementById('email').addEventListener('keyup', handleEnterKey);
+        document.getElementById('password').addEventListener('keyup', handleEnterKey);
+
         document.getElementById('logout-btn').onclick = () => signOut(auth);
 
         document.getElementById('save-btn').onclick = async () => {
