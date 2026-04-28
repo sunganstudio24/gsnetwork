@@ -271,35 +271,37 @@
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+        // [완료] 새로운 프로젝트의 Config를 적용했습니다.
         const firebaseConfig = {
-            apiKey: "AIzaSyBz60TBGXkTwHhJ1LmBN0ZXdyM34_ndS_A",
-            authDomain: "gsn-network.firebaseapp.com",
-            projectId: "gsn-network",
-            storageBucket: "gsn-network.firebasestorage.app",
-            messagingSenderId: "1065753363903",
-            appId: "1:1065753363903:web:bd8445b241e658a3becd0a"
+            apiKey: "AIzaSyCCr3Gv_Tij97ZOyiScptXxiPnzhZ9XTYc",
+            authDomain: "gsnetwork.firebaseapp.com",
+            projectId: "gsnetwork",
+            storageBucket: "gsnetwork.firebasestorage.app",
+            messagingSenderId: "627864872176",
+            appId: "1:627864872176:web:cafd0d1dae27097be04e35"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = "gsn-network";
+        const appId = "gsnetwork"; // [수정] 새로운 앱 ID로 변경
 
-        // 모바일 메뉴 제어
+        // 모바일 메뉴 토글
         window.toggleMobileMenu = () => {
             const menu = document.getElementById('mobile-menu');
             const icon = document.getElementById('mobile-menu-icon');
             if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden'); menu.classList.add('flex');
+                menu.classList.remove('hidden');
+                menu.classList.add('flex');
                 icon.setAttribute('data-lucide', 'x');
             } else {
-                menu.classList.add('hidden'); menu.classList.remove('flex');
+                menu.classList.add('hidden');
+                menu.classList.remove('flex');
                 icon.setAttribute('data-lucide', 'menu');
             }
             lucide.createIcons();
         };
 
-        // 토스트 알림 제어 (디자인 보완)
         window.showToast = (msg, isError = false) => {
             const toast = document.getElementById('custom-toast');
             const icon = document.getElementById('toast-icon');
@@ -361,10 +363,14 @@
         window.applyFilter = (c) => { 
             currentFilter = c; 
             renderNotices(); 
+            
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 const isMatch = (btn.innerText === c) || (c === '전체' && btn.innerText === '전체보기');
-                if (isMatch) btn.className = "filter-btn px-4 md:px-5 py-2 rounded-full text-xs font-bold bg-[#0f172a] text-white shadow-lg";
-                else btn.className = "filter-btn px-4 md:px-5 py-2 rounded-full text-xs font-bold bg-slate-100";
+                if (isMatch) {
+                    btn.className = "filter-btn px-4 md:px-5 py-2 rounded-full text-xs font-bold bg-[#0f172a] text-white shadow-lg";
+                } else {
+                    btn.className = "filter-btn px-4 md:px-5 py-2 rounded-full text-xs font-bold bg-slate-100";
+                }
             });
         };
 
@@ -379,6 +385,7 @@
             document.getElementById('detail-date').innerText = n.date;
             document.getElementById('detail-body').innerHTML = n.content;
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            
             history.pushState({ page: 'board', noticeId: id }, null, `#board?id=${id}`);
 
             document.querySelectorAll('#detail-body img').forEach(img => {
@@ -403,7 +410,10 @@
                 document.getElementById('notice-list-view').classList.remove('hidden');
                 document.getElementById('notice-detail-view').classList.add('hidden');
             }
-            if (pushHistory) history.pushState({ page: id }, null, `#${id}`);
+
+            if (pushHistory) {
+                history.pushState({ page: id }, null, `#${id}`);
+            }
         };
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -420,7 +430,6 @@
             window.showPage(hash, false);
         });
 
-        // --- [수정] 원인 분석형 세분화 접수 로직 ---
         async function submitApplication(formId, type) {
             const form = document.getElementById(formId);
             const btn = form.querySelector('button[type="submit"]');
@@ -428,7 +437,6 @@
             btn.disabled = true;
 
             try {
-                // 1단계: 방문자용 임시 보안 권한 획득 (가장 잦은 오류 발생 지점)
                 try {
                     if (!auth.currentUser) { 
                         await signInAnonymously(auth); 
@@ -436,7 +444,7 @@
                 } catch (authErr) {
                     console.error("Auth 권한 오류:", authErr);
                     window.showToast("접수 권한 오류! (관리자에게 문의하세요)", true);
-                    return; // 권한이 없으므로 다음 단계로 가지 않고 중단
+                    return;
                 }
 
                 const fd = new FormData(form);
@@ -445,31 +453,30 @@
                     content: fd.get('field'), createdAt: serverTimestamp(), date: new Date().toLocaleDateString('ko-KR')
                 };
 
-                // 2단계: 데이터베이스(Firestore) 저장
                 try {
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'applications'), data);
                 } catch (dbErr) {
                     console.error("DB 저장 오류:", dbErr);
                     window.showToast("데이터 저장 오류! (잠시 후 다시 시도해주세요)", true);
-                    return; // DB 저장이 안 됐으므로 중단
+                    return; 
                 }
 
-                // 3단계: 운영자 이메일 발송
                 try {
                     await emailjs.send("service_yk6n7mo", "template_4ys4qgh", {
+                        type: type,
                         from_name: data.name,
-                        content: `[${type}] 연락처: ${data.phone}\n이메일: ${data.email}\n내용: ${data.content}`,
+                        phone: data.phone,
+                        email: data.email,
+                        content: data.content,
                         to_email: "sunganstudio24@gmail.com"
                     });
                 } catch (emailErr) {
                     console.error("이메일 발송 오류:", emailErr);
-                    // 데이터는 무사히 저장되었으므로 '성공'이지만 이메일만 안 갔음을 알림
                     window.showToast("접수 완료! (단, 내부 알림 발송이 지연되고 있습니다)");
                     form.reset();
                     return; 
                 }
 
-                // 모든 단계 무사 통과 시
                 window.showToast("정상적으로 접수되었습니다. 곧 연락드릴게요!");
                 form.reset();
 
