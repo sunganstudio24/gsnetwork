@@ -81,16 +81,20 @@
             </div>
         </div>
 
-        <!-- 로그인 섹션 (크롬 자동완성 차단 & 엔터키 지원) -->
+        <!-- 로그인 섹션 -->
         <div id="login-section" class="max-w-md mx-auto bg-white p-12 rounded-[3rem] shadow-2xl border border-slate-100">
             <h2 class="text-2xl font-black mb-8 text-center text-[#0f172a] uppercase italic">System Access</h2>
-            <div class="space-y-5">
-                <input type="text" style="display:none" aria-hidden="true">
-                <input type="password" style="display:none" aria-hidden="true">
-                <input type="text" id="email" placeholder="ADMIN ID" autocomplete="off" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold text-sm">
-                <input type="text" id="password" placeholder="PASSWORD" autocomplete="off" style="-webkit-text-security: disc;" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold">
-                <button id="login-btn" type="button" class="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black text-lg hover:bg-black transition shadow-xl uppercase">Login</button>
-            </div>
+            <!-- 자동완성 방지를 위한 form 태그 사용 및 속성 추가 -->
+            <form autocomplete="off" onsubmit="event.preventDefault(); window.executeLogin();" class="space-y-5">
+                <!-- 크롬 자동완성 무력화 트릭 -->
+                <input autocomplete="false" name="hidden" type="text" style="display:none;">
+                
+                <input type="text" id="email" placeholder="ADMIN ID" autocomplete="new-password" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold text-sm">
+                
+                <input type="text" id="password" placeholder="PASSWORD" autocomplete="new-password" style="-webkit-text-security: disc;" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold">
+                
+                <button id="login-btn" type="button" onclick="window.executeLogin()" class="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black text-lg hover:bg-black transition shadow-xl uppercase">Login</button>
+            </form>
         </div>
 
         <!-- 관리 메인 -->
@@ -135,7 +139,7 @@
                             </div>
                         </div>
                         
-                        <!-- [신규] 이미지 업로드 버튼 (Storage 연동) -->
+                        <!-- 이미지 업로드 영역 -->
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
                             <div class="flex items-center gap-4">
                                 <label class="cursor-pointer bg-[#0f172a] text-white px-6 py-2.5 rounded-lg font-black text-sm hover:bg-black transition-all">
@@ -182,11 +186,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-        
-        // [신규] Storage 모듈 임포트
         import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
-        // [완료] 새로운 계정(gsnetwork) 설정 적용
+        // 새로운 계정(gsnetwork) 설정 유지
         const firebaseConfig = {
             apiKey: "AIzaSyCCr3Gv_Tij97ZOyiScptXxiPnzhZ9XTYc",
             authDomain: "gsnetwork.firebaseapp.com",
@@ -199,7 +201,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = getStorage(app); // Storage 초기화
+        const storage = getStorage(app);
         const appId = "gsnetwork"; 
         const editor = document.getElementById('editor');
 
@@ -241,17 +243,18 @@
         };
 
         /* --- 로그인 처리 --- */
-        const executeLogin = async () => {
+        window.executeLogin = async () => {
             const e = document.getElementById('email').value.trim();
             const p = document.getElementById('password').value.trim();
             try { 
                 await setPersistence(auth, browserSessionPersistence);
                 await signInWithEmailAndPassword(auth, e, p); 
+                
+                // 로그인 성공 시 입력값 초기화
+                document.getElementById('email').value = "";
+                document.getElementById('password').value = "";
             } catch (err) { window.showModal("실패", "계정 정보가 일치하지 않습니다."); }
         };
-
-        document.getElementById('login-btn').onclick = executeLogin;
-        document.querySelectorAll('#email, #password').forEach(el => el.onkeyup = (e) => { if (e.key === 'Enter') executeLogin(); });
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -357,7 +360,7 @@
                         </div>
                         <div class="flex gap-2 flex-shrink-0">
                             <button onclick="window.editNotice('${n.id}')" class="w-9 h-9 bg-slate-50 text-slate-400 rounded-lg hover:bg-[#0f172a] hover:text-white transition flex items-center justify-center shadow-sm"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                            <button onclick="window.deleteNotice('${n.id}')" class="w-9 h-9 bg-red-50 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition flex items-center justify-center shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button onclick="window.deleteNotice('${n.id}')" class="w-9 h-9 bg-red-50 text-red-400 rounded-lg hover:bg-red-50 hover:text-red-600 transition flex items-center justify-center shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                     </div>`;
             });
