@@ -22,10 +22,8 @@
             display: block; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             cursor: pointer; border: 4px solid transparent; transition: all 0.2s;
         }
-        /* 선택된 이미지 강조 효과 */
         #editor img.selected-img { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); }
         #editor ul { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
-        #editor b, #editor strong { font-weight: 800; color: inherit; }
         
         /* UI 요소 스타일 */
         .admin-tab { padding: 14px 28px; font-weight: 800; cursor: pointer; color: #94a3b8; transition: 0.2s; border-bottom: 3px solid transparent; }
@@ -33,7 +31,7 @@
         .toolbar-group { display: flex; align-items: center; background: #f8fafc; border-radius: 0.75rem; padding: 4px; gap: 2px; border: 1px solid #f1f5f9; }
         .toolbar-btn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; transition: all 0.2s; color: #64748b; cursor: pointer; }
         .toolbar-btn:hover { background: #ffffff; color: #0f172a; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .toolbar-btn.active { background: #0f172a; color: #ffffff; }
+        .toolbar-btn.active { background: #0f172a; color: #ffffff; } /* ON 상태 버튼 스타일 */
         .font-size-box { display: flex; align-items: center; background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0 8px; height: 38px; }
         .font-size-input { width: 40px; border: none; outline: none; font-weight: 800; text-align: center; font-size: 0.9rem; }
         .color-palette-wrap { position: relative; }
@@ -50,14 +48,12 @@
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 업로드 진행 바 UI */
         #upload-progress { display: none; width: 100%; height: 4px; background: #f1f5f9; border-radius: 99px; overflow: hidden; margin-top: 10px; }
         #upload-bar { width: 0%; height: 100%; background: #0f172a; transition: width 0.3s; }
     </style>
 </head>
 <body class="p-4 md:p-10 relative">
 
-    <!-- 커스텀 모달 -->
     <div id="custom-modal" class="hidden fixed inset-0 z-[9999] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 fade-in">
         <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
             <div id="modal-icon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"></div>
@@ -68,7 +64,6 @@
     </div>
 
     <div class="max-w-6xl mx-auto">
-        <!-- 헤더 -->
         <div class="flex justify-between items-center mb-8 bg-[#0f172a] p-8 rounded-[2.5rem] shadow-2xl text-white">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center"><i data-lucide="shield-check" class="text-white w-6 h-6"></i></div>
@@ -82,7 +77,6 @@
             </div>
         </div>
 
-        <!-- 로그인 섹션 (크롬 자동완성 무력화) -->
         <div id="login-section" class="max-w-md mx-auto bg-white p-12 rounded-[3rem] shadow-2xl border border-slate-100">
             <h2 class="text-2xl font-black mb-8 text-center text-[#0f172a] uppercase italic">System Access</h2>
             <form id="login-form" autocomplete="off" onsubmit="event.preventDefault(); window.executeLogin();" class="space-y-5">
@@ -93,14 +87,12 @@
             </form>
         </div>
 
-        <!-- 관리 메인 -->
         <div id="admin-content" class="hidden space-y-8 fade-in">
             <div class="flex gap-4 border-b border-slate-200 mb-8">
                 <div onclick="window.switchTab('notice')" id="tab-notice" class="admin-tab active">📢 공지사항 관리</div>
                 <div onclick="window.switchTab('applicant')" id="tab-applicant" class="admin-tab">👥 지원자 통합 관리</div>
             </div>
 
-            <!-- 공지사항 탭 -->
             <div id="section-notice" class="space-y-8">
                 <div class="bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-100">
                     <div class="grid md:grid-cols-3 gap-6 mb-8">
@@ -112,22 +104,21 @@
                         <input type="text" id="notice-title" placeholder="공지 제목을 입력하세요" class="md:col-span-2 w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 font-bold">
                     </div>
 
-                    <!-- 에디터 툴바 (이벤트 처리 전면 개선) -->
+                    <!-- 개선된 에디터 툴바 (버튼 ID 부여 및 이벤트 속성 일원화) -->
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6 space-y-4 relative z-20">
                         <div class="flex flex-wrap items-center gap-4">
                             <div class="toolbar-group">
-                                <button type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('bold')" class="toolbar-btn" title="굵게"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                <button id="btn-bold" type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('bold')" class="toolbar-btn" title="굵게"><i data-lucide="bold" class="w-4 h-4"></i></button>
                                 <button type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('insertUnorderedList')" class="toolbar-btn" title="글머리 기호"><i data-lucide="list" class="w-4 h-4"></i></button>
                             </div>
                             <div class="font-size-box">
-                                <!-- input의 mousedown 방지 제거 (사용자가 입력할 수 있도록 허용) -->
                                 <input type="number" id="font-size-val" value="11" min="1" max="100" onchange="window.formatDoc('fontSize', this.value)" class="font-size-input" title="글꼴 크기">
                                 <span class="text-[10px] font-black text-slate-300 mr-1 uppercase">pt</span>
                             </div>
                             <div class="toolbar-group">
-                                <button type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('justifyLeft')" class="toolbar-btn" title="왼쪽 정렬"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                <button type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('justifyCenter')" class="toolbar-btn" title="가운데 정렬"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                                <button type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('justifyRight')" class="toolbar-btn" title="오른쪽 정렬"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                <button id="btn-align-left" type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('justifyLeft')" class="toolbar-btn" title="왼쪽 정렬"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                <button id="btn-align-center" type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('justifyCenter')" class="toolbar-btn" title="가운데 정렬"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                <button id="btn-align-right" type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('justifyRight')" class="toolbar-btn" title="오른쪽 정렬"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                             </div>
                             <div class="color-palette-wrap flex items-center gap-2">
                                 <div id="selected-preview" class="custom-trigger bg-black" onmousedown="event.preventDefault();" onclick="window.togglePalette()" title="글꼴 색상"></div>
@@ -137,7 +128,6 @@
                             </div>
                         </div>
                         
-                        <!-- 이미지 업로드 영역 -->
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
                             <div class="flex items-center gap-4">
                                 <label class="cursor-pointer bg-[#0f172a] text-white px-6 py-2.5 rounded-lg font-black text-sm hover:bg-black transition-all">
@@ -150,9 +140,7 @@
                         </div>
                     </div>
 
-                    <!-- 에디터 및 이미지 플로팅 툴바 영역 -->
                     <div class="relative w-full">
-                        <!-- 이미지 전용 미니 툴바 -->
                         <div id="img-toolbar" class="hidden absolute z-50 bg-[#0f172a] text-white rounded-xl shadow-2xl p-1.5 flex items-center gap-1 transition-all border border-slate-700">
                             <button type="button" onmousedown="event.preventDefault();" onclick="window.alignImg('left')" class="p-2 hover:bg-slate-700 rounded-lg transition" title="왼쪽 정렬"><i data-lucide="align-left" class="w-4 h-4"></i></button>
                             <button type="button" onmousedown="event.preventDefault();" onclick="window.alignImg('center')" class="p-2 hover:bg-slate-700 rounded-lg transition" title="가운데 정렬"><i data-lucide="align-center" class="w-4 h-4"></i></button>
@@ -180,7 +168,6 @@
                 <div id="manage-list" class="grid md:grid-cols-2 gap-4 pb-20"></div>
             </div>
 
-            <!-- 지원자 관리 탭 -->
             <div id="section-applicant" class="hidden space-y-6">
                 <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
                     <h2 class="text-3xl font-black text-[#0f172a]">지원자 통합 현황</h2>
@@ -201,7 +188,6 @@
         import { getFirestore, collection, addDoc, getDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js";
 
-        // 새로운 계정(gsnetwork) 설정 유지
         const firebaseConfig = {
             apiKey: "AIzaSyCCr3Gv_Tij97ZOyiScptXxiPnzhZ9XTYc",
             authDomain: "gsnetwork.firebaseapp.com",
@@ -224,21 +210,23 @@
         let inactivityTimeout;
 
         // ==========================================
-        // 1. Selection API 기반 에디터 코어 로직
+        // 1. Selection API 기반 에디터 코어 로직 (execCommand 완벽 대체)
         // ==========================================
         let savedRange = null;
 
-        // 에디터 내에서 일어나는 모든 선택 영역(드래그, 클릭, 키보드 이동)을 실시간 저장
+        // 실시간 커서 위치 파악 및 상태 저장
         document.addEventListener('selectionchange', () => {
             const sel = window.getSelection();
             if (sel.rangeCount > 0) {
                 const range = sel.getRangeAt(0);
                 if (editor.contains(range.commonAncestorContainer)) {
                     savedRange = range.cloneRange();
+                    window.updateToolbarState(); // 커서 위치에 따른 버튼 ON/OFF 반영
                 }
             }
         });
 
+        // 잃어버린 커서 복구
         window.restoreSelection = () => { 
             if (savedRange) { 
                 const sel = window.getSelection(); 
@@ -249,93 +237,109 @@
             }
         };
 
-        // DOM을 직접 조작하여 인라인 스타일(글꼴, 굵기, 색상)을 적용
-        function applyInlineStyle(styleProp, value) {
-            const sel = window.getSelection();
-            if (!sel.rangeCount || sel.getRangeAt(0).collapsed) return;
+        // 툴바 버튼 활성화(ON/OFF) 상태 업데이트
+        window.updateToolbarState = () => {
+            if (!savedRange) return;
+            let node = savedRange.commonAncestorContainer;
+            if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
 
-            const range = sel.getRangeAt(0);
-            
-            try {
-                // 단순 단일 노드 선택의 경우 감싸기
-                const span = document.createElement('span');
-                span.style[styleProp] = value;
-                range.surroundContents(span);
-                
-                sel.removeAllRanges();
-                const newRange = document.createRange();
-                newRange.selectNodeContents(span);
-                sel.addRange(newRange);
-                savedRange = newRange.cloneRange();
-            } catch (e) {
-                // 여러 블록/노드를 걸쳐서 선택한 경우의 우회 처리
-                const fragment = range.extractContents();
-                
-                // 조각 내 모든 요소에 스타일 적용
-                const elements = fragment.querySelectorAll('*');
-                elements.forEach(el => el.style[styleProp] = value);
-                
-                // 최상위 텍스트 노드들을 <span>으로 감싸기
-                const wrapTextNodes = (node) => {
-                    Array.from(node.childNodes).forEach(child => {
-                        if (child.nodeType === 3 && child.textContent.trim().length > 0) {
-                            const s = document.createElement('span');
-                            s.style[styleProp] = value;
-                            node.replaceChild(s, child);
-                            s.appendChild(child);
-                        } else if (child.nodeType === 1) {
-                            wrapTextNodes(child);
-                        }
-                    });
-                };
-                wrapTextNodes(fragment);
-                
-                range.insertNode(fragment);
-                sel.removeAllRanges();
-                sel.addRange(range);
-                savedRange = range.cloneRange();
-            }
-        }
+            // 모든 버튼 초기화
+            document.getElementById('btn-bold').classList.remove('active');
+            document.getElementById('btn-align-left').classList.remove('active');
+            document.getElementById('btn-align-center').classList.remove('active');
+            document.getElementById('btn-align-right').classList.remove('active');
 
-        // 굵게(Bold) 토글 로직
-        function toggleBoldStyle() {
-            const sel = window.getSelection();
-            if (!sel.rangeCount || sel.getRangeAt(0).collapsed) return;
-            const range = sel.getRangeAt(0);
-            let node = range.commonAncestorContainer;
-            if(node.nodeType === 3) node = node.parentNode;
-            
-            const currentStyle = window.getComputedStyle(node).fontWeight;
-            const isBold = currentStyle === '700' || currentStyle === 'bold' || node.tagName === 'B' || node.tagName === 'STRONG';
-            
-            applyInlineStyle('fontWeight', isBold ? 'normal' : 'bold');
-        }
-
-        // 부모 블록을 찾아서 정렬 적용 (execCommand 대체)
-        function setAlignment(align) {
-            const sel = window.getSelection();
-            if (!sel.rangeCount) return;
-            const range = sel.getRangeAt(0);
-            let node = range.commonAncestorContainer;
-            if (node.nodeType === 3) node = node.parentNode;
-
-            // 가장 가까운 블록 요소 찾기
+            // 현재 커서가 위치한 곳의 스타일 역추적
             while (node && node !== editor) {
-                const display = window.getComputedStyle(node).display;
-                if (display === 'block' || display === 'list-item' || display === 'flex' || node.tagName === 'DIV' || node.tagName === 'P') {
-                    node.style.textAlign = align;
-                    return;
+                const style = window.getComputedStyle(node);
+                
+                // Bold 상태 확인
+                if (style.fontWeight === '700' || style.fontWeight === 'bold' || parseInt(style.fontWeight) >= 600 || node.tagName === 'B' || node.tagName === 'STRONG') {
+                    document.getElementById('btn-bold').classList.add('active');
                 }
+
+                // 정렬 상태 확인
+                if (style.textAlign === 'center') document.getElementById('btn-align-center').classList.add('active');
+                if (style.textAlign === 'right') document.getElementById('btn-align-right').classList.add('active');
+                if (style.textAlign === 'left' || style.textAlign === 'start') document.getElementById('btn-align-left').classList.add('active');
+                
                 node = node.parentNode;
             }
+        };
 
-            // 에디터 바로 아래 텍스트라면 div로 묶어서 정렬
-            if (node === editor) {
-                const div = document.createElement('div');
-                div.style.textAlign = align;
-                try {
-                    const contents = range.extractContents();
-                    div.appendChild(contents.textContent ? contents : document.createTextNode('\u200B'));
+        // Span 감싸기 방식의 스타일 적용 함수 (중첩 Span 최소화 로직 포함)
+        window.applyInlineStyle = (styleProp, value) => {
+            window.restoreSelection();
+            const sel = window.getSelection();
+            if (!sel.rangeCount || sel.isCollapsed) return;
+
+            const range = sel.getRangeAt(0);
+            
+            // 동일한 span 안에 완전히 포함되어 있다면 해당 span 스타일만 변경
+            let node = range.commonAncestorContainer;
+            if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+            
+            if (node.tagName === 'SPAN' && node.textContent === sel.toString()) {
+                node.style[styleProp] = value;
+                if (node.style.fontWeight === 'normal') node.style.removeProperty('font-weight');
+                window.updateToolbarState();
+                return;
+            }
+
+            // 새로운 span 요소 생성 및 감싸기
+            const span = document.createElement("span");
+            span.style[styleProp] = value;
+            span.appendChild(range.extractContents());
+            range.insertNode(span);
+
+            // 감싼 요소를 다시 선택 (연속 편집 가능하도록)
+            sel.removeAllRanges();
+            const newRange = document.createRange();
+            newRange.selectNodeContents(span);
+            sel.addRange(newRange);
+            savedRange = newRange.cloneRange();
+            
+            window.updateToolbarState();
+        };
+
+        // 통합 포맷팅 컨트롤러
+        window.formatDoc = (command, value = null) => {
+            window.restoreSelection();
+
+            if (command === 'bold') {
+                const isBold = document.getElementById('btn-bold').classList.contains('active');
+                window.applyInlineStyle('fontWeight', isBold ? 'normal' : 'bold');
+            } 
+            else if (command === 'fontSize') {
+                window.applyInlineStyle('fontSize', value + 'pt');
+            } 
+            else if (command === 'justifyLeft' || command === 'justifyCenter' || command === 'justifyRight') {
+                const alignMap = { 'justifyLeft': 'left', 'justifyCenter': 'center', 'justifyRight': 'right' };
+                const align = alignMap[command];
+                
+                const sel = window.getSelection();
+                if (!sel.rangeCount) return;
+                const range = sel.getRangeAt(0);
+                let node = range.commonAncestorContainer;
+                if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+
+                // 가장 가까운 블록 요소(div, p)를 찾아 정렬 적용
+                let applied = false;
+                while (node && node !== editor) {
+                    const display = window.getComputedStyle(node).display;
+                    if (display === 'block' || display === 'list-item' || display === 'flex' || node.tagName === 'DIV' || node.tagName === 'P') {
+                        node.style.textAlign = align;
+                        applied = true;
+                        break;
+                    }
+                    node = node.parentNode;
+                }
+
+                // 에디터 직속 텍스트인 경우 새로운 div로 묶어서 정렬
+                if (!applied && node === editor) {
+                    const div = document.createElement('div');
+                    div.style.textAlign = align;
+                    div.appendChild(range.extractContents() || document.createTextNode('\u200B'));
                     range.insertNode(div);
                     
                     sel.removeAllRanges();
@@ -343,18 +347,15 @@
                     newRange.selectNodeContents(div);
                     sel.addRange(newRange);
                     savedRange = newRange.cloneRange();
-                } catch(e) {}
+                }
+                window.updateToolbarState();
             }
-        }
-
-        // 리스트 생성 로직 (execCommand 대체)
-        function createList() {
-            const sel = window.getSelection();
-            if (!sel.rangeCount) return;
-            const range = sel.getRangeAt(0);
-            const ul = document.createElement('ul');
-            const li = document.createElement('li');
-            try {
+            else if (command === 'insertUnorderedList') {
+                const sel = window.getSelection();
+                if (!sel.rangeCount) return;
+                const range = sel.getRangeAt(0);
+                const ul = document.createElement('ul');
+                const li = document.createElement('li');
                 const contents = range.extractContents();
                 li.appendChild(contents.textContent.trim() ? contents : document.createTextNode('\u200B'));
                 ul.appendChild(li);
@@ -366,53 +367,43 @@
                 newRange.collapse(false);
                 sel.addRange(newRange);
                 savedRange = newRange.cloneRange();
-            } catch(e) {}
-        }
-
-        // 통합 명령어 처리기 (execCommand 완전 대체)
-        window.formatDoc = (command, value = null) => {
-            window.restoreSelection();
-
-            if (command === 'bold') {
-                toggleBoldStyle();
-            } else if (command === 'fontSize') {
-                applyInlineStyle('fontSize', value + 'pt');
-            } else if (command === 'foreColor') {
-                applyInlineStyle('color', value);
-            } else if (command === 'justifyLeft') {
-                setAlignment('left');
-            } else if (command === 'justifyCenter') {
-                setAlignment('center');
-            } else if (command === 'justifyRight') {
-                setAlignment('right');
-            } else if (command === 'insertUnorderedList') {
-                createList();
             }
+            
             editor.focus(); 
         };
 
-        const themeColors = [['#ffffff', '#000000', '#eeece1', '#1f497d', '#4f81bd', '#c0504d', '#9bbb59', '#8064a2', '#4bacc6', '#f79646']];
+        // 색상 적용 (applyColor) 및 팔레트 (togglePalette)
+        const themeColors = [
+            '#000000', '#444444', '#666666', '#999999', '#cccccc', '#eeeeee',
+            '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff',
+            '#9900ff', '#ff00ff', '#ffffff'
+        ];
+        
         function initPalette() {
             const b = document.getElementById('theme-colors'); b.innerHTML = '';
-            themeColors[0].forEach(c => { 
+            themeColors.forEach(color => { 
                 const d = document.createElement('div'); 
-                d.className='color-cell'; d.style.background=c; 
+                d.className='color-cell'; 
+                d.style.background = color; 
                 d.onmousedown = (e) => e.preventDefault(); // 포커스 잃음 방지
-                d.onclick = () => { 
-                    window.formatDoc('foreColor', c);
-                    document.getElementById('selected-preview').style.background = c; 
-                    document.getElementById('color-popup').classList.remove('show'); 
-                }; 
+                d.onclick = () => window.applyColor(color); 
                 b.appendChild(d); 
             });
         }
         
+        window.applyColor = (color) => {
+            window.applyInlineStyle('color', color);
+            document.getElementById('selected-preview').style.background = color; 
+            document.getElementById('color-popup').classList.remove('show'); 
+            editor.focus();
+        };
+
         window.togglePalette = () => {
             document.getElementById('color-popup').classList.toggle('show');
         };
 
         // ==========================================
-        // 2. 이미지 전용 툴바 로직
+        // 2. 이미지 전용 플로팅 툴바 로직
         // ==========================================
         let currentImg = null;
         const imgToolbar = document.getElementById('img-toolbar');
@@ -461,8 +452,7 @@
             editor.focus();
         };
 
-
-        /* --- 이미지 직접 업로드 (execCommand 제거버전) --- */
+        /* --- 이미지 직접 삽입 (노드 방식) --- */
         window.handleImageUpload = (input) => {
             const file = input.files[0];
             if (!file) return;
@@ -479,7 +469,6 @@
                     getDownloadURL(uploadTask.snapshot.ref).then((url) => {
                         window.restoreSelection();
                         
-                        // DOM 객체 직접 생성 후 삽입 (execCommand 사용안함)
                         const img = document.createElement('img');
                         img.src = url;
                         img.style.width = '100%';
@@ -489,8 +478,6 @@
                         const sel = window.getSelection();
                         if(sel.rangeCount > 0) {
                             sel.getRangeAt(0).insertNode(img);
-                            
-                            // 커서를 이미지 바로 뒤로 이동
                             const newRange = document.createRange();
                             newRange.setStartAfter(img);
                             newRange.collapse(true);
@@ -509,7 +496,7 @@
             );
         };
 
-        /* --- 보안 기능: 30분 미활동 자동 로그아웃 --- */
+        /* --- 보안 기능: 자동 로그아웃 --- */
         const resetTimer = () => {
             clearTimeout(inactivityTimeout);
             inactivityTimeout = setTimeout(async () => {
@@ -517,18 +504,14 @@
             }, 1000 * 60 * 30);
         };
 
-        /* --- 로그인 처리 --- */
         window.executeLogin = async () => {
             const e = document.getElementById('admin_id_input').value.trim();
             const p = document.getElementById('admin_pw_input').value.trim();
-            if(!e || !p) {
-                window.showModal("알림", "아이디와 비밀번호를 모두 입력해주세요.");
-                return;
-            }
+            if(!e || !p) return window.showModal("알림", "아이디와 비밀번호를 모두 입력해주세요.");
+            
             try { 
                 await setPersistence(auth, browserSessionPersistence);
                 await signInWithEmailAndPassword(auth, e, p); 
-                
                 document.getElementById('admin_id_input').value = "";
                 document.getElementById('admin_pw_input').value = "";
             } catch (err) { window.showModal("실패", "계정 정보가 일치하지 않습니다."); }
@@ -563,7 +546,6 @@
             lucide.createIcons();
         });
 
-        /* --- 커스텀 모달 제어 --- */
         window.showModal = (title, desc, type = 'alert') => {
             return new Promise((resolve) => {
                 const m = document.getElementById('custom-modal');
@@ -588,7 +570,6 @@
             });
         };
 
-        /* --- UI 및 데이터 렌더링 --- */
         window.switchTab = (target) => {
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + target).classList.add('active');
