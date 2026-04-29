@@ -30,7 +30,7 @@
         .admin-tab { padding: 14px 28px; font-weight: 800; cursor: pointer; color: #94a3b8; transition: 0.2s; border-bottom: 3px solid transparent; }
         .admin-tab.active { color: #0f172a; border-bottom-color: #0f172a; }
         .toolbar-group { display: flex; align-items: center; background: #f8fafc; border-radius: 0.75rem; padding: 4px; gap: 2px; border: 1px solid #f1f5f9; }
-        .toolbar-btn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; transition: all 0.2s; color: #64748b; }
+        .toolbar-btn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; transition: all 0.2s; color: #64748b; cursor: pointer; }
         .toolbar-btn:hover { background: #ffffff; color: #0f172a; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .toolbar-btn.active { background: #0f172a; color: #ffffff; }
         .font-size-box { display: flex; align-items: center; background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0 8px; height: 38px; }
@@ -81,17 +81,16 @@
             </div>
         </div>
 
-        <!-- 로그인 섹션 -->
+        <!-- 로그인 섹션 (크롬 자동완성 무력화) -->
         <div id="login-section" class="max-w-md mx-auto bg-white p-12 rounded-[3rem] shadow-2xl border border-slate-100">
             <h2 class="text-2xl font-black mb-8 text-center text-[#0f172a] uppercase italic">System Access</h2>
-            <!-- 자동완성 방지를 위한 form 태그 사용 및 속성 추가 -->
-            <form autocomplete="off" onsubmit="event.preventDefault(); window.executeLogin();" class="space-y-5">
-                <!-- 크롬 자동완성 무력화 트릭 -->
+            <!-- name 속성을 임의로 설정하여 브라우저 인식 방해 -->
+            <form id="login-form" autocomplete="off" onsubmit="event.preventDefault(); window.executeLogin();" class="space-y-5">
                 <input autocomplete="false" name="hidden" type="text" style="display:none;">
                 
-                <input type="text" id="email" placeholder="ADMIN ID" autocomplete="new-password" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold text-sm">
+                <input type="text" id="admin_id_input" name="fake_email_123" placeholder="ADMIN ID" autocomplete="new-password" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold text-sm">
                 
-                <input type="text" id="password" placeholder="PASSWORD" autocomplete="new-password" style="-webkit-text-security: disc;" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold">
+                <input type="password" id="admin_pw_input" name="fake_password_456" placeholder="PASSWORD" autocomplete="new-password" class="w-full p-4 rounded-2xl border-2 border-slate-50 outline-none focus:border-[#0f172a] bg-slate-50 transition font-bold">
                 
                 <button id="login-btn" type="button" onclick="window.executeLogin()" class="w-full bg-[#0f172a] text-white p-5 rounded-2xl font-black text-lg hover:bg-black transition shadow-xl uppercase">Login</button>
             </form>
@@ -116,23 +115,24 @@
                         <input type="text" id="notice-title" placeholder="공지 제목을 입력하세요" class="md:col-span-2 w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 font-bold">
                     </div>
 
-                    <!-- 에디터 툴바 -->
+                    <!-- 에디터 툴바 (이벤트 처리 개선) -->
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6 space-y-4">
                         <div class="flex flex-wrap items-center gap-4">
                             <div class="toolbar-group">
-                                <button type="button" onmousedown="event.preventDefault(); window.formatDoc('bold')" class="toolbar-btn"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                <button type="button" onmousedown="event.preventDefault(); window.formatDoc('insertUnorderedList')" class="toolbar-btn"><i data-lucide="list" class="w-4 h-4"></i></button>
+                                <button type="button" onclick="window.formatDoc('bold')" class="toolbar-btn" title="굵게"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                <button type="button" onclick="window.formatDoc('insertUnorderedList')" class="toolbar-btn" title="글머리 기호"><i data-lucide="list" class="w-4 h-4"></i></button>
                             </div>
                             <div class="font-size-box">
-                                <input type="number" id="font-size-val" value="11" min="1" max="100" onchange="window.applyFontSize(this.value)" class="font-size-input">
+                                <input type="number" id="font-size-val" value="11" min="1" max="100" onchange="window.applyFontSize(this.value)" class="font-size-input" title="글꼴 크기">
                                 <span class="text-[10px] font-black text-slate-300 mr-1 uppercase">pt</span>
                             </div>
                             <div class="toolbar-group">
-                                <button type="button" onmousedown="event.preventDefault(); window.formatDoc('justifyLeft')" class="toolbar-btn"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                <button type="button" onmousedown="event.preventDefault(); window.formatDoc('justifyCenter')" class="toolbar-btn"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                <button type="button" onclick="window.formatDoc('justifyLeft')" class="toolbar-btn" title="왼쪽 정렬"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                <button type="button" onclick="window.formatDoc('justifyCenter')" class="toolbar-btn" title="가운데 정렬"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                <button type="button" onclick="window.formatDoc('justifyRight')" class="toolbar-btn" title="오른쪽 정렬"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                             </div>
                             <div class="color-palette-wrap flex items-center gap-2">
-                                <div id="selected-preview" class="custom-trigger bg-black" onclick="window.togglePalette()"></div>
+                                <div id="selected-preview" class="custom-trigger bg-black" onclick="window.togglePalette()" title="글꼴 색상"></div>
                                 <div id="color-popup" class="fade-in">
                                     <div class="color-grid-theme" id="theme-colors"></div>
                                 </div>
@@ -227,7 +227,7 @@
                 () => {
                     getDownloadURL(uploadTask.snapshot.ref).then((url) => {
                         window.restoreSelection();
-                        document.execCommand('insertHTML', false, `<img src="${url}" referrerpolicy="no-referrer">`);
+                        document.execCommand('insertImage', false, url);
                         progressArea.style.display = 'none'; progressBar.style.width = '0%'; input.value = "";
                     });
                 }
@@ -244,17 +244,29 @@
 
         /* --- 로그인 처리 --- */
         window.executeLogin = async () => {
-            const e = document.getElementById('email').value.trim();
-            const p = document.getElementById('password').value.trim();
+            const e = document.getElementById('admin_id_input').value.trim();
+            const p = document.getElementById('admin_pw_input').value.trim();
+            if(!e || !p) {
+                window.showModal("알림", "아이디와 비밀번호를 모두 입력해주세요.");
+                return;
+            }
             try { 
                 await setPersistence(auth, browserSessionPersistence);
                 await signInWithEmailAndPassword(auth, e, p); 
                 
                 // 로그인 성공 시 입력값 초기화
-                document.getElementById('email').value = "";
-                document.getElementById('password').value = "";
+                document.getElementById('admin_id_input').value = "";
+                document.getElementById('admin_pw_input').value = "";
             } catch (err) { window.showModal("실패", "계정 정보가 일치하지 않습니다."); }
         };
+        
+        // 엔터키 로그인 이벤트 추가
+        document.getElementById('admin_pw_input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                window.executeLogin();
+            }
+        });
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -368,17 +380,65 @@
         }
 
         /* --- 웹 에디터 기능 --- */
-        window.saveSelection = () => { const s = window.getSelection(); if (s.getRangeAt && s.rangeCount) lastSelection = s.getRangeAt(0); };
-        window.restoreSelection = () => { if (lastSelection) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(lastSelection); } };
-        window.formatDoc = (c, v = null) => { window.restoreSelection(); document.execCommand(c, false, v); editor.focus(); };
-        window.applyFontSize = (s) => { if(!s) return; window.restoreSelection(); document.execCommand('fontSize', false, "1"); const f = editor.getElementsByTagName("font"); for (let i=0; i<f.length; i++) { if (f[i].size === "1") { f[i].removeAttribute("size"); f[i].style.fontSize = s + "pt"; } } };
+        window.saveSelection = () => { 
+            const s = window.getSelection(); 
+            if (s.getRangeAt && s.rangeCount > 0) {
+                lastSelection = s.getRangeAt(0).cloneRange(); 
+            }
+        };
+        
+        window.restoreSelection = () => { 
+            if (lastSelection) { 
+                const sel = window.getSelection(); 
+                sel.removeAllRanges(); 
+                sel.addRange(lastSelection); 
+            } else {
+                // 저장된 선택 영역이 없으면 에디터에 포커스
+                editor.focus();
+            }
+        };
+
+        // 툴바 버튼 클릭 시 에디터 포커스 잃는 문제 해결을 위해 이벤트 수정
+        window.formatDoc = (command, value = null) => {
+            window.restoreSelection(); // 명령 실행 전 선택 영역 복구
+            document.execCommand(command, false, value);
+            editor.focus(); // 명령 실행 후 에디터로 다시 포커스
+        };
+
+        window.applyFontSize = (s) => { 
+            if(!s) return; 
+            window.restoreSelection(); 
+            document.execCommand('fontSize', false, "7"); // 임시로 7 설정
+            const f = editor.getElementsByTagName("font"); 
+            for (let i=0; i<f.length; i++) { 
+                if (f[i].size === "7") { 
+                    f[i].removeAttribute("size"); 
+                    f[i].style.fontSize = s + "pt"; 
+                } 
+            }
+            editor.focus();
+        };
 
         const themeColors = [['#ffffff', '#000000', '#eeece1', '#1f497d', '#4f81bd', '#c0504d', '#9bbb59', '#8064a2', '#4bacc6', '#f79646']];
         function initPalette() {
             const b = document.getElementById('theme-colors'); b.innerHTML = '';
-            themeColors[0].forEach(c => { const d = document.createElement('div'); d.className='color-cell'; d.style.background=c; d.onclick=() => { window.formatDoc('foreColor', c); document.getElementById('selected-preview').style.background = c; document.getElementById('color-popup').classList.remove('show'); }; b.appendChild(d); });
+            themeColors[0].forEach(c => { 
+                const d = document.createElement('div'); 
+                d.className='color-cell'; d.style.background=c; 
+                d.onclick = () => { 
+                    window.restoreSelection(); // 색상 적용 전 선택 영역 복구
+                    document.execCommand('foreColor', false, c); 
+                    document.getElementById('selected-preview').style.background = c; 
+                    document.getElementById('color-popup').classList.remove('show'); 
+                    editor.focus(); // 적용 후 에디터 포커스
+                }; 
+                b.appendChild(d); 
+            });
         }
-        window.togglePalette = () => document.getElementById('color-popup').classList.toggle('show');
+        window.togglePalette = () => {
+            window.saveSelection(); // 팔레트 열기 전 선택 영역 저장
+            document.getElementById('color-popup').classList.toggle('show');
+        };
 
         document.getElementById('save-btn').onclick = async () => {
             const t = document.getElementById('notice-title').value.trim();
@@ -406,7 +466,11 @@
         window.cancelEdit = async () => { if(await window.showModal("취소", "작성 중인 내용이 사라집니다.", "confirm")) window.resetForm(); };
         document.getElementById('logout-btn').onclick = () => signOut(auth);
 
-        editor.onmouseup = editor.onkeyup = window.saveSelection;
+        // 에디터 내용 변경 또는 클릭/키보드 입력 시 현재 커서(선택 영역) 위치 저장
+        editor.addEventListener('mouseup', window.saveSelection);
+        editor.addEventListener('keyup', window.saveSelection);
+        editor.addEventListener('mouseleave', window.saveSelection); // 마우스가 에디터를 벗어날 때도 저장
+
         lucide.createIcons();
     </script>
 </body>
