@@ -20,9 +20,10 @@
         #editor img { 
             max-width: 100%; border-radius: 8px; margin: 1.5rem auto; 
             display: block; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            cursor: pointer; border: 4px solid transparent;
+            cursor: pointer; border: 4px solid transparent; transition: all 0.2s;
         }
-        #editor img.selected { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        /* 선택된 이미지 강조 효과 */
+        #editor img.selected-img { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); }
         #editor ul { list-style-type: disc; padding-left: 1.5rem; margin: 1rem 0; }
         #editor b, #editor strong { font-weight: 800; color: inherit; }
         
@@ -115,24 +116,25 @@
                         <input type="text" id="notice-title" placeholder="공지 제목을 입력하세요" class="md:col-span-2 w-full p-4 border-2 border-slate-50 rounded-2xl outline-none focus:border-[#0f172a] bg-slate-50 font-bold">
                     </div>
 
-                    <!-- 에디터 툴바 (이벤트 처리 개선) -->
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6 space-y-4">
+                    <!-- 에디터 툴바 (이벤트 처리 개선 - onmousedown preventDefault 필수 추가) -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6 space-y-4 relative z-20">
                         <div class="flex flex-wrap items-center gap-4">
                             <div class="toolbar-group">
-                                <button type="button" onclick="window.formatDoc('bold')" class="toolbar-btn" title="굵게"><i data-lucide="bold" class="w-4 h-4"></i></button>
-                                <button type="button" onclick="window.formatDoc('insertUnorderedList')" class="toolbar-btn" title="글머리 기호"><i data-lucide="list" class="w-4 h-4"></i></button>
+                                <!-- [수정] onmousedown="event.preventDefault();"를 추가하여 에디터 초점 잃음 방지 -->
+                                <button type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('bold')" class="toolbar-btn" title="굵게"><i data-lucide="bold" class="w-4 h-4"></i></button>
+                                <button type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('insertUnorderedList')" class="toolbar-btn" title="글머리 기호"><i data-lucide="list" class="w-4 h-4"></i></button>
                             </div>
                             <div class="font-size-box">
-                                <input type="number" id="font-size-val" value="11" min="1" max="100" onchange="window.applyFontSize(this.value)" class="font-size-input" title="글꼴 크기">
+                                <input type="number" id="font-size-val" value="11" min="1" max="100" onmousedown="event.preventDefault();" onchange="window.applyFontSize(this.value)" class="font-size-input" title="글꼴 크기">
                                 <span class="text-[10px] font-black text-slate-300 mr-1 uppercase">pt</span>
                             </div>
                             <div class="toolbar-group">
-                                <button type="button" onclick="window.formatDoc('justifyLeft')" class="toolbar-btn" title="왼쪽 정렬"><i data-lucide="align-left" class="w-4 h-4"></i></button>
-                                <button type="button" onclick="window.formatDoc('justifyCenter')" class="toolbar-btn" title="가운데 정렬"><i data-lucide="align-center" class="w-4 h-4"></i></button>
-                                <button type="button" onclick="window.formatDoc('justifyRight')" class="toolbar-btn" title="오른쪽 정렬"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                                <button type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('justifyLeft')" class="toolbar-btn" title="왼쪽 정렬"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                                <button type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('justifyCenter')" class="toolbar-btn" title="가운데 정렬"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                                <button type="button" onmousedown="event.preventDefault();" onclick="window.formatDoc('justifyRight')" class="toolbar-btn" title="오른쪽 정렬"><i data-lucide="align-right" class="w-4 h-4"></i></button>
                             </div>
                             <div class="color-palette-wrap flex items-center gap-2">
-                                <div id="selected-preview" class="custom-trigger bg-black" onclick="window.togglePalette()" title="글꼴 색상"></div>
+                                <div id="selected-preview" class="custom-trigger bg-black" onmousedown="event.preventDefault();" onclick="window.togglePalette()" title="글꼴 색상"></div>
                                 <div id="color-popup" class="fade-in">
                                     <div class="color-grid-theme" id="theme-colors"></div>
                                 </div>
@@ -152,7 +154,22 @@
                         </div>
                     </div>
 
-                    <div id="editor" contenteditable="true"></div>
+                    <!-- [신규] 에디터 및 이미지 플로팅 툴바 감싸는 영역 -->
+                    <div class="relative w-full">
+                        <!-- 이미지 전용 미니 툴바 (초기 숨김) -->
+                        <div id="img-toolbar" class="hidden absolute z-50 bg-[#0f172a] text-white rounded-xl shadow-2xl p-1.5 flex items-center gap-1 transition-all border border-slate-700">
+                            <button type="button" onmousedown="event.preventDefault();" onclick="window.alignImg('left')" class="p-2 hover:bg-slate-700 rounded-lg transition" title="왼쪽 정렬"><i data-lucide="align-left" class="w-4 h-4"></i></button>
+                            <button type="button" onmousedown="event.preventDefault();" onclick="window.alignImg('center')" class="p-2 hover:bg-slate-700 rounded-lg transition" title="가운데 정렬"><i data-lucide="align-center" class="w-4 h-4"></i></button>
+                            <button type="button" onmousedown="event.preventDefault();" onclick="window.alignImg('right')" class="p-2 hover:bg-slate-700 rounded-lg transition" title="오른쪽 정렬"><i data-lucide="align-right" class="w-4 h-4"></i></button>
+                            <div class="w-px h-5 bg-slate-600 mx-1"></div>
+                            <button type="button" onmousedown="event.preventDefault();" onclick="window.resizeImg('100%')" class="px-3 py-1.5 text-xs font-black hover:bg-slate-700 rounded-lg transition">100%</button>
+                            <button type="button" onmousedown="event.preventDefault();" onclick="window.resizeImg('50%')" class="px-3 py-1.5 text-xs font-black hover:bg-slate-700 rounded-lg transition">50%</button>
+                            <button type="button" onmousedown="event.preventDefault();" onclick="window.resizeImg('30%')" class="px-3 py-1.5 text-xs font-black hover:bg-slate-700 rounded-lg transition">30%</button>
+                        </div>
+                        
+                        <div id="editor" contenteditable="true"></div>
+                    </div>
+                    
                     <input type="hidden" id="edit-id">
                     <div class="flex gap-4 mt-10">
                         <button id="save-btn" type="button" class="flex-1 bg-[#0f172a] text-white p-6 rounded-2xl font-black text-xl hover:bg-black transition shadow-xl">PUBLISH NOTICE</button>
@@ -211,7 +228,59 @@
         let currentApplicantType = '전체';
         let inactivityTimeout;
 
-        /* --- [신규 기능] 이미지 직접 업로드 --- */
+        /* --- [신규] 이미지 전용 툴바 로직 --- */
+        let currentImg = null;
+        const imgToolbar = document.getElementById('img-toolbar');
+
+        editor.addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+                // 기존 선택 해제
+                if (currentImg) currentImg.classList.remove('selected-img');
+                
+                currentImg = e.target;
+                currentImg.classList.add('selected-img');
+                imgToolbar.classList.remove('hidden');
+                
+                // 이미지 우측 상단 근처로 툴바 위치 이동
+                imgToolbar.style.top = Math.max(0, currentImg.offsetTop - 50) + 'px';
+                imgToolbar.style.left = currentImg.offsetLeft + 'px';
+            } else {
+                // 빈 공간 클릭 시 툴바 숨김 및 선택 해제
+                if (currentImg) {
+                    currentImg.classList.remove('selected-img');
+                    currentImg = null;
+                }
+                imgToolbar.classList.add('hidden');
+            }
+        });
+
+        window.alignImg = (type) => {
+            if (!currentImg) return;
+            if (type === 'center') {
+                currentImg.style.display = 'block';
+                currentImg.style.margin = '1.5rem auto';
+                currentImg.style.float = 'none';
+            } else if (type === 'left') {
+                currentImg.style.display = 'inline-block';
+                currentImg.style.margin = '1rem 1rem 1rem 0';
+                currentImg.style.float = 'left';
+            } else if (type === 'right') {
+                currentImg.style.display = 'inline-block';
+                currentImg.style.margin = '1rem 0 1rem 1rem';
+                currentImg.style.float = 'right';
+            }
+            editor.focus();
+        };
+
+        window.resizeImg = (size) => {
+            if (!currentImg) return;
+            currentImg.style.width = size;
+            currentImg.style.height = 'auto'; // 비율 유지
+            editor.focus();
+        };
+
+
+        /* --- 이미지 직접 업로드 --- */
         window.handleImageUpload = (input) => {
             const file = input.files[0];
             if (!file) return;
@@ -227,7 +296,9 @@
                 () => {
                     getDownloadURL(uploadTask.snapshot.ref).then((url) => {
                         window.restoreSelection();
-                        document.execCommand('insertImage', false, url);
+                        // 이미지 삽입 시 기본 100% 꽉 차게 삽입되도록 스타일 추가
+                        const imgHTML = `<img src="${url}" style="width: 100%; height: auto;" referrerpolicy="no-referrer">`;
+                        document.execCommand('insertHTML', false, imgHTML);
                         progressArea.style.display = 'none'; progressBar.style.width = '0%'; input.value = "";
                     });
                 }
@@ -393,22 +464,20 @@
                 sel.removeAllRanges(); 
                 sel.addRange(lastSelection); 
             } else {
-                // 저장된 선택 영역이 없으면 에디터에 포커스
                 editor.focus();
             }
         };
 
-        // 툴바 버튼 클릭 시 에디터 포커스 잃는 문제 해결을 위해 이벤트 수정
         window.formatDoc = (command, value = null) => {
-            window.restoreSelection(); // 명령 실행 전 선택 영역 복구
+            window.restoreSelection();
             document.execCommand(command, false, value);
-            editor.focus(); // 명령 실행 후 에디터로 다시 포커스
+            editor.focus(); 
         };
 
         window.applyFontSize = (s) => { 
             if(!s) return; 
             window.restoreSelection(); 
-            document.execCommand('fontSize', false, "7"); // 임시로 7 설정
+            document.execCommand('fontSize', false, "7"); 
             const f = editor.getElementsByTagName("font"); 
             for (let i=0; i<f.length; i++) { 
                 if (f[i].size === "7") { 
@@ -425,18 +494,20 @@
             themeColors[0].forEach(c => { 
                 const d = document.createElement('div'); 
                 d.className='color-cell'; d.style.background=c; 
+                // [수정] 컬러 버튼 클릭 시에도 초점 유지
+                d.onmousedown = (e) => e.preventDefault();
                 d.onclick = () => { 
-                    window.restoreSelection(); // 색상 적용 전 선택 영역 복구
+                    window.restoreSelection(); 
                     document.execCommand('foreColor', false, c); 
                     document.getElementById('selected-preview').style.background = c; 
                     document.getElementById('color-popup').classList.remove('show'); 
-                    editor.focus(); // 적용 후 에디터 포커스
+                    editor.focus(); 
                 }; 
                 b.appendChild(d); 
             });
         }
         window.togglePalette = () => {
-            window.saveSelection(); // 팔레트 열기 전 선택 영역 저장
+            window.saveSelection();
             document.getElementById('color-popup').classList.toggle('show');
         };
 
@@ -462,14 +533,13 @@
         };
 
         window.deleteNotice = async (id) => { if(await window.showModal("삭제", "정말 삭제하시겠습니까?", "confirm")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); };
-        window.resetForm = () => { document.getElementById('notice-title').value = ""; editor.innerHTML = ""; document.getElementById('edit-id').value = ""; document.getElementById('cancel-edit-btn').classList.add('hidden'); };
+        window.resetForm = () => { document.getElementById('notice-title').value = ""; editor.innerHTML = ""; document.getElementById('edit-id').value = ""; document.getElementById('cancel-edit-btn').classList.add('hidden'); document.getElementById('img-toolbar').classList.add('hidden'); currentImg = null; };
         window.cancelEdit = async () => { if(await window.showModal("취소", "작성 중인 내용이 사라집니다.", "confirm")) window.resetForm(); };
         document.getElementById('logout-btn').onclick = () => signOut(auth);
 
-        // 에디터 내용 변경 또는 클릭/키보드 입력 시 현재 커서(선택 영역) 위치 저장
         editor.addEventListener('mouseup', window.saveSelection);
         editor.addEventListener('keyup', window.saveSelection);
-        editor.addEventListener('mouseleave', window.saveSelection); // 마우스가 에디터를 벗어날 때도 저장
+        editor.addEventListener('mouseleave', window.saveSelection); 
 
         lucide.createIcons();
     </script>
