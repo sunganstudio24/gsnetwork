@@ -130,13 +130,11 @@
 
             <!-- 공지사항 관리 섹션 -->
             <div id="section-notice" class="space-y-8">
-                <!-- 하위 메뉴 탭 -->
                 <div class="flex items-center gap-3 px-2">
                     <button onclick="window.switchNoticeSubTab('list')" id="subtab-notice-list" class="sub-tab-btn active">글 목록</button>
                     <button onclick="window.switchNoticeSubTab('write')" id="subtab-notice-write" class="sub-tab-btn">새 글 쓰기</button>
                 </div>
 
-                <!-- [탭 1] 글 목록 영역 -->
                 <div id="notice-list-container" class="space-y-6">
                     <div class="flex flex-col md:flex-row justify-between items-center px-2 gap-4">
                         <h3 class="font-black text-slate-400 uppercase text-xs tracking-widest mr-auto">Notice Inventory</h3>
@@ -158,7 +156,6 @@
                     <div id="manage-list" class="grid md:grid-cols-2 gap-4 pb-20"></div>
                 </div>
 
-                <!-- [탭 2] 글 쓰기/수정 영역 -->
                 <div id="notice-editor-container" class="hidden">
                     <div class="bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-100">
                         <div class="grid md:grid-cols-3 gap-6 mb-8">
@@ -280,8 +277,12 @@
         let noticeCategoryFilter = "전체"; 
         let currentApplicantType = '전체';
         let savedRange = null;
+        let inactivityTimeout;
+
+        window.isFormatting = false;
 
         window.saveSelection = () => {
+            if (window.isFormatting) return;
             const sel = window.getSelection();
             if (sel.rangeCount > 0 && editor.contains(sel.getRangeAt(0).commonAncestorContainer)) {
                 savedRange = sel.getRangeAt(0).cloneRange();
@@ -296,7 +297,9 @@
         };
 
         window.trackSelection = () => {
+            if (window.isFormatting) return;
             if (document.activeElement !== editor) return;
+            
             const sel = window.getSelection();
             if (sel.rangeCount > 0) {
                 let node = sel.getRangeAt(0).commonAncestorContainer;
@@ -322,24 +325,87 @@
             window.saveSelection(); window.trackSelection();
         };
 
+        // ==========================================
+        // [완벽 해결] DOM 파괴 방지 + Range 객체 보존 + Span 중첩 방지
+        // ==========================================
         window.applyFontSize = (val) => {
             if (!val) return;
-            editor.focus(); window.restoreSelection();
+            window.isFormatting = true;
+            
+            editor.focus(); 
+            window.restoreSelection();
+            
             const sel = window.getSelection();
-            if (!sel.rangeCount) return;
+            if (!sel.rangeCount) {
+                window.isFormatting = false;
+                return;
+            }
+            
             const range = sel.getRangeAt(0);
             
             if (range.collapsed) {
-                const span = document.createElement('span'); span.style.fontSize = val + 'pt'; span.innerHTML = '&#8203;';
+                // 커서 위치에 스타일이 적용된 빈 span 삽입
+                const span = document.createElement('span'); 
+                span.style.fontSize = val + 'pt'; 
+                span.innerHTML = '&#8203;'; // 제로 너비 공백
                 range.insertNode(span);
-                const newRange = document.createRange(); newRange.setStart(span.firstChild, 1); newRange.collapse(true);
-                sel.removeAllRanges(); sel.addRange(newRange);
+                
+                const newRange = document.createRange(); 
+                newRange.setStart(span.firstChild, 1); 
+                newRange.collapse(true);
+                sel.removeAllRanges(); 
+                sel.addRange(newRange);
             } else {
+                // 1. 스타일 적용 전 현재 선택 상태의 마커 삽입 (위치 고정용)
+                const startMarker = document.createElement('span');
+                startMarker.style.display = 'none';
+                startMarker.id = 'temp-selection-start';
+                
+                const endMarker = document.createElement('span');
+                endMarker.style.display = 'none';
+                endMarker.id = 'temp-selection-end';
+
+                const rangeClone = range.cloneRange();
+                rangeClone.collapse(false);
+                rangeClone.insertNode(endMarker);
+                
+                rangeClone.setStart(range.startContainer, range.startOffset);
+                rangeClone.collapse(true);
+                rangeClone.insertNode(startMarker);
+
+                // 마커 사이로 선택 영역 다시 설정
+                const workRange = document.createRange();
+                workRange.setStartAfter(startMarker);
+                workRange.setEndBefore(endMarker);
+                sel.removeAllRanges();
+                sel.addRange(workRange);
+
+                // 2. 브라우저 기본 기능을 이용해 기존 span 분할 및 중첩 방지
+                document.execCommand('styleWithCSS', false, true);
                 document.execCommand('fontSize', false, "7");
-                const fonts = editor.querySelectorAll("font[size='7']");
-                fonts.forEach(f => { f.removeAttribute('size'); f.style.fontSize = val + 'pt'; });
+
+                // 3. 생성된 요소들을 pt 단위로 교체 (In-place 수정)
+                const largeNodes = editor.querySelectorAll("span[style*='xxx-large'], span[style*='-webkit-xxx-large'], font[size='7']");
+                largeNodes.forEach(node => {
+                    if (node.tagName === 'FONT') node.removeAttribute('size');
+                    node.style.fontSize = val + 'pt';
+                });
+
+                // 4. 마커 위치를 기반으로 Range 복원 (커서 튐 방지)
+                const restoreRange = document.createRange();
+                restoreRange.setStartAfter(startMarker);
+                restoreRange.setEndBefore(endMarker);
+                sel.removeAllRanges();
+                sel.addRange(restoreRange);
+
+                // 5. 임시 마커 제거
+                startMarker.remove();
+                endMarker.remove();
             }
-            window.saveSelection(); window.trackSelection();
+            
+            window.saveSelection(); 
+            window.isFormatting = false;
+            window.trackSelection();
         };
 
         window.initFontSizePopup = () => {
@@ -361,9 +427,6 @@
         window.togglePalette = () => { document.getElementById('color-popup').classList.toggle('show'); document.getElementById('font-size-popup').classList.remove('show'); };
         window.applyColor = (color) => { if (!color) return; editor.focus(); window.restoreSelection(); document.execCommand('foreColor', false, color); document.getElementById('selected-preview').style.background = color; document.getElementById('color-popup').classList.remove('show'); window.saveSelection(); window.trackSelection(); };
 
-        // ==========================================
-        // 2. 제출 및 검증 로직 (오직 100ms 딜레이 후 모달 추가만 보완)
-        // ==========================================
         window.processSubmit = async () => {
             const t = document.getElementById('notice-title').value.trim();
             const co = editor.innerText.trim();
@@ -394,10 +457,7 @@
                 if (eid) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', eid), { ...d, updatedAt: serverTimestamp() });
                 else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), { ...d, createdAt: serverTimestamp() });
                 
-                // 브라우저가 이전 'confirm' 모달을 완전히 닫은 뒤 새 모달을 열 수 있도록 약간의 딜레이 추가
                 await new Promise(resolve => setTimeout(resolve, 100));
-                
-                // 기존 커스텀 모달로 알림 표시
                 await window.showModal("알림", "저장되었습니다.");
                 
                 window.resetForm();
@@ -408,9 +468,6 @@
             }
         };
 
-        // ==========================================
-        // 3. UI 제어 및 모달 시스템
-        // ==========================================
         window.showModal = (title, desc, type = 'alert') => {
             return new Promise((resolve) => {
                 const m = document.getElementById('custom-modal');
@@ -467,18 +524,12 @@
         window.editNotice = async (id) => {
             const s = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id));
             if (s.exists()) {
-                const d = s.data(); 
-                document.getElementById('notice-title').value = d.title; 
-                document.getElementById('notice-category').value = d.category || "지원공고"; 
-                editor.innerHTML = d.content; 
-                document.getElementById('edit-id').value = id; 
-                document.getElementById('cancel-edit-btn').classList.remove('hidden'); 
-                window.switchNoticeSubTab('write'); 
+                const d = s.data(); document.getElementById('notice-title').value = d.title; document.getElementById('notice-category').value = d.category || "지원공고"; editor.innerHTML = d.content; document.getElementById('edit-id').value = id; document.getElementById('cancel-edit-btn').classList.remove('hidden'); window.switchNoticeSubTab('write'); 
             }
         };
 
         window.deleteNotice = async (id) => { if(await window.showModal("삭제", "정말 삭제하시겠습니까?", "confirm")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)); };
-        window.resetForm = () => { document.getElementById('notice-title').value = ""; editor.innerHTML = ""; document.getElementById('edit-id').value = ""; document.getElementById('cancel-edit-btn').classList.add('hidden'); };
+        window.resetForm = () => { document.getElementById('notice-title').value = ""; editor.innerHTML = ""; document.getElementById('edit-id').value = ""; document.getElementById('cancel-edit-btn').classList.add('hidden'); window.hideImgOverlay(); };
         window.cancelEdit = async () => { if(await window.showModal("취소", "작성 중인 내용이 사라집니다.", "confirm")) { window.resetForm(); window.switchNoticeSubTab('list'); } };
 
         function renderApplicants() {
@@ -492,9 +543,6 @@
         window.setApplicantType = (type) => { currentApplicantType = type; document.querySelectorAll('.app-filter-btn').forEach(btn => { btn.classList.remove('active', 'bg-[#0f172a]', 'text-white'); btn.classList.add('text-slate-400'); }); const b = document.getElementById(`filter-${type === '전체' ? 'all' : (type === '창업자' ? 'founder' : 'expert')}`); b.classList.add('active', 'bg-[#0f172a]', 'text-white'); b.classList.remove('text-slate-400'); renderApplicants(); };
         window.deleteApplicant = async (id) => { if(await window.showModal("삭제", "정말 삭제하시겠습니까?", "confirm")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'applications', id)); };
 
-        // ==========================================
-        // 5. 초기화 및 시스템 연동
-        // ==========================================
         window.executeLogin = async () => {
             const e = document.getElementById('admin_id_input').value.trim(); const p = document.getElementById('admin_pw_input').value.trim();
             if(!e || !p) return window.showModal("알림", "아이디와 비밀번호를 모두 입력해주세요.");
@@ -503,9 +551,6 @@
         };
 
         document.querySelectorAll('#admin_id_input, #admin_pw_input').forEach(el => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); window.executeLogin(); } }));
-
-        let inactivityTimeout;
-        const resetTimer = () => { clearTimeout(inactivityTimeout); inactivityTimeout = setTimeout(async () => { if (auth.currentUser) { await signOut(auth); window.showModal("자동 로그아웃", "보안을 위해 30분간 활동이 없어 로그아웃되었습니다."); } }, 1000 * 60 * 30); };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -530,6 +575,8 @@
             } else { document.getElementById('login-section').classList.remove('hidden'); document.getElementById('admin-content').classList.add('hidden'); document.getElementById('auth-status').classList.add('hidden'); clearTimeout(inactivityTimeout); }
             lucide.createIcons();
         });
+
+        const resetTimer = () => { clearTimeout(inactivityTimeout); inactivityTimeout = setTimeout(async () => { if (auth.currentUser) { await signOut(auth); window.showModal("자동 로그아웃", "보안을 위해 30분간 활동이 없어 로그아웃되었습니다."); } }, 1000 * 60 * 30); };
 
         const fontSizesList = [6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 18, 20, 24, 32, 48, 72];
         window.initFontSizePopup = () => {
@@ -587,22 +634,8 @@
 
         editor.addEventListener('keydown', (e) => {
             if ((e.key === 'Backspace' || e.key === 'Delete') && currentImg) { e.preventDefault(); window.deleteCurrentImg(); return; }
-            if (e.key === 'Enter' && document.activeElement === editor) {
-                const targetFontSize = document.getElementById('font-size-val').value;
-                const isBold = document.getElementById('btn-bold').classList.contains('active');
-                setTimeout(() => {
-                    const sel = window.getSelection(); if (!sel.rangeCount) return;
-                    let node = sel.getRangeAt(0).commonAncestorContainer; if (node.nodeType === 3) node = node.parentNode;
-                    if (editor.contains(node)) {
-                        const computedStyle = window.getComputedStyle(node);
-                        if (Math.round(parseFloat(computedStyle.fontSize) * 0.75) != targetFontSize) window.applyFontSize(targetFontSize);
-                        if (isBold && (computedStyle.fontWeight === '400' || computedStyle.fontWeight === 'normal')) window.formatDoc('bold');
-                    }
-                }, 10); 
-            }
         });
 
-        document.getElementById('logout-btn').onclick = () => signOut(auth);
     </script>
 </body>
 </html>
