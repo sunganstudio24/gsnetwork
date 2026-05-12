@@ -128,10 +128,29 @@
             </div>
 
             <div id="section-notice" class="space-y-6">
-                <div class="flex justify-between items-center bg-platinum p-2 rounded-stripe-card border border-powder shadow-stripe-sm">
-                    <div class="flex items-center gap-1">
-                        <button onclick="window.switchNoticeSubTab('list')" id="subtab-notice-list" class="sub-tab-btn active">글 목록</button>
-                        <button onclick="window.switchNoticeSubTab('write')" id="subtab-notice-write" class="sub-tab-btn">새 글 쓰기</button>
+                <div class="bg-platinum rounded-stripe-card border border-powder shadow-stripe-sm overflow-hidden">
+                    <div class="flex justify-between items-center p-2 border-b border-powder">
+                        <div class="flex items-center gap-1">
+                            <button onclick="window.switchNoticeSubTab('list')" id="subtab-notice-list" class="sub-tab-btn active">글 목록</button>
+                            <button onclick="window.switchNoticeSubTab('write')" id="subtab-notice-write" class="sub-tab-btn">새 글 쓰기</button>
+                        </div>
+                    </div>
+                    <div id="notice-list-filters" class="flex items-center gap-3 px-3 py-2.5">
+                        <select id="manage-category-filter" onchange="window.filterNoticesByCategory(this.value)"
+                            class="text-[13px] font-medium text-midnight bg-porcelain border border-powder rounded-stripe-btn px-3 py-1.5 outline-none cursor-pointer appearance-none pr-7 hover:border-violet transition"
+                            style="min-width:120px; background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2350617a%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
+                            <option value="전체">전체 카테고리</option>
+                            <option value="지원공고">📢 지원공고</option>
+                            <option value="네트워킹">🤝 네트워킹</option>
+                            <option value="일반소식">📰 일반소식</option>
+                        </select>
+                        <div class="w-px h-4 bg-powder flex-shrink-0"></div>
+                        <div class="relative flex-1">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ghost pointer-events-none"></i>
+                            <input type="text" id="notice-search-input" oninput="window.filterNotices(this.value)"
+                                placeholder="제목으로 검색..."
+                                class="w-full pl-8 pr-4 py-1.5 text-[13px] bg-porcelain border border-powder rounded-stripe-btn outline-none text-midnight placeholder-ghost focus:border-violet focus:bg-white transition">
+                        </div>
                     </div>
                 </div>
 
@@ -141,7 +160,7 @@
                 <div id="notice-editor-container" class="hidden">
                     <div class="bg-platinum p-8 rounded-stripe-card shadow-stripe-sm border border-powder">
                         <div class="grid md:grid-cols-4 gap-4 mb-6">
-                            <select id="notice-category" class="stripe-input"><option value="지원공고">지원공고</option><option value="네트워킹">네트워킹</option><option value="일반소식">일반소식</option></select>
+                            <select id="notice-category" class="stripe-input appearance-none" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2350617a%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>'); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;"><option value="지원공고">지원공고</option><option value="네트워킹">네트워킹</option><option value="일반소식">일반소식</option></select>
                             <input type="text" id="notice-title" placeholder="제목을 입력하세요" class="stripe-input md:col-span-3">
                         </div>
 
@@ -223,7 +242,16 @@
                 </div>
             </div>
 
-            <div id="section-applicant" class="hidden"><div id="applicant-list" class="grid gap-4"></div></div>
+            <div id="section-applicant" class="hidden space-y-6">
+                <div class="flex justify-between items-center bg-platinum p-2 rounded-stripe-card border border-powder shadow-stripe-sm">
+                    <div class="flex gap-1">
+                        <button onclick="window.setApplicantType('전체')" class="app-filter-btn sub-tab-btn active" id="filter-all">전체</button>
+                        <button onclick="window.setApplicantType('창업자')" class="app-filter-btn sub-tab-btn" id="filter-founder">창업자</button>
+                        <button onclick="window.setApplicantType('전문가')" class="app-filter-btn sub-tab-btn" id="filter-expert">전문가</button>
+                    </div>
+                </div>
+                <div id="applicant-list" class="grid gap-4 pb-20"></div>
+            </div>
         </div>
     </div>
 
@@ -272,6 +300,7 @@
             editor.focus();
             window.restoreSelection();
             document.execCommand('bold', false, null);
+            window.activeStyle.bold = document.queryCommandState('bold');
             window.saveSelection();
             window.trackSelection();
         };
@@ -290,6 +319,7 @@
                 editor.querySelectorAll('font[size="7"]').forEach(el => {
                     const span = document.createElement('span');
                     span.style.fontSize = val + 'pt';
+                    if (window.activeStyle.bold) span.style.fontWeight = 'bold';
                     span.innerHTML = el.innerHTML;
                     el.parentNode.replaceChild(span, el);
                 });
@@ -328,12 +358,16 @@
             document.getElementById('subtab-notice-'+t).classList.add('active'); 
             document.getElementById('notice-list-container').classList.toggle('hidden', t!=='list'); 
             document.getElementById('notice-editor-container').classList.toggle('hidden', t!=='write'); 
+            document.getElementById('notice-list-filters').classList.toggle('hidden', t!=='list');
             if (t === 'write') {
                 document.getElementById('cancel-edit-btn').classList.remove('hidden');
             } else {
                 document.getElementById('cancel-edit-btn').classList.add('hidden');
             }
         };
+
+        window.filterNotices = (val) => { noticeSearchTerm = val.toLowerCase().trim(); renderNotices(); };
+        window.filterNoticesByCategory = (val) => { noticeCategoryFilter = val; renderNotices(); };
 
         window.formatDoc = (cmd, val = null) => { 
             editor.focus(); 
