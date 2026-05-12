@@ -509,12 +509,23 @@
             renderNotices();
         });
 
+        function stripHtml(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            return div.textContent || div.innerText || '';
+        }
+
+        window.applySearch = (t) => { currentSearchTerm = t.trim(); renderNotices(); };
+
         function renderNotices() {
             let filtered = allNotices;
             if (currentFilter !== '전체') filtered = filtered.filter(n => n.category === currentFilter);
             if (currentSearchTerm) {
                 const t = currentSearchTerm.toLowerCase();
-                filtered = filtered.filter(n => n.title.toLowerCase().includes(t) || n.content.toLowerCase().includes(t));
+                filtered = filtered.filter(n => 
+                    n.title.toLowerCase().includes(t) || 
+                    stripHtml(n.content).toLowerCase().includes(t)
+                );
             }
             document.getElementById('notice-list-container').innerHTML = filtered.map(n => `
                 <div class="px-6 py-6 border-b border-powder hover:bg-porcelain cursor-pointer group transition-colors" onclick="window.openNotice('${n.id}')">
@@ -540,8 +551,6 @@
                 }
             });
         };
-
-        window.applySearch = (t) => { currentSearchTerm = t.trim(); renderNotices(); };
 
         window.openNotice = (id) => {
             const n = allNotices.find(i => i.id === id); if(!n) return;
