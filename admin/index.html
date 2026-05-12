@@ -183,29 +183,37 @@
                             </div>
                         </div>
 
+                        <!-- 에디터 본문 -->
                         <div class="relative w-full" id="editor-container">
                             <div id="img-toolbar" class="hidden absolute z-50 bg-midnight text-white rounded p-1.5 flex items-center gap-1">
-                              <button onmousedown="event.preventDefault(); window.alignImg('left');" class="p-1.5 hover:bg-slate rounded"><i data-lucide="align-left" class="w-3 h-3"></i></button>
-                              <button onmousedown="event.preventDefault(); window.alignImg('center');" class="p-1.5 hover:bg-slate rounded"><i data-lucide="align-center" class="w-3 h-3"></i></button>
-                              <button onmousedown="event.preventDefault(); window.alignImg('right');" class="p-1.5 hover:bg-slate rounded"><i data-lucide="align-right" class="w-3 h-3"></i></button>
-                              <input type="number" id="img-width-input" class="w-12 h-6 bg-transparent text-white text-[11px] text-center border border-slate rounded outline-none" onmousedown="event.stopPropagation();" onchange="window.resizeImg(this.value + 'px')">
-                              <button onmousedown="event.preventDefault(); window.deleteCurrentImg();" class="p-1.5 text-vibrant hover:bg-slate rounded"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                                <button onmousedown="event.preventDefault(); window.alignImg('left');" class="p-1.5 hover:bg-slate rounded"><i data-lucide="align-left" class="w-3 h-3"></i></button>
+                                <button onmousedown="event.preventDefault(); window.alignImg('center');" class="p-1.5 hover:bg-slate rounded"><i data-lucide="align-center" class="w-3 h-3"></i></button>
+                                <button onmousedown="event.preventDefault(); window.alignImg('right');" class="p-1.5 hover:bg-slate rounded"><i data-lucide="align-right" class="w-3 h-3"></i></button>
+                                <input type="number" id="img-width-input" class="w-12 h-6 bg-transparent text-white text-[11px] text-center border border-slate rounded outline-none" onmousedown="event.stopPropagation();" onchange="window.resizeImg(this.value + 'px')">
+                                <button onmousedown="event.preventDefault(); window.deleteCurrentImg();" class="p-1.5 text-vibrant hover:bg-slate rounded"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                             </div>
                             <div id="img-resize-overlay">
-                              <div class="resize-handle handle-nw" data-pos="nw"></div>
-                              <div class="resize-handle handle-ne" data-pos="ne"></div>
-                              <div class="resize-handle handle-sw" data-pos="sw"></div>
-                              <div class="resize-handle handle-se" data-pos="se"></div>
+                                <div class="resize-handle handle-nw" data-pos="nw"></div>
+                                <div class="resize-handle handle-ne" data-pos="ne"></div>
+                                <div class="resize-handle handle-sw" data-pos="sw"></div>
+                                <div class="resize-handle handle-se" data-pos="se"></div>
                             </div>
                             <div id="editor" contenteditable="true"></div>
                         </div>
+
                         <input type="hidden" id="edit-id">
-                        
+
+                        <!-- 하단 액션바 -->
                         <div class="flex justify-between items-center mt-6">
-                            <label class="cursor-pointer bg-white border border-powder px-4 py-2 rounded-stripe-btn text-[13px] font-medium flex items-center gap-2">
-                                <i data-lucide="image" class="w-4 h-4"></i> 이미지 삽입
-                                <input type="file" id="image-upload" class="hidden" accept="image/*" onchange="window.handleImageUpload(this)">
-                            </label>
+                            <div class="flex flex-col gap-2">
+                                <label class="cursor-pointer bg-white border border-powder px-4 py-2 rounded-stripe-btn text-[13px] font-medium flex items-center gap-2">
+                                    <i data-lucide="image" class="w-4 h-4"></i> 이미지 삽입
+                                    <input type="file" id="image-upload" class="hidden" accept="image/*" onchange="window.handleImageUpload(this)">
+                                </label>
+                                <div id="upload-progress" style="display:none; width:100%; height:4px; background:#e5edf5; border-radius:99px; overflow:hidden; margin-top:4px;">
+                                    <div id="upload-bar" style="width:0%; height:100%; background:#533afd; transition:width 0.3s;"></div>
+                                </div>
+                            </div>
                             <div class="flex gap-3">
                                 <button id="cancel-edit-btn" onclick="window.cancelEdit()" class="hidden px-6 py-2 text-slate text-[13px]">취소</button>
                                 <button id="save-btn" class="px-8 py-3 bg-violet text-white rounded-stripe-btn font-medium shadow-sm">공지사항 등록</button>
@@ -272,6 +280,8 @@
             if (!val) return;
             window.activeStyle.size = val + 'pt';
             document.getElementById('font-size-val').value = val;
+            editor.focus();
+            window.restoreSelection();
             const sel = window.getSelection();
             if (sel.rangeCount && !sel.getRangeAt(0).collapsed) {
                 editor.focus();
@@ -318,6 +328,11 @@
             document.getElementById('subtab-notice-'+t).classList.add('active'); 
             document.getElementById('notice-list-container').classList.toggle('hidden', t!=='list'); 
             document.getElementById('notice-editor-container').classList.toggle('hidden', t!=='write'); 
+            if (t === 'write') {
+                document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('cancel-edit-btn').classList.add('hidden');
+            }
         };
 
         window.formatDoc = (cmd, val = null) => { 
