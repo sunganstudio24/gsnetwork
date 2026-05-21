@@ -109,26 +109,32 @@
     </nav>
 
     <main class="pt-[68px] md:pt-[84px]">
-        <section id="page-home" class="tab-content active relative bg-platinum overflow-hidden min-h-[600px] md:min-h-[800px] flex items-center">
-            <div class="absolute inset-0 bg-dreamy-gradient opacity-[0.15] mix-blend-multiply pointer-events-none"></div>
-            <div class="absolute -top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-soft opacity-10 blur-[100px] pointer-events-none"></div>
-            <div class="relative max-w-6xl mx-auto px-6 w-full fade-in flex flex-col md:flex-row items-center gap-12 z-10">
-                <div class="flex-1 text-left pt-12 md:pt-0">
-                    <div class="inline-block bg-porcelain border border-powder text-violet text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-widest mb-6 shadow-sm">Global Startup Support Network</div>
-                    <h1 class="text-[56px] md:text-[80px] font-light text-midnight leading-[1.05] tracking-tighter mb-6">경계를 넘는<br><span class="font-normal text-violet">성장의 인프라</span></h1>
-                    <p class="text-base md:text-lg text-slate max-w-lg mb-10 font-normal leading-relaxed">대한민국 스타트업의 글로벌 성공을 위한 압도적 네트워크. 전 세계 최고 수준의 전문가들과 함께 혁신의 궤도를 완성합니다.</p>
-                    <div class="flex flex-wrap gap-4">
-                        <button onclick="window.showPage('startup')" class="bg-violet text-platinum px-6 py-[15.5px] rounded-stripe-btn font-medium text-sm hover:bg-opacity-90 transition-all shadow-sm">창업 지원 시작하기</button>
-                        <button onclick="window.showPage('about')" class="bg-transparent text-midnight border border-stone px-6 py-[14.5px] rounded-stripe-btn font-medium text-sm hover:border-slate hover:bg-porcelain transition-all">비전 알아보기</button>
-                    </div>
-                </div>
-<div class="flex-1 hidden md:flex justify-center relative">
-    <div class="w-[400px] h-[500px] rounded-stripe-card overflow-hidden shadow-stripe-xl">
-        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80" alt="GSN Network" class="w-full h-full object-cover">
+<section id="page-home" class="tab-content active relative overflow-hidden min-h-[600px] md:min-h-[800px] flex items-center">
+    <!-- 배경 이미지 -->
+    <div class="absolute inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600&q=80" class="w-full h-full object-cover" alt="">
+        <div class="absolute inset-0 bg-midnight opacity-60"></div>
     </div>
-</div>
+
+    <div class="relative max-w-6xl mx-auto px-6 w-full fade-in z-10">
+        <div class="max-w-2xl">
+            <div class="inline-block border border-platinum/40 text-platinum text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-widest mb-6">
+                Global Startup Support Network
             </div>
-        </section>
+            <h1 class="text-[56px] md:text-[80px] font-light text-platinum leading-[1.05] tracking-tighter mb-6">
+                경계를 넘는<br>
+                <span class="font-normal text-soft">성장의 인프라</span>
+            </h1>
+            <p class="text-base md:text-lg text-platinum/70 max-w-lg mb-10 font-normal leading-relaxed">
+                대한민국 스타트업의 글로벌 성공을 위한 압도적 네트워크. 전 세계 최고 수준의 전문가들과 함께 혁신의 궤도를 완성합니다.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <button onclick="window.showPage('startup')" class="bg-violet text-platinum px-6 py-[15.5px] rounded-stripe-btn font-medium text-sm hover:bg-opacity-90 transition-all shadow-sm">창업 지원 시작하기</button>
+                <button onclick="window.showPage('about')" class="bg-transparent text-platinum border border-platinum/50 px-6 py-[14.5px] rounded-stripe-btn font-medium text-sm hover:bg-white/10 transition-all">비전 알아보기</button>
+            </div>
+        </div>
+    </div>
+</section>
 
         <section id="page-about" class="tab-content bg-porcelain">
             <div class="py-24 md:py-36 bg-midnight relative overflow-hidden">
