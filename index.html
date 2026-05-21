@@ -4,142 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>(사)글로벌창업지원네트워크 - GSN NETWORK</title>
-    
-    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Stripe Theme Tailwind Configuration -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        midnight: '#061b31',
-                        slate: '#50617a',
-                        ghost: '#64748d',
-                        platinum: '#ffffff',
-                        porcelain: '#f8fafd',
-                        powder: '#e5edf5',
-                        stone: '#d8d6df',
-                        violet: '#533afd',
-                        washed: '#b9b9f9',
-                        soft: '#8087ff',
-                        accentg: '#81b81a',
-                        vibrant: '#ff6118',
-                    },
-                    boxShadow: {
-                        'stripe-xl': '0px 0px 32px 8px rgba(0, 0, 0, 0.08)',
-                        'stripe-sm': '0px 3px 6px 0px rgba(23, 23, 23, 0.06)',
-                    },
-                    borderRadius: {
-                        'stripe-card': '6px',
-                        'stripe-btn': '4px',
-                    },
-                    fontFamily: {
-                        sans: ['sohne-var', 'system-ui', '-apple-system', 'sans-serif'],
-                    },
-                    backgroundImage: {
-                        'dreamy-gradient': 'radial-gradient(circle at 100% 0%, rgb(127, 125, 252) 0%, rgb(244, 75, 204) 33%, rgb(229, 237, 245) 66%, rgba(255,255,255,0) 100%)',
-                        'sunburst-gradient': 'linear-gradient(90deg, rgb(114, 50, 241) 3.13%, rgb(251, 118, 250) 50%, rgb(255, 207, 94))',
-                    }
+                    colors: { midnight: '#061b31', slate: '#50617a', ghost: '#64748d', platinum: '#ffffff', porcelain: '#f8fafd', powder: '#e5edf5', stone: '#d8d6df', violet: '#533afd', washed: '#b9b9f9', soft: '#8087ff', accentg: '#81b81a', vibrant: '#ff6118' },
+                    boxShadow: { 'stripe-xl': '0px 0px 32px 8px rgba(0,0,0,0.08)', 'stripe-sm': '0px 3px 6px 0px rgba(23,23,23,0.06)' },
+                    borderRadius: { 'stripe-card': '6px', 'stripe-btn': '4px' },
+                    fontFamily: { sans: ['sohne-var','system-ui','-apple-system','sans-serif'] },
+                    backgroundImage: { 'dreamy-gradient': 'radial-gradient(circle at 100% 0%, rgb(127,125,252) 0%, rgb(244,75,204) 33%, rgb(229,237,245) 66%, rgba(255,255,255,0) 100%)', 'sunburst-gradient': 'linear-gradient(90deg, rgb(114,50,241) 3.13%, rgb(251,118,250) 50%, rgb(255,207,94))' }
                 }
             }
         }
     </script>
-    
     <script src="https://unpkg.com/lucide@latest"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@100;300;400;500;600;700;800;900&display=swap');
-        body { font-family: 'Pretendard', 'sohne-var', sans-serif; scroll-behavior: smooth; background-color: #ffffff; color: #061b31; -webkit-font-smoothing: antialiased; }
-        
-        /* 탭 표시/숨김 로직 완벽 제어 (!important 추가로 flex 충돌 해결) */
+        body { font-family: 'Pretendard','sohne-var',sans-serif; scroll-behavior: smooth; background-color: #ffffff; color: #061b31; -webkit-font-smoothing: antialiased; }
         .tab-content:not(.active) { display: none !important; }
         .tab-content.active { animation: fadeIn 0.4s ease-out; }
-        
         .nav-link { position: relative; transition: all 0.2s; color: #64748d; font-weight: 500; font-size: 14px; }
         .nav-link:hover { color: #061b31; }
         .nav-link.active { color: #061b31 !important; font-weight: 600; }
-        .nav-link.active::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 100%; height: 2px; background-color: #533afd; }
-
-        .article-container { max-width: 800px; margin: 0 auto; padding: 0 1.5rem; }
-        .article-title { font-size: 2.5rem; font-weight: 300; color: #061b31; line-height: 1.15; margin-bottom: 1.5rem; word-break: keep-all; letter-spacing: -0.02em; }
-        .article-meta { color: #64748d; font-size: 13px; margin-bottom: 3rem; border-bottom: 1px solid #e5edf5; padding-bottom: 1.5rem; display: flex; gap: 15px; font-weight: 500; }
-        
-        .article-body { line-height: 1.8; color: #061b31; font-size: 16px; word-break: keep-all; font-weight: 400; }
-        .article-body b, .article-body strong { font-weight: 600; color: inherit; }
-        .article-body img { width: 100%; height: auto; display: block; margin: 2rem 0; border-radius: 4px; cursor: zoom-in; }
-
-        .cat-chip { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
-        .cat-지원공고 { background-color: #e5edf5; color: #533afd; }
-        .cat-네트워킹 { background-color: #f8fafd; color: #81b81a; border: 1px solid #e5edf5; }
-        .cat-일반소식 { background-color: #ffffff; color: #64748d; border: 1px solid #d8d6df; }
-
-        /* Stripe 스타일 폼 인풋 */
-        .stripe-input {
-            width: 100%; padding: 14px 16px; border-radius: 4px; border: 1px solid #d8d6df;
-            outline: none; background: #ffffff; color: #061b31; font-size: 14px; transition: border-color 0.2s, box-shadow 0.2s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-        }
-        .stripe-input:focus { border-color: #533afd; box-shadow: 0 0 0 3px rgba(83, 58, 253, 0.15); }
-        .stripe-input::placeholder { color: #64748d; font-weight: 400; }
-
-        /* 플로팅 메뉴 시스템 */
-        .floating-container { position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
-        .floating-menu { display: none; flex-direction: column; gap: 8px; margin-bottom: 5px; }
-        .floating-menu.show { display: flex; animation: slideUp 0.3s ease-out; }
-        
-        .sub-float-btn {
-            background: #ffffff; color: #061b31; padding: 12px 20px; border-radius: 6px;
-            font-size: 13px; font-weight: 600; box-shadow: 0px 0px 32px 8px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e5edf5; transition: transform 0.2s, color 0.2s; white-space: nowrap;
-        }
-        .sub-float-btn:hover { color: #533afd; transform: translateX(-4px); }
-
-        .main-float-btn {
-            background: #533afd; color: #ffffff; padding: 14px 24px; border-radius: 50px;
-            display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 14px;
-            box-shadow: 0px 0px 32px 8px rgba(83, 58, 253, 0.2); transition: transform 0.3s, background-color 0.2s; white-space: nowrap;
-        }
-        .main-float-btn:hover { background-color: #432ac7; transform: translateY(-2px); }
-
-        /* 커스텀 토스트 알림창 */
-        #custom-toast {
-            position: fixed; top: 40px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            z-index: 9999; background: #061b31; color: white; padding: 14px 28px; border-radius: 6px;
-            font-weight: 500; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex; align-items: center; gap: 12px; opacity: 0; pointer-events: none; width: 90%; max-width: 400px; justify-content: center;
-        }
-        #custom-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-        /* 이미지 확대 모달 */
-        #image-modal {
-            display: none; position: fixed; inset: 0; z-index: 2000;
-            background: rgba(6, 27, 49, 0.95); align-items: center; justify-content: center; cursor: zoom-out;
-        }
-        #image-modal img { max-width: 90%; max-height: 90%; border-radius: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* 체크박스 커스텀 */
-        input[type="checkbox"] { accent-color: #533afd; }
+        .nav-link.active::after { content:''; position:absolute; bottom:-8px; left:0; width:100%; height:2px; background-color:#533afd; }
+        .article-container { max-width:800px; margin:0 auto; padding:0 1.5rem; }
+        .article-title { font-size:2.5rem; font-weight:300; color:#061b31; line-height:1.15; margin-bottom:1.5rem; word-break:keep-all; letter-spacing:-0.02em; }
+        .article-meta { color:#64748d; font-size:13px; margin-bottom:3rem; border-bottom:1px solid #e5edf5; padding-bottom:1.5rem; display:flex; gap:15px; font-weight:500; }
+        .article-body { line-height:1.8; color:#061b31; font-size:16px; word-break:keep-all; font-weight:400; }
+        .article-body b, .article-body strong { font-weight:600; }
+        .article-body img { width:100%; height:auto; display:block; margin:2rem 0; border-radius:4px; cursor:zoom-in; }
+        .cat-chip { padding:4px 10px; border-radius:4px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; }
+        .cat-지원공고 { background-color:#e5edf5; color:#533afd; }
+        .cat-네트워킹 { background-color:#f8fafd; color:#81b81a; border:1px solid #e5edf5; }
+        .cat-일반소식 { background-color:#ffffff; color:#64748d; border:1px solid #d8d6df; }
+        .stripe-input { width:100%; padding:14px 16px; border-radius:4px; border:1px solid #d8d6df; outline:none; background:#ffffff; color:#061b31; font-size:14px; transition:border-color 0.2s,box-shadow 0.2s; box-shadow:0 1px 2px rgba(0,0,0,0.02); }
+        .stripe-input:focus { border-color:#533afd; box-shadow:0 0 0 3px rgba(83,58,253,0.15); }
+        .stripe-input::placeholder { color:#64748d; font-weight:400; }
+        .floating-container { position:fixed; bottom:30px; right:30px; z-index:1000; display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
+        .floating-menu { display:none; flex-direction:column; gap:8px; margin-bottom:5px; }
+        .floating-menu.show { display:flex; animation:slideUp 0.3s ease-out; }
+        .sub-float-btn { background:#ffffff; color:#061b31; padding:12px 20px; border-radius:6px; font-size:13px; font-weight:600; box-shadow:0px 0px 32px 8px rgba(0,0,0,0.08); border:1px solid #e5edf5; transition:transform 0.2s,color 0.2s; white-space:nowrap; }
+        .sub-float-btn:hover { color:#533afd; transform:translateX(-4px); }
+        .main-float-btn { background:#533afd; color:#ffffff; padding:14px 24px; border-radius:50px; display:flex; align-items:center; gap:10px; font-weight:500; font-size:14px; box-shadow:0px 0px 32px 8px rgba(83,58,253,0.2); transition:transform 0.3s,background-color 0.2s; white-space:nowrap; }
+        .main-float-btn:hover { background-color:#432ac7; transform:translateY(-2px); }
+        #custom-toast { position:fixed; top:40px; left:50%; transform:translateX(-50%) translateY(-100px); z-index:9999; background:#061b31; color:white; padding:14px 28px; border-radius:6px; font-weight:500; font-size:14px; box-shadow:0 10px 30px rgba(0,0,0,0.15); transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); display:flex; align-items:center; gap:12px; opacity:0; pointer-events:none; width:90%; max-width:400px; justify-content:center; }
+        #custom-toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+        #image-modal { display:none; position:fixed; inset:0; z-index:2000; background:rgba(6,27,49,0.95); align-items:center; justify-content:center; cursor:zoom-out; }
+        #image-modal img { max-width:90%; max-height:90%; border-radius:4px; box-shadow:0 20px 40px rgba(0,0,0,0.3); }
+        @keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .fade-in { animation:fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        input[type="checkbox"] { accent-color:#533afd; }
     </style>
 </head>
 <body>
-
-    <!-- 상단 데코레이션 띠 -->
     <div class="h-1 w-full absolute top-0 left-0 bg-sunburst-gradient z-[100]"></div>
-
-    <!-- 토스트 알림바 -->
     <div id="custom-toast">
         <i data-lucide="info" class="w-4 h-4 text-washed" id="toast-icon"></i>
         <span id="toast-msg">정상적으로 접수되었습니다.</span>
     </div>
-
-    <!-- 플로팅 메뉴 -->
     <div class="floating-container">
         <div id="float-menu" class="floating-menu">
             <button onclick="window.moveToApply('startup')" class="sub-float-btn">🚀 창업자 지원하기</button>
@@ -151,24 +76,15 @@
             <span class="md:hidden">지원하기</span>
         </button>
     </div>
-
-    <!-- 이미지 확대 -->
     <div id="image-modal" onclick="this.style.display='none'">
         <img id="modal-img" src="" alt="확대 이미지">
     </div>
-
-    <!-- 반응형 네비게이션 -->
     <nav class="fixed w-full z-50 bg-platinum/90 backdrop-blur-md border-b border-powder transition-all duration-300 top-1">
         <div class="max-w-6xl mx-auto px-6 h-16 md:h-20 flex justify-between items-center">
-            <!-- 로고 -->
             <div class="flex items-center gap-3 cursor-pointer relative z-50" onclick="window.showPage('home')">
-                <div class="w-8 h-8 md:w-9 md:h-9 bg-violet rounded-stripe-btn flex items-center justify-center text-platinum shadow-sm">
-                    <i data-lucide="layers" class="w-4 h-4 md:w-5 md:h-5"></i>
-                </div>
+                <div class="w-8 h-8 md:w-9 md:h-9 bg-violet rounded-stripe-btn flex items-center justify-center text-platinum shadow-sm"><i data-lucide="layers" class="w-4 h-4 md:w-5 md:h-5"></i></div>
                 <span class="text-[17px] md:text-lg font-light tracking-tight text-midnight">GSN <span class="font-semibold">Network</span></span>
             </div>
-            
-            <!-- PC 환경 메뉴 -->
             <div class="hidden md:flex items-center space-x-10">
                 <button id="nav-about" onclick="window.showPage('about')" class="nav-link">소개/비전</button>
                 <button id="nav-startup" onclick="window.showPage('startup')" class="nav-link">창업자 모집</button>
@@ -177,14 +93,10 @@
                 <div class="h-4 w-px bg-stone mx-2"></div>
                 <button onclick="location.href='./admin/'" class="text-[11px] font-medium text-ghost hover:text-violet transition-colors tracking-widest uppercase">Admin</button>
             </div>
-
-            <!-- 모바일 햄버거 버튼 -->
             <button class="md:hidden text-midnight p-2 relative z-50 hover:bg-powder rounded-stripe-btn transition" onclick="window.toggleMobileMenu()">
                 <i data-lucide="menu" id="mobile-menu-icon" class="w-6 h-6"></i>
             </button>
         </div>
-
-        <!-- 모바일 드롭다운 메뉴 -->
         <div id="mobile-menu" class="hidden md:hidden absolute top-[100%] left-0 w-full bg-platinum/95 backdrop-blur-xl border-b border-powder shadow-stripe-xl flex-col py-6 px-8 space-y-5">
             <button onclick="window.showPage('about'); window.toggleMobileMenu()" class="text-left text-lg font-light tracking-tight text-midnight hover:text-violet transition">소개 / 비전</button>
             <button onclick="window.showPage('startup'); window.toggleMobileMenu()" class="text-left text-lg font-light tracking-tight text-midnight hover:text-violet transition">창업자 모집</button>
@@ -197,184 +109,234 @@
     </nav>
 
     <main class="pt-[68px] md:pt-[84px]">
-        <!-- 홈 섹션 -->
         <section id="page-home" class="tab-content active relative bg-platinum overflow-hidden min-h-[600px] md:min-h-[800px] flex items-center">
-            <!-- Stripe 스타일 배경 그라데이션 장식 -->
             <div class="absolute inset-0 bg-dreamy-gradient opacity-[0.15] mix-blend-multiply pointer-events-none"></div>
             <div class="absolute -top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-soft opacity-10 blur-[100px] pointer-events-none"></div>
-            
             <div class="relative max-w-6xl mx-auto px-6 w-full fade-in flex flex-col md:flex-row items-center gap-12 z-10">
                 <div class="flex-1 text-left pt-12 md:pt-0">
-                    <div class="inline-block bg-porcelain border border-powder text-violet text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-widest mb-6 shadow-sm">
-                        Global Startup Support Network
-                    </div>
-                    <h1 class="text-[56px] md:text-[80px] font-light text-midnight leading-[1.05] tracking-tighter mb-6">
-                        경계를 넘는<br>
-                        <span class="font-normal text-violet">성장의 인프라</span>
-                    </h1>
-                    <p class="text-base md:text-lg text-slate max-w-lg mb-10 font-normal leading-relaxed">
-                        대한민국 스타트업의 글로벌 성공을 위한 압도적 네트워크. 전 세계 최고 수준의 전문가들과 함께 혁신의 궤도를 완성합니다.
-                    </p>
+                    <div class="inline-block bg-porcelain border border-powder text-violet text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-widest mb-6 shadow-sm">Global Startup Support Network</div>
+                    <h1 class="text-[56px] md:text-[80px] font-light text-midnight leading-[1.05] tracking-tighter mb-6">경계를 넘는<br><span class="font-normal text-violet">성장의 인프라</span></h1>
+                    <p class="text-base md:text-lg text-slate max-w-lg mb-10 font-normal leading-relaxed">대한민국 스타트업의 글로벌 성공을 위한 압도적 네트워크. 전 세계 최고 수준의 전문가들과 함께 혁신의 궤도를 완성합니다.</p>
                     <div class="flex flex-wrap gap-4">
-                        <button onclick="window.showPage('startup')" class="bg-violet text-platinum px-6 py-[15.5px] rounded-stripe-btn font-medium text-sm hover:bg-opacity-90 transition-all shadow-sm">
-                            창업 지원 시작하기
-                        </button>
-                        <button onclick="window.showPage('about')" class="bg-transparent text-midnight border border-stone px-6 py-[14.5px] rounded-stripe-btn font-medium text-sm hover:border-slate hover:bg-porcelain transition-all">
-                            비전 알아보기
-                        </button>
+                        <button onclick="window.showPage('startup')" class="bg-violet text-platinum px-6 py-[15.5px] rounded-stripe-btn font-medium text-sm hover:bg-opacity-90 transition-all shadow-sm">창업 지원 시작하기</button>
+                        <button onclick="window.showPage('about')" class="bg-transparent text-midnight border border-stone px-6 py-[14.5px] rounded-stripe-btn font-medium text-sm hover:border-slate hover:bg-porcelain transition-all">비전 알아보기</button>
                     </div>
                 </div>
-                <!-- 우측 장식 그래픽 요소 -->
                 <div class="flex-1 hidden md:flex justify-center relative">
                     <div class="w-[400px] h-[500px] bg-porcelain rounded-stripe-card border border-powder shadow-stripe-xl flex flex-col p-6 overflow-hidden">
-                        <div class="flex gap-2 mb-6">
-                            <div class="w-3 h-3 rounded-full bg-stone"></div><div class="w-3 h-3 rounded-full bg-stone"></div><div class="w-3 h-3 rounded-full bg-stone"></div>
+                        <div class="grid grid-cols-2 gap-4 w-full h-full">
+                            <div class="bg-white border border-powder p-6 rounded flex flex-col items-center justify-center">
+                                <p class="text-3xl font-light text-midnight mb-1">8년</p>
+                                <p class="text-xs text-ghost uppercase tracking-wider">설립 연혁</p>
+                            </div>
+                            <div class="bg-white border border-powder p-6 rounded flex flex-col items-center justify-center">
+                                <p class="text-3xl font-light text-midnight mb-1">100+</p>
+                                <p class="text-xs text-ghost uppercase tracking-wider">전문가 네트워크</p>
+                            </div>
+                            <div class="bg-white border border-powder p-6 rounded flex flex-col items-center justify-center">
+                                <p class="text-3xl font-light text-midnight mb-1">4개</p>
+                                <p class="text-xs text-ghost uppercase tracking-wider">핵심 사업 분야</p>
+                            </div>
+                            <div class="bg-white border border-powder p-6 rounded flex flex-col items-center justify-center">
+                                <p class="text-3xl font-light text-midnight mb-1">부울경</p>
+                                <p class="text-xs text-ghost uppercase tracking-wider">주요 활동 권역</p>
+                            </div>
                         </div>
-                        <div class="w-full h-32 bg-powder rounded-[4px] mb-4"></div>
-                        <div class="w-3/4 h-6 bg-powder rounded-[4px] mb-2"></div>
-                        <div class="w-1/2 h-6 bg-powder rounded-[4px] mb-8"></div>
-                        <div class="mt-auto w-full h-1 bg-sunburst-gradient opacity-50"></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 소개 섹션 -->
-        <section id="page-about" class="tab-content py-24 md:py-32 bg-porcelain">
-            <div class="max-w-5xl mx-auto px-6">
-                <div class="text-center mb-20">
-                    <span class="text-violet font-semibold text-[11px] uppercase tracking-widest mb-2 block">Our Purpose</span>
-                    <h2 class="text-[32px] md:text-[44px] font-light text-midnight tracking-tight mb-6">비전 및 미션</h2>
-                    <p class="text-slate text-base max-w-2xl mx-auto">글로벌 무대에서 대한민국 기업의 가능성을 증명합니다.</p>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-8">
-                    <!-- 비전 카드 -->
-                    <div class="bg-platinum p-10 md:p-12 rounded-stripe-card shadow-stripe-xl border border-powder relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-powder rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
-                        <div class="w-12 h-12 bg-powder text-violet rounded-stripe-btn flex items-center justify-center mb-8">
-                            <i data-lucide="eye" class="w-6 h-6"></i>
+        <section id="page-about" class="tab-content bg-porcelain">
+            <div class="py-24 md:py-36 bg-midnight relative overflow-hidden">
+                <div class="absolute inset-0 bg-dreamy-gradient opacity-10 pointer-events-none"></div>
+                <div class="max-w-5xl mx-auto px-6 relative z-10">
+                    <span class="text-washed font-semibold text-[11px] uppercase tracking-widest mb-4 block">Our Purpose</span>
+                    <h2 class="text-[36px] md:text-[60px] font-light text-platinum tracking-tighter leading-[1.05] mb-16 max-w-3xl">국경 없는 창업 생태계,<br><span class="text-soft">글로벌 스탠다드</span>를 만듭니다.</h2>
+                    <div class="grid md:grid-cols-2 gap-px bg-white/10">
+                        <div class="bg-midnight/80 backdrop-blur p-10 md:p-12">
+                            <p class="text-[11px] font-semibold text-washed uppercase tracking-widest mb-4">Vision</p>
+                            <p class="text-[14px] text-platinum/80 leading-relaxed font-light">대한민국 기업이 글로벌 스탠다드가 되는 세상을 만듭니다.</p>
                         </div>
-                        <h3 class="text-2xl font-light text-midnight tracking-tight mb-4">Vision</h3>
-                        <p class="text-[15px] text-slate leading-relaxed font-normal">
-                            "국경 없는 창업 생태계를 주도하여 대한민국 기업이 글로벌 스탠다드가 되는 세상을 만듭니다."
-                        </p>
+                        <div class="bg-midnight/80 backdrop-blur p-10 md:p-12">
+                            <p class="text-[11px] font-semibold text-washed uppercase tracking-widest mb-4">Mission</p>
+                            <ul class="space-y-3 text-[15px] text-platinum/70 font-light">
+                                <li class="flex items-start gap-3"><span class="text-accentg mt-0.5">→</span>실질적인 글로벌 진출 가이드라인 구축</li>
+                                <li class="flex items-start gap-3"><span class="text-accentg mt-0.5">→</span>산·학·연 글로벌 전문가 네트워크 연계</li>
+                                <li class="flex items-start gap-3"><span class="text-accentg mt-0.5">→</span>지속 가능한 창업 인프라 투자 및 지원</li>
+                            </ul>
+                        </div>
                     </div>
-
-                    <!-- 미션 카드 -->
-                    <div class="bg-platinum p-10 md:p-12 rounded-stripe-card shadow-stripe-xl border border-powder relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-powder rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
-                        <div class="w-12 h-12 bg-powder text-violet rounded-stripe-btn flex items-center justify-center mb-8">
-                            <i data-lucide="target" class="w-6 h-6"></i>
+                </div>
+            </div>
+            <div class="py-20 md:py-28 bg-platinum">
+                <div class="max-w-5xl mx-auto px-6">
+                    <div class="flex flex-col md:flex-row md:items-end gap-4 mb-16">
+                        <div class="flex-1">
+                            <span class="text-violet font-semibold text-[11px] uppercase tracking-widest mb-2 block">Organization</span>
+                            <h2 class="text-[28px] md:text-[40px] font-light text-midnight tracking-tight">법인 개요</h2>
                         </div>
-                        <h3 class="text-2xl font-light text-midnight tracking-tight mb-4">Mission</h3>
-                        <ul class="space-y-4 text-[15px] text-slate font-normal">
-                            <li class="flex items-start gap-3">
-                                <i data-lucide="check" class="text-accentg w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                                실질적인 글로벌 진출 가이드라인 구축
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <i data-lucide="check" class="text-accentg w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                                산·학·연 글로벌 전문가 네트워크 연계
-                            </li>
-                            <li class="flex items-start gap-3">
-                                <i data-lucide="check" class="text-accentg w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                                지속 가능한 창업 인프라 투자 및 지원
-                            </li>
-                        </ul>
+                        <p class="text-slate text-[13px] leading-relaxed">중소벤처기업부 소관 비영리법인으로 2017년 설립, 부울경 창업 생태계를 선도합니다.</p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 border border-powder">
+                        <div class="p-8 border-r border-b md:border-b-0 border-powder">
+                            <p class="text-[40px] font-light text-midnight tracking-tighter leading-none mb-2">8<span class="text-violet text-[24px]">년</span></p>
+                            <p class="text-[12px] text-ghost font-medium uppercase tracking-wider">설립 연혁</p>
+                        </div>
+                        <div class="p-8 border-b md:border-r md:border-b-0 border-powder">
+                            <p class="text-[40px] font-light text-midnight tracking-tighter leading-none mb-2">100<span class="text-violet text-[24px]">+</span></p>
+                            <p class="text-[12px] text-ghost font-medium uppercase tracking-wider">전문가 네트워크</p>
+                        </div>
+                        <div class="p-8 border-r border-powder">
+                            <p class="text-[40px] font-light text-midnight tracking-tighter leading-none mb-2">4<span class="text-violet text-[24px]">개</span></p>
+                            <p class="text-[12px] text-ghost font-medium uppercase tracking-wider">핵심 사업 분야</p>
+                        </div>
+                        <div class="p-8">
+                            <p class="text-[40px] font-light text-midnight tracking-tighter leading-none mb-2">부울경</p>
+                            <p class="text-[12px] text-ghost font-medium uppercase tracking-wider">주요 활동 권역</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 grid md:grid-cols-3 gap-4">
+                        <div class="border border-powder p-7">
+                            <p class="text-[11px] text-ghost font-semibold uppercase tracking-widest mb-3">설립일</p>
+                            <p class="text-[15px] font-medium text-midnight">2017. 12. 01</p>
+                            <p class="text-[12px] text-slate mt-1">중소벤처기업부 허가</p>
+                        </div>
+                        <div class="border border-powder p-7">
+                            <p class="text-[11px] text-ghost font-semibold uppercase tracking-widest mb-3">소재지</p>
+                            <p class="text-[15px] font-medium text-midnight">부산 중구 충장대로 5번길 37</p>
+                            <p class="text-[12px] text-slate mt-1">중앙동 4가</p>
+                        </div>
+                        <div class="border border-powder p-7">
+                            <p class="text-[11px] text-ghost font-semibold uppercase tracking-widest mb-3">업태</p>
+                            <p class="text-[15px] font-medium text-midnight">경영컨설팅 · 학술연구</p>
+                            <p class="text-[12px] text-slate mt-1">창업교육 · 직업소개</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 border-l-2 border-violet pl-8 py-4">
+                        <p class="text-[11px] text-ghost font-semibold uppercase tracking-widest mb-2">설립 목적</p>
+                        <p class="text-[14px] text-slate font-light leading-relaxed" style="word-break: keep-all;">부산·울산·경남(부울경) 지역의 창의적 인재 발굴 및 육성을 통한 건전한 창업 생태계 조성, 양질의 일자리 창출 및 지역 경제 발전에 기여합니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="py-20 md:py-28 bg-porcelain border-t border-powder">
+                <div class="max-w-5xl mx-auto px-6">
+                    <div class="mb-16">
+                        <span class="text-violet font-semibold text-[11px] uppercase tracking-widest mb-2 block">Business Areas</span>
+                        <h2 class="text-[28px] md:text-[40px] font-light text-midnight tracking-tight">주요 사업 분야</h2>
+                    </div>
+                    <div class="divide-y divide-powder">
+                        <div class="py-10 flex flex-col md:flex-row md:items-start gap-6 group">
+                            <span class="text-[60px] font-light text-powder leading-none w-20 flex-shrink-0 group-hover:text-violet transition-colors duration-300">01</span>
+                            <div class="flex-1 md:pt-3"><h3 class="text-[20px] font-medium text-midnight mb-3">창업 멘토링 및 교육</h3><p class="text-[15px] text-slate leading-relaxed">창업자와 벤처 1세대 CEO 및 분야별 전문가 매칭을 통한 맞춤형 창업 지도, 핵심역량 교육 프로그램 운영</p></div>
+                        </div>
+                        <div class="py-10 flex flex-col md:flex-row md:items-start gap-6 group">
+                            <span class="text-[60px] font-light text-powder leading-none w-20 flex-shrink-0 group-hover:text-violet transition-colors duration-300">02</span>
+                            <div class="flex-1 md:pt-3"><h3 class="text-[20px] font-medium text-midnight mb-3">글로벌 창업 지원</h3><p class="text-[15px] text-slate leading-relaxed">글로벌 창업 인재 및 전문 창업 멘토 발굴·양성, 국내외 네트워크 구축</p></div>
+                        </div>
+                        <div class="py-10 flex flex-col md:flex-row md:items-start gap-6 group">
+                            <span class="text-[60px] font-light text-powder leading-none w-20 flex-shrink-0 group-hover:text-violet transition-colors duration-300">03</span>
+                            <div class="flex-1 md:pt-3"><h3 class="text-[20px] font-medium text-midnight mb-3">정부 및 지자체 수탁 사업</h3><p class="text-[15px] text-slate leading-relaxed">지자체 발주 용역, 도시재생 및 취약지역 생활여건 개조사업, 주민 역량 강화 프로그램 기획 및 운영</p></div>
+                        </div>
+                        <div class="py-10 flex flex-col md:flex-row md:items-start gap-6 group">
+                            <span class="text-[60px] font-light text-powder leading-none w-20 flex-shrink-0 group-hover:text-violet transition-colors duration-300">04</span>
+                            <div class="flex-1 md:pt-3"><h3 class="text-[20px] font-medium text-midnight mb-3">창업 학술연구 및 컨설팅</h3><p class="text-[15px] text-slate leading-relaxed">창업 관련 학술연구용역 수행, 소상공인·스타트업 경영 컨설팅 및 성장 지원</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="py-20 md:py-28 bg-platinum border-t border-powder">
+                <div class="max-w-5xl mx-auto px-6">
+                    <div class="mb-16">
+                        <span class="text-violet font-semibold text-[11px] uppercase tracking-widest mb-2 block">History</span>
+                        <h2 class="text-[28px] md:text-[40px] font-light text-midnight tracking-tight">연혁</h2>
+                    </div>
+                    <div class="mb-16">
+                        <div class="flex items-baseline gap-6 mb-8 pb-4 border-b-2 border-midnight">
+                            <span class="text-[48px] md:text-[72px] font-light text-midnight tracking-tighter leading-none">2017</span>
+                            <span class="text-[48px] md:text-[72px] font-light text-powder tracking-tighter leading-none">— 18</span>
+                            <span class="text-[13px] font-medium text-slate ml-2">설립 및 기반 구축</span>
+                        </div>
+                        <div class="space-y-4 pl-4">
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2017. 09</span><span class="text-slate">창립총회 개최 — 벤처 1세대 CEO 멘토 7명 발기, 각 분야 전문가 100명 회원 구성</span></div>
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2017. 12</span><span class="text-slate">중소벤처기업부(부산지방중소벤처기업청) 비영리법인 설립 허가 및 법인 등록</span></div>
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2018. 07</span><span class="text-slate">수익사업 개시를 위한 사업자등록 완료</span></div>
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2018. 08</span><span class="text-slate">생활혁신형 아이디어 창업지원사업 수행 — 한국생산성본부 연계, 부울경·대구경북·서울강원</span></div>
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2018. 11</span><span class="text-slate">대학생 창업캠프 특강 및 멘토링 수행 (동원과학기술대학교)</span></div>
+                        </div>
+                    </div>
+                    <div class="mb-16">
+                        <div class="flex items-baseline gap-6 mb-8 pb-4 border-b-2 border-midnight">
+                            <span class="text-[48px] md:text-[72px] font-light text-midnight tracking-tighter leading-none">2019</span>
+                            <span class="text-[48px] md:text-[72px] font-light text-powder tracking-tighter leading-none">— 21</span>
+                            <span class="text-[13px] font-medium text-slate ml-2">창업 지원 및 멘토링 고도화</span>
+                        </div>
+                        <div class="space-y-4 pl-4">
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2019 – 21</span><span class="text-slate">대학생·소상공인 서포터즈 멘토링 및 컨설팅 사업 수행 (부산경제진흥원)</span></div>
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2019. 02</span><span class="text-slate">창업멘토링 활성화 — 김해중장년창업지원센터, 부산창업카페, 비즈니스센터 입주기업 등</span></div>
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2019. 02</span><span class="text-slate">성공·실패 경험을 보유한 CEO 경력자 대상 전문 멘토 교육 운영</span></div>
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2019. 10</span><span class="text-slate">부산특화상품(미역·다시마) 연구개발 용역 수행 (한국수산자원공단)</span></div>
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2019. 11</span><span class="text-slate">우리동네 골목 활력 증진 컨설팅 수행 (부산경제진흥원)</span></div>
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2020 – 21</span><span class="text-slate">비대면 온라인 지원 강화 — 오픈채팅 즉석 멘토링, 양산·하동·산청·김해 창업농 온라인 교육</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-6 mb-8 pb-4 border-b-2 border-accentg">
+                            <span class="text-[48px] md:text-[72px] font-light text-midnight tracking-tighter leading-none">2022</span>
+                            <span class="text-[48px] md:text-[72px] font-light text-accentg/30 tracking-tighter leading-none">— 현재</span>
+                            <span class="text-[13px] font-medium text-accentg ml-2">지역 상생 및 위탁 사업 다각화</span>
+                        </div>
+                        <div class="space-y-4 pl-4">
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2022 –</span><span class="text-slate">지역 창업보육센터 입주기업-CEO 멘토 매칭 지원사업 매년 지속 (한국청년기업가정신재단)</span></div>
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2022. 03</span><span class="text-slate">기장군 일광면 광산마을 취약지역 생활여건 개조사업 — 휴먼케어·역량강화 용역 및 준공백서 발간 (기장군청, ~2024.12)</span></div>
+                            <div class="flex gap-6 text-[14px]"><span class="text-ghost font-medium w-24 flex-shrink-0">2024. 03</span><span class="text-slate">안동시 하회마을 명소화 추진사업 개발 용역 1~2년차 수행 (안동시청, ~2025.05)</span></div>
+                            <div class="flex gap-6 text-[14px] items-start"><span class="text-ghost font-medium w-24 flex-shrink-0">2026. 02</span><span class="text-slate flex items-center gap-2 flex-wrap">일광 도시재생 뉴딜 가족특화 프로그램 운영 용역 — 다문화가정 멘토링 등 (기장군청, ~2026.10) <span class="inline-block bg-accentg/10 text-accentg text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">진행 중</span></span></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 창업자 모집 -->
         <section id="page-startup" class="tab-content py-24 md:py-32 bg-platinum">
             <div class="max-w-2xl mx-auto px-6">
                 <div class="text-center mb-12">
                     <h2 class="text-[32px] md:text-[44px] font-light text-midnight tracking-tight mb-4">창업자 지원</h2>
                     <p class="text-slate text-[15px]">글로벌 진출을 꿈꾸는 혁신적인 스타트업을 기다립니다.</p>
                 </div>
-
                 <form id="startup-form" class="bg-porcelain p-8 md:p-12 rounded-stripe-card border border-powder shadow-stripe-sm space-y-6">
                     <div class="grid md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">성함 / 기업명</label>
-                            <input type="text" name="name" required placeholder="John Doe / Company" class="stripe-input">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">연락처</label>
-                            <input type="tel" name="phone" required placeholder="010-0000-0000" class="stripe-input">
-                        </div>
+                        <div><label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">성함 / 기업명</label><input type="text" name="name" required placeholder="John Doe / Company" class="stripe-input"></div>
+                        <div><label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">연락처</label><input type="tel" name="phone" required placeholder="010-0000-0000" class="stripe-input"></div>
                     </div>
-                    <div>
-                        <label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">이메일 주소</label>
-                        <input type="email" name="email" required placeholder="you@company.com" class="stripe-input">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">상세 지원 내용</label>
-                        <textarea name="field" required placeholder="귀사의 비즈니스 모델과 지원이 필요한 분야를 자세히 설명해 주세요." class="stripe-input h-32 md:h-40 resize-none"></textarea>
-                    </div>
-                    
-                    <div class="pt-2 pb-4">
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" required class="w-4 h-4 cursor-pointer">
-                            <span class="text-[13px] font-medium text-slate group-hover:text-midnight transition">개인정보 수집 및 이용에 동의합니다.</span>
-                        </label>
-                    </div>
-
-                    <button type="submit" id="startup-btn" class="w-full bg-violet text-platinum py-[15.5px] rounded-stripe-btn font-medium text-[15px] shadow-sm hover:bg-opacity-90 transition">
-                        지원서 제출하기
-                    </button>
+                    <div><label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">이메일 주소</label><input type="email" name="email" required placeholder="you@company.com" class="stripe-input"></div>
+                    <div><label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">상세 지원 내용</label><textarea name="field" required placeholder="귀사의 비즈니스 모델과 지원이 필요한 분야를 자세히 설명해 주세요." class="stripe-input h-32 md:h-40 resize-none"></textarea></div>
+                    <div class="pt-2 pb-4"><label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" required class="w-4 h-4 cursor-pointer"><span class="text-[13px] font-medium text-slate group-hover:text-midnight transition">개인정보 수집 및 이용에 동의합니다.</span></label></div>
+                    <button type="submit" id="startup-btn" class="w-full bg-violet text-platinum py-[15.5px] rounded-stripe-btn font-medium text-[15px] shadow-sm hover:bg-opacity-90 transition">지원서 제출하기</button>
                 </form>
             </div>
         </section>
 
-        <!-- 전문가 모집 (디자인 통일 완료) -->
         <section id="page-expert" class="tab-content py-24 md:py-32 bg-platinum">
             <div class="max-w-2xl mx-auto px-6">
                 <div class="text-center mb-12">
                     <h2 class="text-[32px] md:text-[44px] font-light text-midnight tracking-tight mb-4">전문가 등록</h2>
                     <p class="text-slate text-[15px]">스타트업의 성장을 이끌어주실 각 분야의 스페셜리스트를 모십니다.</p>
                 </div>
-
                 <form id="expert-form" class="bg-porcelain p-8 md:p-12 rounded-stripe-card border border-powder shadow-stripe-sm space-y-6">
                     <div class="grid md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">성함</label>
-                            <input type="text" name="name" required placeholder="John Doe" class="stripe-input">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">연락처</label>
-                            <input type="tel" name="phone" required placeholder="010-0000-0000" class="stripe-input">
-                        </div>
+                        <div><label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">성함</label><input type="text" name="name" required placeholder="John Doe" class="stripe-input"></div>
+                        <div><label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">연락처</label><input type="tel" name="phone" required placeholder="010-0000-0000" class="stripe-input"></div>
                     </div>
-                    <div>
-                        <label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">이메일 주소</label>
-                        <input type="email" name="email" required placeholder="expert@domain.com" class="stripe-input">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">주요 경력 및 전문 분야</label>
-                        <textarea name="field" required placeholder="멘토링 또는 자문이 가능한 분야와 핵심 이력을 입력해 주세요." class="stripe-input h-32 md:h-40 resize-none"></textarea>
-                    </div>
-                    
-                    <div class="pt-2 pb-4">
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="checkbox" required class="w-4 h-4 cursor-pointer">
-                            <span class="text-[13px] font-medium text-slate group-hover:text-midnight transition">전문가 풀 등록을 위한 정보 수집 및 이용에 동의합니다.</span>
-                        </label>
-                    </div>
-
-                    <button type="submit" id="expert-btn" class="w-full bg-violet text-platinum py-[15.5px] rounded-stripe-btn font-medium text-[15px] shadow-sm hover:bg-opacity-90 transition">
-                        등록 신청하기
-                    </button>
+                    <div><label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">이메일 주소</label><input type="email" name="email" required placeholder="expert@domain.com" class="stripe-input"></div>
+                    <div><label class="block text-[11px] font-medium text-slate uppercase tracking-widest mb-2">주요 경력 및 전문 분야</label><textarea name="field" required placeholder="멘토링 또는 자문이 가능한 분야와 핵심 이력을 입력해 주세요." class="stripe-input h-32 md:h-40 resize-none"></textarea></div>
+                    <div class="pt-2 pb-4"><label class="flex items-center gap-3 cursor-pointer group"><input type="checkbox" required class="w-4 h-4 cursor-pointer"><span class="text-[13px] font-medium text-slate group-hover:text-midnight transition">전문가 풀 등록을 위한 정보 수집 및 이용에 동의합니다.</span></label></div>
+                    <button type="submit" id="expert-btn" class="w-full bg-violet text-platinum py-[15.5px] rounded-stripe-btn font-medium text-[15px] shadow-sm hover:bg-opacity-90 transition">등록 신청하기</button>
                 </form>
             </div>
         </section>
 
-        <!-- 공지사항 -->
         <section id="page-board" class="tab-content py-24 md:py-32 bg-platinum min-h-screen">
             <div class="max-w-4xl mx-auto px-6">
-                <!-- 리스트 뷰 -->
                 <div id="notice-list-view">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
                         <div class="w-full">
@@ -391,32 +353,19 @@
                             <input type="text" placeholder="검색어 입력..." oninput="window.applySearch(this.value)" class="stripe-input py-[10px] pl-9 text-[13px] bg-porcelain">
                         </div>
                     </div>
-                    
                     <div class="bg-platinum rounded-stripe-card border border-powder overflow-hidden shadow-sm">
-                        <div id="notice-list-container" class="divide-y divide-powder">
-                            <!-- 리스트 렌더링 구역 -->
-                        </div>
+                        <div id="notice-list-container" class="divide-y divide-powder"></div>
                     </div>
                 </div>
-
-                <!-- 상세 뷰 -->
                 <div id="notice-detail-view" class="hidden fade-in bg-platinum rounded-stripe-card border border-powder shadow-stripe-sm p-8 md:p-12">
                     <div class="flex justify-between items-center mb-8 border-b border-powder pb-6">
-                        <button onclick="window.backToList()" class="flex items-center gap-2 text-slate hover:text-midnight font-medium transition text-[13px]">
-                            <i data-lucide="arrow-left" class="w-4 h-4"></i> 돌아가기
-                        </button>
-                        <button onclick="window.copyNoticeURL()" class="flex items-center gap-2 bg-porcelain px-3 py-1.5 border border-stone rounded-stripe-btn text-[12px] font-medium text-slate hover:bg-powder transition">
-                            <i data-lucide="link" class="w-3 h-3"></i> 주소 복사
-                        </button>
+                        <button onclick="window.backToList()" class="flex items-center gap-2 text-slate hover:text-midnight font-medium transition text-[13px]"><i data-lucide="arrow-left" class="w-4 h-4"></i> 돌아가기</button>
+                        <button onclick="window.copyNoticeURL()" class="flex items-center gap-2 bg-porcelain px-3 py-1.5 border border-stone rounded-stripe-btn text-[12px] font-medium text-slate hover:bg-powder transition"><i data-lucide="link" class="w-3 h-3"></i> 주소 복사</button>
                     </div>
                     <div class="article-container max-w-none px-0">
                         <div id="detail-category" class="mb-4"></div>
                         <h1 id="detail-title" class="article-title"></h1>
-                        <div class="article-meta mb-10">
-                            <span id="detail-date"></span>
-                            <span class="text-stone">|</span>
-                            <span class="text-midnight font-medium">GSN Official</span>
-                        </div>
+                        <div class="article-meta mb-10"><span id="detail-date"></span><span class="text-stone">|</span><span class="text-midnight font-medium">GSN Official</span></div>
                         <div id="detail-body" class="article-body"></div>
                     </div>
                 </div>
@@ -429,247 +378,35 @@
         <p class="text-ghost text-[10px] font-medium uppercase tracking-widest px-4">© 2026 Global Startup Support Network. All rights reserved.</p>
     </footer>
 
-    <!-- ========================================== -->
-    <!-- ⚙️ 엔진 구역 (이전 코드에서 100% 동일하게 유지됨) -->
-    <!-- ========================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCCr3Gv_Tij97ZOyiScptXxiPnzhZ9XTYc",
-            authDomain: "gsnetwork.firebaseapp.com",
-            projectId: "gsnetwork",
-            storageBucket: "gsnetwork.firebasestorage.app",
-            messagingSenderId: "627864872176",
-            appId: "1:627864872176:web:cafd0d1dae27097be04e35"
-        };
-
+        const firebaseConfig = { apiKey:"AIzaSyCCr3Gv_Tij97ZOyiScptXxiPnzhZ9XTYc", authDomain:"gsnetwork.firebaseapp.com", projectId:"gsnetwork", storageBucket:"gsnetwork.firebasestorage.app", messagingSenderId:"627864872176", appId:"1:627864872176:web:cafd0d1dae27097be04e35" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = "gsnetwork";
-
-        // 모바일 메뉴 토글
-        window.toggleMobileMenu = () => {
-            const menu = document.getElementById('mobile-menu');
-            const icon = document.getElementById('mobile-menu-icon');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                menu.classList.add('flex');
-                icon.setAttribute('data-lucide', 'x');
-            } else {
-                menu.classList.add('hidden');
-                menu.classList.remove('flex');
-                icon.setAttribute('data-lucide', 'menu');
-            }
-            lucide.createIcons();
-        };
-
-        window.showToast = (msg, isError = false) => {
-            const toast = document.getElementById('custom-toast');
-            const icon = document.getElementById('toast-icon');
-            document.getElementById('toast-msg').innerText = msg;
-            
-            if (isError) {
-                icon.setAttribute('data-lucide', 'alert-circle');
-                icon.classList.remove('text-washed');
-                icon.classList.add('text-vibrant');
-            } else {
-                icon.setAttribute('data-lucide', 'check-circle');
-                icon.classList.remove('text-vibrant');
-                icon.classList.add('text-washed');
-            }
-            
-            lucide.createIcons();
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3500);
-        };
-
-        window.toggleFloatMenu = () => {
-            const menu = document.getElementById('float-menu');
-            const icon = document.getElementById('float-icon');
-            menu.classList.toggle('show');
-            icon.setAttribute('data-lucide', menu.classList.contains('show') ? 'x' : 'plus');
-            lucide.createIcons();
-        };
+        window.toggleMobileMenu = () => { const menu=document.getElementById('mobile-menu'); const icon=document.getElementById('mobile-menu-icon'); if(menu.classList.contains('hidden')){menu.classList.remove('hidden');menu.classList.add('flex');icon.setAttribute('data-lucide','x');}else{menu.classList.add('hidden');menu.classList.remove('flex');icon.setAttribute('data-lucide','menu');} lucide.createIcons(); };
+        window.showToast = (msg, isError=false) => { const toast=document.getElementById('custom-toast'); const icon=document.getElementById('toast-icon'); document.getElementById('toast-msg').innerText=msg; if(isError){icon.setAttribute('data-lucide','alert-circle');icon.classList.remove('text-washed');icon.classList.add('text-vibrant');}else{icon.setAttribute('data-lucide','check-circle');icon.classList.remove('text-vibrant');icon.classList.add('text-washed');} lucide.createIcons(); toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),3500); };
+        window.toggleFloatMenu = () => { const menu=document.getElementById('float-menu'); const icon=document.getElementById('float-icon'); menu.classList.toggle('show'); icon.setAttribute('data-lucide',menu.classList.contains('show')?'x':'plus'); lucide.createIcons(); };
         window.moveToApply = (id) => { window.showPage(id); window.toggleFloatMenu(); };
-
-        let allNotices = [];
-        let currentFilter = '전체';
-        let currentSearchTerm = '';
-
-        window.copyNoticeURL = () => {
-            navigator.clipboard.writeText(window.location.href).then(() => window.showToast("주소가 복사되었습니다."));
-        };
-
-        onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notices'), orderBy("createdAt", "desc")), (snapshot) => {
-            allNotices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderNotices();
-        });
-
-        function stripHtml(html) {
-            const div = document.createElement('div');
-            div.innerHTML = html;
-            return div.textContent || div.innerText || '';
-        }
-
-        window.applySearch = (t) => { currentSearchTerm = t.trim(); renderNotices(); };
-
-        function renderNotices() {
-            let filtered = allNotices;
-            if (currentFilter !== '전체') filtered = filtered.filter(n => n.category === currentFilter);
-            if (currentSearchTerm) {
-                const t = currentSearchTerm.toLowerCase();
-                filtered = filtered.filter(n => 
-                    n.title.toLowerCase().includes(t) || 
-                    stripHtml(n.content).toLowerCase().includes(t)
-                );
-            }
-            document.getElementById('notice-list-container').innerHTML = filtered.map(n => `
-                <div class="px-6 py-6 border-b border-powder hover:bg-porcelain cursor-pointer group transition-colors" onclick="window.openNotice('${n.id}')">
-                    <div class="flex items-center gap-3 mb-2">
-                        <span class="cat-chip cat-${n.category || '일반소식'}">${n.category || '일반소식'}</span>
-                        <span class="text-ghost text-[12px] font-medium">${n.date}</span>
-                    </div>
-                    <h3 class="text-lg font-medium text-midnight group-hover:text-violet transition line-clamp-1">${n.title}</h3>
-                </div>`).join('') || '<p class="text-slate py-10 text-center font-medium">등록된 내용이 없습니다.</p>';
-            lucide.createIcons();
-        }
-
-        window.applyFilter = (c) => { 
-            currentFilter = c; 
-            renderNotices(); 
-            
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                const isMatch = (btn.innerText === c) || (c === '전체' && btn.innerText === 'All');
-                if (isMatch) {
-                    btn.className = "filter-btn px-4 py-1.5 rounded-full text-[12px] font-medium bg-midnight text-platinum transition";
-                } else {
-                    btn.className = "filter-btn px-4 py-1.5 rounded-full text-[12px] font-medium bg-porcelain text-slate hover:bg-powder transition";
-                }
-            });
-        };
-
-        window.openNotice = (id) => {
-            const n = allNotices.find(i => i.id === id); if(!n) return;
-            document.getElementById('notice-list-view').classList.add('hidden');
-            document.getElementById('notice-detail-view').classList.remove('hidden');
-            document.getElementById('detail-category').innerHTML = `<span class="cat-chip cat-${n.category}">${n.category}</span>`;
-            document.getElementById('detail-title').innerText = n.title;
-            document.getElementById('detail-date').innerText = n.date;
-            document.getElementById('detail-body').innerHTML = n.content;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            history.pushState({ page: 'board', noticeId: id }, null, `#board?id=${id}`);
-
-            document.querySelectorAll('#detail-body img').forEach(img => {
-                img.onclick = () => { document.getElementById('modal-img').src = img.src; document.getElementById('image-modal').style.display = 'flex'; };
-            });
-        };
-
-        window.backToList = () => { 
-            document.getElementById('notice-list-view').classList.remove('hidden'); 
-            document.getElementById('notice-detail-view').classList.add('hidden'); 
-            history.pushState({ page: 'board' }, null, `#board`);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.showPage = (id, pushHistory = true) => {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById('page-' + id)?.classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.getElementById('nav-' + id)?.classList.add('active');
-            
-            if (id === 'board' && pushHistory) {
-                document.getElementById('notice-list-view').classList.remove('hidden');
-                document.getElementById('notice-detail-view').classList.add('hidden');
-            }
-
-            if (pushHistory) {
-                history.pushState({ page: id }, null, `#${id}`);
-            }
-        };
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const hash = window.location.hash.replace('#', '').split('?')[0] || 'home';
-            window.showPage(hash, false);
-        });
-
-        window.addEventListener('popstate', (e) => {
-            const hash = window.location.hash.replace('#', '').split('?')[0] || 'home';
-            if(hash === 'board' && !window.location.hash.includes('?id=')) {
-                document.getElementById('notice-list-view').classList.remove('hidden');
-                document.getElementById('notice-detail-view').classList.add('hidden');
-            }
-            window.showPage(hash, false);
-        });
-
-        async function submitApplication(formId, type) {
-            const form = document.getElementById(formId);
-            const btn = form.querySelector('button[type="submit"]');
-            btn.innerText = "처리 중...";
-            btn.disabled = true;
-
-            try {
-                try {
-                    if (!auth.currentUser) { 
-                        await signInAnonymously(auth); 
-                    }
-                } catch (authErr) {
-                    console.error("Auth 권한 오류:", authErr);
-                    window.showToast("접수 권한 오류! (관리자에게 문의하세요)", true);
-                    return;
-                }
-
-                const fd = new FormData(form);
-                const data = {
-                    type: type, name: fd.get('name'), phone: fd.get('phone'), email: fd.get('email'),
-                    content: fd.get('field'), createdAt: serverTimestamp(), date: new Date().toLocaleDateString('ko-KR')
-                };
-
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'applications'), data);
-                } catch (dbErr) {
-                    console.error("DB 저장 오류:", dbErr);
-                    window.showToast("데이터 저장 오류! (잠시 후 다시 시도해주세요)", true);
-                    return; 
-                }
-
-                try {
-                    await emailjs.send("service_yk6n7mo", "template_4ys4qgh", {
-                        type: type,
-                        from_name: data.name,
-                        phone: data.phone,
-                        email: data.email,
-                        content: data.content,
-                        to_email: "sunganstudio24@gmail.com"
-                    });
-                } catch (emailErr) {
-                    console.error("이메일 발송 오류:", emailErr);
-                    window.showToast("접수 완료! (단, 내부 알림 발송이 지연되고 있습니다)");
-                    form.reset();
-                    return; 
-                }
-
-                window.showToast("정상적으로 접수되었습니다. 곧 연락드릴게요!");
-                form.reset();
-
-            } catch (fatalErr) {
-                console.error("알 수 없는 오류:", fatalErr);
-                window.showToast("시스템 오류가 발생했습니다. 다시 시도해 주세요.", true);
-            } finally {
-                btn.innerText = (type === '창업자' ? "지원서 제출하기" : "등록 신청하기");
-                btn.disabled = false;
-            }
-        }
-
+        let allNotices=[]; let currentFilter='전체'; let currentSearchTerm='';
+        window.copyNoticeURL = () => { navigator.clipboard.writeText(window.location.href).then(()=>window.showToast("주소가 복사되었습니다.")); };
+        onSnapshot(query(collection(db,'artifacts',appId,'public','data','notices'),orderBy("createdAt","desc")),(snapshot)=>{ allNotices=snapshot.docs.map(doc=>({id:doc.id,...doc.data()})); renderNotices(); });
+        function stripHtml(html){const div=document.createElement('div');div.innerHTML=html;return div.textContent||div.innerText||'';}
+        window.applySearch=(t)=>{currentSearchTerm=t.trim();renderNotices();};
+        function renderNotices(){let filtered=allNotices;if(currentFilter!=='전체')filtered=filtered.filter(n=>n.category===currentFilter);if(currentSearchTerm){const t=currentSearchTerm.toLowerCase();filtered=filtered.filter(n=>n.title.toLowerCase().includes(t)||stripHtml(n.content).toLowerCase().includes(t));}document.getElementById('notice-list-container').innerHTML=filtered.map(n=>`<div class="px-6 py-6 border-b border-powder hover:bg-porcelain cursor-pointer group transition-colors" onclick="window.openNotice('${n.id}')"><div class="flex items-center gap-3 mb-2"><span class="cat-chip cat-${n.category||'일반소식'}">${n.category||'일반소식'}</span><span class="text-ghost text-[12px] font-medium">${n.date}</span></div><h3 class="text-lg font-medium text-midnight group-hover:text-violet transition line-clamp-1">${n.title}</h3></div>`).join('')||'<p class="text-slate py-10 text-center font-medium">등록된 내용이 없습니다.</p>';lucide.createIcons();}
+        window.applyFilter=(c)=>{currentFilter=c;renderNotices();document.querySelectorAll('.filter-btn').forEach(btn=>{const isMatch=(btn.innerText===c)||(c==='전체'&&btn.innerText==='All');if(isMatch){btn.className="filter-btn px-4 py-1.5 rounded-full text-[12px] font-medium bg-midnight text-platinum transition";}else{btn.className="filter-btn px-4 py-1.5 rounded-full text-[12px] font-medium bg-porcelain text-slate hover:bg-powder transition";}});};
+        window.openNotice=(id)=>{const n=allNotices.find(i=>i.id===id);if(!n)return;document.getElementById('notice-list-view').classList.add('hidden');document.getElementById('notice-detail-view').classList.remove('hidden');document.getElementById('detail-category').innerHTML=`<span class="cat-chip cat-${n.category}">${n.category}</span>`;document.getElementById('detail-title').innerText=n.title;document.getElementById('detail-date').innerText=n.date;document.getElementById('detail-body').innerHTML=n.content;window.scrollTo({top:0,behavior:'smooth'});history.pushState({page:'board',noticeId:id},null,`#board?id=${id}`);document.querySelectorAll('#detail-body img').forEach(img=>{img.onclick=()=>{document.getElementById('modal-img').src=img.src;document.getElementById('image-modal').style.display='flex';};});};
+        window.backToList=()=>{document.getElementById('notice-list-view').classList.remove('hidden');document.getElementById('notice-detail-view').classList.add('hidden');history.pushState({page:'board'},null,`#board`);window.scrollTo({top:0,behavior:'smooth'});};
+        window.showPage=(id,pushHistory=true)=>{document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('page-'+id)?.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));document.getElementById('nav-'+id)?.classList.add('active');if(id==='board'&&pushHistory){document.getElementById('notice-list-view').classList.remove('hidden');document.getElementById('notice-detail-view').classList.add('hidden');}if(pushHistory){history.pushState({page:id},null,`#${id}`);}};
+        window.addEventListener('DOMContentLoaded',()=>{const hash=window.location.hash.replace('#','').split('?')[0]||'home';window.showPage(hash,false);});
+        window.addEventListener('popstate',(e)=>{const hash=window.location.hash.replace('#','').split('?')[0]||'home';if(hash==='board'&&!window.location.hash.includes('?id=')){document.getElementById('notice-list-view').classList.remove('hidden');document.getElementById('notice-detail-view').classList.add('hidden');}window.showPage(hash,false);});
+        async function submitApplication(formId,type){const form=document.getElementById(formId);const btn=form.querySelector('button[type="submit"]');btn.innerText="처리 중...";btn.disabled=true;try{try{if(!auth.currentUser){await signInAnonymously(auth);}}catch(authErr){console.error("Auth 권한 오류:",authErr);window.showToast("접수 권한 오류! (관리자에게 문의하세요)",true);return;}const fd=new FormData(form);const data={type:type,name:fd.get('name'),phone:fd.get('phone'),email:fd.get('email'),content:fd.get('field'),createdAt:serverTimestamp(),date:new Date().toLocaleDateString('ko-KR')};try{await addDoc(collection(db,'artifacts',appId,'public','data','applications'),data);}catch(dbErr){console.error("DB 저장 오류:",dbErr);window.showToast("데이터 저장 오류! (잠시 후 다시 시도해주세요)",true);return;}try{await emailjs.send("service_yk6n7mo","template_4ys4qgh",{type:type,from_name:data.name,phone:data.phone,email:data.email,content:data.content,to_email:"sunganstudio24@gmail.com"});}catch(emailErr){console.error("이메일 발송 오류:",emailErr);window.showToast("접수 완료! (단, 내부 알림 발송이 지연되고 있습니다)");form.reset();return;}window.showToast("정상적으로 접수되었습니다. 곧 연락드릴게요!");form.reset();}catch(fatalErr){console.error("알 수 없는 오류:",fatalErr);window.showToast("시스템 오류가 발생했습니다. 다시 시도해 주세요.",true);}finally{btn.innerText=(type==='창업자'?"지원서 제출하기":"등록 신청하기");btn.disabled=false;}}
         emailjs.init("vGFkDB_DP_DlBxsHM");
-        document.getElementById('startup-form').onsubmit = (e) => { e.preventDefault(); submitApplication('startup-form', '창업자'); };
-        document.getElementById('expert-form').onsubmit = (e) => { e.preventDefault(); submitApplication('expert-form', '전문가'); };
-
+        document.getElementById('startup-form').onsubmit=(e)=>{e.preventDefault();submitApplication('startup-form','창업자');};
+        document.getElementById('expert-form').onsubmit=(e)=>{e.preventDefault();submitApplication('expert-form','전문가');};
         lucide.createIcons();
     </script>
 </body>
